@@ -113,7 +113,7 @@ requireAuth(function init(){
   $('btnBoard').onclick=()=>{$('q').value='';$('btnBoard').classList.add('on');$('btnOut').classList.remove('on');renderBoard();};
 
   function doSearch(raw){
-    $('btnOut').classList.remove('on');
+    $('btnOut').classList.remove('on');$('btnBoard').classList.remove('on');
     const q=raw.trim().toUpperCase();
     if(!q){$('res').innerHTML='<div class="empty">Search to begin 請輸入查詢</div>';return;}
     let list=[];
