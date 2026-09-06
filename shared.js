@@ -2,7 +2,7 @@
 firebase.initializeApp(FIREBASE_CONFIG);
 const db   = firebase.database();
 const auth = firebase.auth();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); // 登入一次，裝置長期保持
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 const HOUSE_META = {
   K:{color:'#e5484d',text:'#ffffff'},  // K 紅
@@ -11,6 +11,16 @@ const HOUSE_META = {
   C:{color:'#f5b90f',text:'#161200'}   // C 黃
 };
 function houseMeta(h){ h=String(h||'').toUpperCase().trim(); return HOUSE_META[h]||{color:'#7e8aa2',text:'#fff'}; }
+
+/* ---- 活動場景 ---- */
+const SCENARIOS = {
+  track:{ en:'Sports Day',    zh:'陸運會',
+          in:{en:'INSIDE STAND', zh:'看台內'}, out:{en:'OUTSIDE STAND', zh:'看台外'} },
+  swim: { en:'Swimming Gala', zh:'水運會',
+          in:{en:'INSIDE VENUE', zh:'場館內'}, out:{en:'OUTSIDE VENUE', zh:'場館外'} }
+};
+function scenarioMeta(k){ return SCENARIOS[k] || SCENARIOS.track; }
+function watchScenario(cb){ db.ref('config/scenario').on('value',s=>cb(s.val()==='swim'?'swim':'track')); }
 
 const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pad2 = n=>String(n).padStart(2,'0');
@@ -54,7 +64,7 @@ function showLock(){
   if(document.getElementById('lock'))return;
   const el=document.createElement('div');el.id='lock';
   el.innerHTML=`<form id="lockForm">
-    <div class="mk">G<b>A</b>TE <span style="font-size:12px;color:#8fa1c5;letter-spacing:.2em">PASS SYSTEM 進出記錄系統</span></div>
+    <div class="mk">G<b>A</b>TE <span style="font-size:12px;color:#8fa1c5;letter-spacing:.2em">EVENT PASS SYSTEM 進出記錄系統</span></div>
     <h1>Staff Access<span>職員登入</span></h1>
     <input id="lockPwd" type="password" placeholder="Password 密碼" autocomplete="current-password" required>
     <button type="submit">UNLOCK 進入</button>
