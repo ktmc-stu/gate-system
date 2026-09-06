@@ -12,7 +12,7 @@
 body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
  background:radial-gradient(1000px 480px at 92% -10%,rgba(75,139,255,.14),transparent 60%),radial-gradient(800px 480px at -6% 110%,rgba(255,178,36,.1),transparent 60%),var(--ink)}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
-.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 26px;border-bottom:1px solid var(--line);background:rgba(9,15,29,.65);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 26px;border-bottom:1px solid var(--line);background:rgba(9,15,29,.65);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);flex-wrap:wrap}
 .brand{font-family:Archivo;font-weight:900;font-size:21px;letter-spacing:.05em}.brand b{color:var(--amber)}.brand span{font-size:12px;color:var(--dim);font-weight:500;margin-left:8px;letter-spacing:.15em}
 .tabs{display:flex;gap:6px}
 .tab{background:none;border:1px solid transparent;color:var(--dim);padding:9px 18px;border-radius:99px;font-weight:700;font-size:14px;cursor:pointer}
@@ -40,7 +40,7 @@ section.pane.on{display:block}
 .drop{border:2px dashed var(--line);border-radius:12px;padding:34px;text-align:center;color:var(--dim);cursor:pointer;transition:.2s;margin-top:14px}
 .drop:hover,.drop.over{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.05)}
 .drop b{display:block;font-size:16px;color:var(--text);margin-bottom:4px}
-.radios{display:flex;gap:18px;margin-top:14px;font-size:13.5px;color:var(--dim)}
+.radios{display:flex;gap:18px;margin-top:14px;font-size:13.5px;color:var(--dim);flex-wrap:wrap}
 .radios label{display:flex;gap:7px;align-items:center;cursor:pointer}.radios input{accent-color:var(--amber)}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0}
 .toolbar input[type=text],.toolbar input[type=date],input.num{background:#0c1526;border:1px solid #31477a;color:var(--text);border-radius:9px;padding:10px 13px;font-size:14px;outline:none}
@@ -54,7 +54,6 @@ tbody tr{transition:.12s}tbody tr:hover td{background:rgba(255,255,255,.03)}
 .op{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;margin-right:6px}
 .op:hover{color:var(--amber);border-color:var(--amber)}
 .op.del:hover{color:var(--red);border-color:var(--red)}
-.hchip.dim2{background:#37435c}
 .count-line{font-size:12.5px;color:var(--faint);margin-top:10px}
 #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:#182742;border:1px solid var(--amber);color:var(--text);padding:12px 22px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99}
 #toast.show{opacity:1;transform:translateX(-50%)}
@@ -76,7 +75,7 @@ tbody tr{transition:.12s}tbody tr:hover td{background:rgba(255,255,255,.03)}
 <main>
   <div class="stats">
     <div class="tile"><span class="tnum" id="stTotal">0</span><span class="tlab">STUDENTS 學生總數</span></div>
-    <div class="tile a"><span class="tnum" id="stOut">0</span><span class="tlab">CURRENTLY OUT 正在外出</span></div>
+    <div class="tile a"><span class="tnum" id="stOut">0</span><span class="tlab">CURRENTLY OUTSIDE 正在外面</span></div>
     <div class="tile b"><span class="tnum" id="stToday">0</span><span class="tlab">TODAY'S EXITS 今日外出</span></div>
     <div class="tile r"><span class="tnum" id="stFlag">0</span><span class="tlab">OVERLONG FLAGS 超時標記</span></div>
   </div>
@@ -129,6 +128,18 @@ tbody tr{transition:.12s}tbody tr:hover td{background:rgba(255,255,255,.03)}
   <!-- Settings 設定 -->
   <section class="pane" id="pane-set">
     <div class="card">
+      <h3>Event Scenario<span>活動場景</span></h3>
+      <div class="radios" style="flex-direction:column;align-items:flex-start;gap:10px">
+        <label><input type="radio" name="scen" value="track" checked> Sports Day 陸運會 — Inside / Outside Stand 看台內／看台外</label>
+        <label><input type="radio" name="scen" value="swim"> Swimming Gala 水運會 — Inside / Outside Venue 場館內／場館外</label>
+      </div>
+      <div class="setrow">
+        <button class="btn primary" id="btnScen">Save Scenario 儲存場景</button>
+        <button class="btn green" id="btnStartDay">Start Event Day 開始活動（所有人視為在內）</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">Switching scenario updates all gate devices instantly. 轉換場景後所有閘口裝置即時同步。每筆記錄會蓋上當時場景。</p>
+    </div>
+    <div class="card">
       <h3>Overlong Threshold<span>超時時限</span></h3>
       <p class="dim" style="font-size:13.5px;margin-top:6px">If a student is out longer than this, the return is flagged. 外出超過此時限，返回時會被標記。</p>
       <div class="setrow"><input type="number" class="num" id="thIn" min="1" max="120" style="width:90px"> <span class="dim">min 分鐘</span>
@@ -166,6 +177,12 @@ requireAuth(function init(){
   db.ref('students').on('value',s=>{students=s.val()||{};updateStats();renderStudents();});
   db.ref('live').on('value',s=>{live=s.val()||{};updateStats();});
   watchThreshold(v=>$('thIn').value=v);
+  watchScenario(v=>{const el=document.querySelector(`input[name=scen][value=${v}]`);if(el)el.checked=true;});
+  $('btnScen').onclick=()=>db.ref('config/scenario').set(document.querySelector('input[name=scen]:checked').value).then(()=>toast('Scenario saved 已儲存場景'));
+  $('btnStartDay').onclick=()=>{
+    if(confirm('Start event day? All current OUTSIDE states will be cleared (everyone treated as inside).\n開始活動？所有外出狀態將清除（全部學生視為在內）。'))
+      db.ref('live').remove().then(()=>toast('Event day started 活動已開始'));
+  };
   loadToday();
 
   function updateStats(){
@@ -283,12 +300,12 @@ requireAuth(function init(){
   function loadRecords(){
     $('btnLoad').disabled=true;
     fetchRecords().then(rows=>{
-      $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>Out 出</th><th>In 入</th><th>Duration 時長</th><th>Flag</th></tr>'+
+      $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+
         rows.slice(0,200).map(r=>{const m=houseMeta(r.house);return `<tr>
           <td class="mono">${fmtDate(r.outAt)}</td><td>${esc(r.sid)}</td><td>${esc(r.cls)}</td><td>${esc(r.no)}</td>
           <td><span class="hchip" style="--hc:${m.color}">${esc(r.house||'?')}</span></td>
           <td class="mono">${fmtHM(r.outAt)} <span class="dim">${esc(r.gateOut||'')}</span></td>
-          <td class="mono">${r.inAt?fmtHM(r.inAt)+' ':''}<span class="dim">${esc(r.gateIn||'')}${r.inAt?'':' · STILL OUT 未返'}</span></td>
+          <td class="mono">${r.inAt?fmtHM(r.inAt)+' ':''}<span class="dim">${esc(r.gateIn||'')}${r.inAt?'':' · STILL OUTSIDE 未返'}</span></td>
           <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td>
           <td>${r.overlong?'<span class="flagchip">⚠</span>':''}</td></tr>`;}).join('');
       $('recCount').textContent=`${rows.length} records in range 範圍內記錄（顯示首 200 條）`;
@@ -300,11 +317,12 @@ requireAuth(function init(){
     const btn=$('btnExpRec');btn.disabled=true;btn.textContent='Loading…';
     fetchRecords().then(rows=>{
       rows.sort((a,b)=>a.outAt-b.outAt);
-      const data=rows.map(r=>({'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Class 班別':r.cls,'Class Number 學號':r.no,'House 社':r.house,'Card 卡號':r.card,
-        'Gate Out 出閘':r.gateOut||'','Out Time 出時間':r.outAt?fmtClock(r.outAt):'','Gate In 入閘':r.gateIn||'',
-        'In Time 入時間':r.inAt?fmtClock(r.inAt):'STILL OUT 仍在外面','Duration 時長':r.durationSec!=null?fmtDur(r.durationSec*1000):'',
-        'Overlong 超時':r.overlong?'YES 是':''}));
-      const ws=XLSX.utils.json_to_sheet(data);ws['!cols']=[{wch:11},{wch:12},{wch:8},{wch:8},{wch:6},{wch:12},{wch:12},{wch:10},{wch:12},{wch:10},{wch:12},{wch:10}];
+      const data=rows.map(r=>{const sm=scenarioMeta(r.scenario);return {
+        'Event 活動':`${sm.zh} ${sm.en}`,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Class 班別':r.cls,'Class Number 學號':r.no,'House 社':r.house,'Card 卡號':r.card,
+        'Gate Out 離開閘口':r.gateOut||'','Out Time 離開時間':r.outAt?fmtClock(r.outAt):'','Gate In 返回閘口':r.gateIn||'',
+        'In Time 返回時間':r.inAt?fmtClock(r.inAt):'STILL OUTSIDE 仍未返回','Duration 在外時間':r.durationSec!=null?fmtDur(r.durationSec*1000):'',
+        'Overlong 超時':r.overlong?'YES 是':''};});
+      const ws=XLSX.utils.json_to_sheet(data);ws['!cols']=[{wch:24},{wch:11},{wch:12},{wch:8},{wch:8},{wch:6},{wch:12},{wch:14},{wch:10},{wch:14},{wch:10},{wch:12},{wch:10}];
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');
       XLSX.writeFile(wb,`gate-records_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
     }).finally(()=>{btn.disabled=false;btn.textContent='Export Excel 匯出記錄';});
@@ -315,7 +333,7 @@ requireAuth(function init(){
       rows.forEach(r=>{const k=r.sid||r.card;const e=map[k]||(map[k]={sid:r.sid,cls:r.cls,no:r.no,house:r.house,n:0,sec:0,over:0});
         e.n++;e.sec+=r.durationSec||0;if(r.overlong)e.over++;});
       const data=Object.values(map).sort((a,b)=>b.n-a.n).map(e=>({'Student ID 學生編號':e.sid,'Class 班別':e.cls,'No. 學號':e.no,'House 社':e.house,
-        'Total Exits 外出次數':e.n,'Total Time Out 總外出時長':fmtDur(e.sec*1000),'Overlong 超時次數':e.over}));
+        'Total Exits 外出次數':e.n,'Total Time Outside 總在外時間':fmtDur(e.sec*1000),'Overlong 超時次數':e.over}));
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Summary');
       XLSX.writeFile(wb,`gate-summary_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
     });
