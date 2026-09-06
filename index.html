@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gate Control System (閘口控制系統)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* House Colors */
+        .house-K { background-color: #ef4444; color: white; } /* Red */
+        .house-T { background-color: #3b82f6; color: white; } /* Blue */
+        .house-M { background-color: #22c55e; color: white; } /* Green */
+        .house-C { background-color: #facc15; color: black; } /* Yellow */
+        
+        .text-house-K { color: #ef4444; }
+        .text-house-T { color: #3b82f6; }
+        .text-house-M { color: #22c55e; }
+        .text-house-C { color: #ca8a04; }
+
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+        
+        input, select { font-size: 16px !important; }
+        .nav-btn { transition: all 0.2s; }
+        .nav-btn.active { background-color: #2563eb; color: white; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<div id="app" class="min-h-screen flex flex-col">
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-sm p-4 flex justify-between items-center sticky top-0 z-40">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800">Gate System <span class="text-sm text-gray-500 font-normal">(閘口系統)</span></h1>
+        
+        <nav class="flex gap-2">
+            <button @click="switchView('gate')" :class="['nav-btn px-3 py-2 rounded-lg text-sm font-medium', currentView === 'gate' ? 'active' : 'bg-gray-100 hover:bg-gray-200']">
+                Gate (閘口)
+            </button>
+            <button @click="switchView('admin')" :class="['nav-btn px-3 py-2 rounded-lg text-sm font-medium', currentView === 'admin' ? 'active' : 'bg-gray-100 hover:bg-gray-200']">
+                Admin (管理)
+            </button>
+            <button @click="switchView('query')" :class="['nav-btn px-3 py-2 rounded-lg text-sm font-medium', currentView === 'query' ? 'active' : 'bg-gray-100 hover:bg-gray-200']">
+                Query (查詢)
+            </button>
+            <button @click="showSettings = true" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 hover:bg-gray-200">
+                ⚙️
+            </button>
+        </nav>
+    </header>
+
+    <main class="flex-1 p-4 md:p-6 max-w-6xl mx-auto w-full">
+        
+        <!-- ================= VIEW 1: GATE (閘口) ================= -->
+        <div v-if="currentView === 'gate'">
+            <div v-if="!isConfigured" class="text-center py-20 bg-white rounded-xl shadow">
+                <h2 class="text-xl text-gray-500">Please configure Firebase in Settings first.<br>請先在「設定 (⚙️)」中配置 Firebase。</h2>
+            </div>
+
+            <div v-else class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold">Gate: {{ gateId }} <span class="text-gray-500 text-sm">({{ gateModeLabel }})</span></h2>
+                    </div>
+                    <div class="text-right text-sm text-gray-500">
+                        <div>Current Time (目前時間)</div>
+                        <div class="text-lg font-mono">{{ currentTime }}</div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Scan Card or Enter Manually (拍卡或手動輸入)</label>
+                    <div class="flex gap-2">
+                        <input 
+                            ref="cardInput"
+                            v-model="inputCardNo" 
+                            @keyup.enter="processCard"
+                            type="text" 
+                            placeholder="Card Number (卡號)" 
+                            class="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-xl"
+                            autocomplete="off"
+                        >
+                        <button @click="processCard" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-lg">Enter (確認)</button>
+                    </div>
+                </div>
+
+                <div v-if="currentStudent" class="border-2 rounded-xl p-6 mb-6 transition-all duration-300" :class="getHouseColorClass(currentStudent.house)">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="text-3xl md:text-4xl font-bold mb-2">{{ currentStudent.house }} House ({{ currentStudent.house }} 社)</div>
+                            <div class="text-lg md:text-xl">ID: {{ currentStudent.studentId }} | Class: {{ currentStudent.class }} {{ currentStudent.classNo }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div v-if="currentStudent.hasPrevOverstay" class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold mb-2">
+                                Prev. Overstay (曾超時)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex gap-4">
+                        <template v-if="gateMode === 'dual'">
+                            <button @click="recordAction('out')" class="flex-1 py-4 bg-red-500 text-white rounded-lg text-xl font-bold hover:bg-red-600">OUT (外出)</button>
+                            <button @click="recordAction('in')" class="flex-1 py-4 bg-green-500 text-white rounded-lg text-xl font-bold hover:bg-green-600">IN (回來)</button>
+                        </template>
+                        <template v-else>
+                            <button @click="recordAction(gateMode)" class="flex-1 py-4 text-white rounded-lg text-xl font-bold" 
+                                    :class="gateMode === 'out' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'">
+                                {{ gateMode === 'out' ? 'OUT (外出)' : 'IN (回來)' }}
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <div v-if="feedbackMsg" class="p-4 rounded-lg text-center text-xl font-bold mb-4" :class="feedbackType === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">
+                    {{ feedbackMsg }}
+                </div>
+
+                <div v-if="overstayWarning" class="p-4 bg-orange-100 border-2 border-orange-500 rounded-lg text-center text-xl font-bold text-orange-800 animate-pulse">
+                    ⚠️ {{ overstayWarning }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= VIEW 2: ADMIN (管理) ================= -->
+        <div v-if="currentView === 'admin'">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-4">Admin Panel (管理面板)</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Import -->
+                    <div class="p-4 bg-gray-50 rounded-lg border">
+                        <h3 class="font-bold text-lg mb-3">Import Students (匯入學生資料)</h3>
+                        <p class="text-xs text-gray-500 mb-3">Excel Headers (表頭): Card No (卡號), Student ID (學生編號), Class (班別), Class No (學號), House (社)</p>
+                        <input type="file" @change="importStudents" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+
+                    <!-- Export -->
+                    <div class="p-4 bg-gray-50 rounded-lg border">
+                        <h3 class="font-bold text-lg mb-3">Export Records (匯出進出記錄)</h3>
+                        <p class="text-xs text-gray-500 mb-3">Download all gate records as Excel file.</p>
+                        <button @click="exportRecords" class="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 font-medium">Download Excel (下載 Excel)</button>
+                    </div>
+                </div>
+
+                <!-- Active Sessions -->
+                <div class="mt-6">
+                    <h3 class="font-bold text-lg mb-3">Currently Out (目前在外學生) - {{ Object.keys(activeSessions).length }} students</h3>
+                    <div class="border rounded-lg overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 text-left">Card No (卡號)</th>
+                                    <th class="p-3 text-left">Student (學生)</th>
+                                    <th class="p-3 text-left">House (社)</th>
+                                    <th class="p-3 text-left">Out Time (外出時間)</th>
+                                    <th class="p-3 text-left">Duration (時長)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr v-for="(session, cardNo) in activeSessions" :key="cardNo" class="hover:bg-gray-50">
+                                    <td class="p-3 font-mono">{{ cardNo }}</td>
+                                    <td class="p-3">{{ session.class }} {{ session.classNo }}</td>
+                                    <td class="p-3"><span class="px-2 py-1 rounded text-xs text-white" :class="'house-' + session.house">{{ session.house }}</span></td>
+                                    <td class="p-3">{{ formatTime(session.outTimestamp) }}</td>
+                                    <td class="p-3 font-bold" :class="getDuration(session.outTimestamp) >= 15 ? 'text-red-600' : ''">{{ getDuration(session.outTimestamp) }} mins</td>
+                                </tr>
+                                <tr v-if="Object.keys(activeSessions).length === 0">
+                                    <td colspan="5" class="p-6 text-center text-gray-400">No students out (沒有學生在外)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= VIEW 3: QUERY (查詢) ================= -->
+        <div v-if="currentView === 'query'">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold mb-6 border-b pb-4">Student Query (學生查詢)</h2>
+                
+                <!-- Search Bar -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search by Card No / Student ID / Class (輸入卡號/學生編號/班別查詢)</label>
+                    <div class="flex gap-2">
+                        <input 
+                            v-model="querySearchText" 
+                            @keyup.enter="performQuery"
+                            type="text" 
+                            placeholder="e.g., 123456 or 1A01 (例如: 123456 或 1A01)" 
+                            class="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                        >
+                        <button @click="performQuery" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-lg">Search (查詢)</button>
+                    </div>
+                </div>
+
+                <!-- Query Results -->
+                <div v-if="queriedStudent">
+                    <!-- Student Profile -->
+                    <div class="border-2 rounded-xl p-6 mb-6" :class="getHouseColorClass(queriedStudent.house)">
+                        <div class="text-3xl font-bold mb-1">{{ queriedStudent.house }} House ({{ queriedStudent.house }} 社)</div>
+                        <div class="text-lg">ID: {{ queriedStudent.studentId }} | Class: {{ queriedStudent.class }} {{ queriedStudent.classNo }}</div>
+                    </div>
+
+                    <!-- Status & Stats -->
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <!-- Current Status -->
+                        <div class="md:col-span-1 p-4 rounded-lg border-2" :class="isStudentOut(queriedStudent.cardNo) ? 'bg-red-50 border-red-300' : 'bg-green-50 border-green-300'">
+                            <h4 class="text-sm font-bold text-gray-500 mb-1">Current Status (目前狀態)</h4>
+                            <div class="text-2xl font-bold" :class="isStudentOut(queriedStudent.cardNo) ? 'text-red-600' : 'text-green-600'">
+                                {{ isStudentOut(queriedStudent.cardNo) ? 'OUT (在外)' : 'IN (在校)' }}
+                            </div>
+                            <div v-if="isStudentOut(queriedStudent.cardNo)" class="text-sm text-red-500 mt-1">
+                                Out for {{ getDuration(getSession(queriedStudent.cardNo).outTimestamp) }} mins (已外出 {{ getDuration(getSession(queriedStudent.cardNo).outTimestamp) }} 分鐘)
+                            </div>
+                        </div>
+
+                        <!-- Total Trips -->
+                        <div class="p-4 rounded-lg border bg-blue-50 border-blue-300">
+                            <h4 class="text-sm font-bold text-gray-500 mb-1">Total Trips (總外出次數)</h4>
+                            <div class="text-3xl font-bold text-blue-600">{{ getStudentStats(queriedStudent.cardNo).totalTrips }}</div>
+                        </div>
+
+                        <!-- Total Time & Overstay -->
+                        <div class="p-4 rounded-lg border bg-purple-50 border-purple-300">
+                            <h4 class="text-sm font-bold text-gray-500 mb-1">Total Time / Overstay (總時長 / 超時次數)</h4>
+                            <div class="text-2xl font-bold text-purple-600">{{ getStudentStats(queriedStudent.cardNo).totalMins }} mins</div>
+                            <div class="text-sm text-orange-600 font-bold" v-if="getStudentStats(queriedStudent.cardNo).overstayCount > 0">
+                                ⚠️ {{ getStudentStats(queriedStudent.cardNo).overstayCount }} Overstays (次超時)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Table -->
+                    <h3 class="font-bold text-lg mb-3">Recent History (最近進出記錄)</h3>
+                    <div class="border rounded-lg overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 text-left">Time (時間)</th>
+                                    <th class="p-3 text-left">Action (動作)</th>
+                                    <th class="p-3 text-left">Gate (閘口)</th>
+                                    <th class="p-3 text-left">Duration (時長)</th>
+                                    <th class="p-3 text-left">Status (狀態)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr v-for="rec in getStudentHistory(queriedStudent.cardNo)" :key="rec.id" class="hover:bg-gray-50">
+                                    <td class="p-3 font-mono text-xs">{{ formatDateTime(rec.timestamp) }}</td>
+                                    <td class="p-3 font-bold" :class="rec.action === 'out' ? 'text-red-500' : 'text-green-500'">{{ rec.action.toUpperCase() }}</td>
+                                    <td class="p-3">{{ rec.gateId }}</td>
+                                    <td class="p-3">{{ rec.durationMins ? rec.durationMins + ' mins' : '-' }}</td>
+                                    <td class="p-3">
+                                        <span v-if="rec.isOverstay" class="text-red-600 font-bold">Overstay (超時)</span>
+                                        <span v-else class="text-gray-400">Normal (正常)</span>
+                                    </td>
+                                </tr>
+                                <tr v-if="getStudentHistory(queriedStudent.cardNo).length === 0">
+                                    <td colspan="5" class="p-6 text-center text-gray-400">No records found (沒有記錄)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div v-else-if="querySearched" class="text-center py-10 text-gray-500">
+                    Student not found. Please check the input. (找不到學生，請檢查輸入資料)
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ================= AUTH MODAL (通用密碼驗證) ================= -->
+    <div v-if="showAuthModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-sm">
+            <h3 class="text-xl font-bold mb-4">Authentication Required (需要驗證)</h3>
+            <p class="text-sm text-gray-500 mb-4">Please enter the Admin PIN to access {{ pendingView }}.<br>請輸入管理員密碼以進入 {{ pendingView }}。</p>
+            <input v-model="inputAuthPin" type="password" @keyup.enter="verifyAuth" class="w-full p-3 border-2 rounded-lg mb-4 focus:border-blue-500 focus:outline-none text-lg" placeholder="Enter PIN (輸入密碼)" autofocus>
+            <div class="flex gap-2">
+                <button @click="verifyAuth" class="flex-1 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 font-medium">Verify (驗證)</button>
+                <button @click="cancelAuth" class="flex-1 py-2 bg-gray-200 rounded hover:bg-gray-300 font-medium">Cancel (取消)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SETTINGS MODAL (系統設定) ================= -->
+    <div v-if="showSettings" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold mb-4">Settings (系統設定)</h3>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Firebase Config (JSON)</label>
+                <textarea v-model="firebaseConfigStr" rows="5" class="w-full p-2 border rounded text-xs font-mono" placeholder='{"apiKey": "...", ...}'></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Gate ID (閘口編號)</label>
+                <input v-model="gateId" type="text" class="w-full p-2 border rounded" placeholder="e.g., Gate-A">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Gate Mode (閘口模式)</label>
+                <select v-model="gateMode" class="w-full p-2 border rounded">
+                    <option value="out">OUT Only (僅外出)</option>
+                    <option value="in">IN Only (僅回來)</option>
+                    <option value="dual">Dual Mode (雙模式)</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-1">Universal Admin PIN (通用管理員密碼)</label>
+                <input v-model="adminPin" type="text" class="w-full p-2 border rounded" placeholder="Default: 1234">
+            </div>
+
+            <div class="flex gap-2">
+                <button @click="saveSettings" class="flex-1 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Save (保存)</button>
+                <button @click="showSettings = false" class="flex-1 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel (取消)</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
+
+createApp({
+    setup() {
+        // --- Navigation & Auth ---
+        const currentView = ref('gate');
+        const showAuthModal = ref(false);
+        const isAuthenticated = ref(false);
+        const pendingView = ref('');
+        const inputAuthPin = ref('');
+
+        // --- Settings ---
+        const showSettings = ref(false);
+        const firebaseConfigStr = ref(localStorage.getItem('fb_config') || '');
+        const gateId = ref(localStorage.getItem('gate_id') || 'Gate-1');
+        const gateMode = ref(localStorage.getItem('gate_mode') || 'dual');
+        const adminPin = ref(localStorage.getItem('admin_pin') || '1234');
+
+        // --- Data ---
+        const students = ref({}); 
+        const activeSessions = ref({}); 
+        const records = ref([]); 
+        
+        // --- Gate UI ---
+        const inputCardNo = ref('');
+        const currentStudent = ref(null);
+        const feedbackMsg = ref('');
+        const feedbackType = ref('success');
+        const overstayWarning = ref('');
+        const currentTime = ref('');
+        const cardInput = ref(null);
+
+        // --- Query UI ---
+        const querySearchText = ref('');
+        const queriedStudent = ref(null);
+        const querySearched = ref(false);
+
+        let db = null;
+
+        // --- Computed ---
+        const isConfigured = computed(() => {
+            try {
+                const config = JSON.parse(firebaseConfigStr.value);
+                return config.apiKey && gateId.value;
+            } catch { return false; }
+        });
+
+        const gateModeLabel = computed(() => {
+            if (gateMode.value === 'out') return 'OUT Only (僅外出)';
+            if (gateMode.value === 'in') return 'IN Only (僅回來)';
+            return 'Dual Mode (雙模式)';
+        });
+
+        // --- Methods: Navigation & Auth ---
+        const switchView = (view) => {
+            if (view === 'gate') {
+                currentView.value = 'gate';
+                nextTick(() => focusInput());
+            } else {
+                if (!isAuthenticated.value) {
+                    pendingView.value = view === 'admin' ? 'Admin Panel (管理面板)' : 'Query Page (查詢頁面)';
+                    showAuthModal.value = true;
+                    inputAuthPin.value = '';
+                    nextTick(() => {
+                        // Focus password input
+                        const pinInput = document.querySelector('.fixed input[type="password"]');
+                        if(pinInput) pinInput.focus();
+                    });
+                } else {
+                    currentView.value = view;
+                }
+            }
+        };
+
+        const verifyAuth = () => {
+            if (inputAuthPin.value === adminPin.value) {
+                isAuthenticated.value = true;
+                showAuthModal.value = false;
+                currentView.value = pendingView.value.includes('Admin') ? 'admin' : 'query';
+            } else {
+                alert('Incorrect PIN (密碼錯誤)');
+                inputAuthPin.value = '';
+            }
+        };
+
+        const cancelAuth = () => {
+            showAuthModal.value = false;
+        };
+
+        // --- Methods: Firebase & Data ---
+        const initFirebase = () => {
+            if (!firebase.apps.length) {
+                try {
+                    const config = JSON.parse(firebaseConfigStr.value);
+                    firebase.initializeApp(config);
+                    db = firebase.database();
+                    
+                    db.ref('students').on('value', snap => students.value = snap.val() || {});
+                    db.ref('activeSessions').on('value', snap => activeSessions.value = snap.val() || {});
+                    db.ref('records').on('value', snap => {
+                        const val = snap.val();
+                        records.value = val ? Object.entries(val).map(([id, data]) => ({ id, ...data })) : [];
+                    });
+                } catch (e) {
+                    console.error("Firebase init error", e);
+                }
+            }
+        };
+
+        const saveSettings = () => {
+            localStorage.setItem('fb_config', firebaseConfigStr.value);
+            localStorage.setItem('gate_id', gateId.value);
+            localStorage.setItem('gate_mode', gateMode.value);
+            localStorage.setItem('admin_pin', adminPin.value);
+            showSettings.value = false;
+            initFirebase();
+            focusInput();
+        };
+
+        const focusInput = () => {
+            nextTick(() => {
+                if (cardInput.value && currentView.value === 'gate') cardInput.value.focus();
+            });
+        };
+
+        // --- Methods: Gate Logic ---
+        const processCard = () => {
+            const cardNo = inputCardNo.value.trim();
+            if (!cardNo) return;
+
+            const student = students.value[cardNo];
+            if (student) {
+                currentStudent.value = { ...student, cardNo };
+                
+                if (student.hasPrevOverstay) {
+                    overstayWarning.value = "Warning: Previous overstay record! (警告：曾有外出超時記錄！)";
+                } else {
+                    overstayWarning.value = '';
+                }
+            } else {
+                currentStudent.value = null;
+                showFeedback(`Card not found: ${cardNo} (找不到卡號：${cardNo})`, 'error');
+            }
+            inputCardNo.value = '';
+            focusInput();
+        };
+
+        const recordAction = (action) => {
+            if (!currentStudent.value || !db) return;
+            const student = currentStudent.value;
+            const now = Date.now();
+
+            if (action === 'out') {
+                if (activeSessions.value[student.cardNo]) {
+                    showFeedback("Student is already OUT! (學生已經在外！)", 'error');
+                    return;
+                }
+                
+                const sessionData = {
+                    outTimestamp: now, gateId: gateId.value, house: student.house,
+                    studentId: student.studentId, class: student.class, classNo: student.classNo
+                };
+                
+                db.ref(`activeSessions/${student.cardNo}`).set(sessionData);
+                db.ref('records').push({ ...sessionData, cardNo: student.cardNo, action: 'out', timestamp: now });
+                showFeedback(`OUT recorded for ${student.house} House (已記錄 ${student.house} 社外出)`, 'success');
+                
+            } else if (action === 'in') {
+                const session = activeSessions.value[student.cardNo];
+                if (!session) {
+                    showFeedback("Student is not OUT! (學生目前不在外！)", 'error');
+                    return;
+                }
+
+                const durationMins = Math.round((now - session.outTimestamp) / 60000);
+                const isOverstay = durationMins >= 15;
+
+                if (isOverstay) {
+                    db.ref(`students/${student.cardNo}/hasPrevOverstay`).set(true);
+                }
+
+                db.ref(`activeSessions/${student.cardNo}`).remove();
+                db.ref('records').push({
+                    cardNo: student.cardNo, studentId: student.studentId, class: student.class, 
+                    classNo: student.classNo, house: student.house, gateId: gateId.value,
+                    action: 'in', timestamp: now, outTimestamp: session.outTimestamp, 
+                    durationMins: durationMins, isOverstay: isOverstay
+                });
+
+                if (isOverstay) {
+                    showFeedback(`IN recorded. OVERSTAY (${durationMins} mins)! (回來記錄。超時 ${durationMins} 分鐘！)`, 'error');
+                    overstayWarning.value = `Overstay: ${durationMins} mins (超時：${durationMins} 分鐘)`;
+                } else {
+                    showFeedback(`IN recorded (${durationMins} mins) (回來記錄，外出 ${durationMins} 分鐘)`, 'success');
+                    overstayWarning.value = '';
+                }
+            }
+            currentStudent.value = null;
+            focusInput();
+        };
+
+        const showFeedback = (msg, type) => {
+            feedbackMsg.value = msg;
+            feedbackType.value = type;
+            setTimeout(() => { feedbackMsg.value = ''; }, 3000);
+        };
+
+        // --- Methods: Admin Logic ---
+        const importStudents = (event) => {
+            const file = event.target.files[0];
+            if (!file || !db) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(firstSheet);
+
+                const updates = {};
+                json.forEach(row => {
+                    const cardNo = row['Card No'] || row['卡號'];
+                    if (cardNo) {
+                        updates[cardNo] = {
+                            studentId: row['Student ID'] || row['學生編號'] || '',
+                            class: row['Class'] || row['班別'] || '',
+                            classNo: row['Class No'] || row['學號'] || '',
+                            house: (row['House'] || row['社'] || '').toUpperCase(),
+                            hasPrevOverstay: students.value[cardNo]?.hasPrevOverstay || false // Preserve overstay flag
+                        };
+                    }
+                });
+
+                db.ref('students').update(updates).then(() => {
+                    alert(`Imported ${Object.keys(updates).length} students (已匯入 ${Object.keys(updates).length} 名學生)`);
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        const exportRecords = () => {
+            if (!records.value.length) {
+                alert("No records to export (沒有記錄可匯出)");
+                return;
+            }
+
+            const exportData = records.value.map(r => ({
+                'Timestamp (時間)': new Date(r.timestamp).toLocaleString(),
+                'Action (動作)': r.action === 'out' ? 'OUT (外出)' : 'IN (回來)',
+                'Card No (卡號)': r.cardNo,
+                'Student ID (學生編號)': r.studentId,
+                'Class (班別)': r.class,
+                'Class No (學號)': r.classNo,
+                'House (社)': r.house,
+                'Gate (閘口)': r.gateId,
+                'Duration (mins) (時長/分鐘)': r.durationMins || '',
+                'Is Overstay (是否超時)': r.isOverstay ? 'Yes (是)' : 'No (否)'
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Records");
+            XLSX.writeFile(wb, `Gate_Records_${new Date().toISOString().slice(0,10)}.xlsx`);
+        };
+
+        // --- Methods: Query Logic ---
+        const performQuery = () => {
+            const text = querySearchText.value.trim().toLowerCase();
+            if (!text) return;
+
+            querySearched.value = true;
+            queriedStudent.value = null;
+
+            // Search in students object
+            for (const cardNo in students.value) {
+                const s = students.value[cardNo];
+                if (
+                    cardNo.toLowerCase() === text ||
+                    s.studentId.toLowerCase() === text ||
+                    s.class.toLowerCase() === text ||
+                    s.classNo.toLowerCase() === text ||
+                    (s.class + s.classNo).toLowerCase() === text
+                ) {
+                    queriedStudent.value = { ...s, cardNo };
+                    break;
+                }
+            }
+        };
+
+        const isStudentOut = (cardNo) => {
+            return !!activeSessions.value[cardNo];
+        };
+
+        const getSession = (cardNo) => {
+            return activeSessions.value[cardNo] || {};
+        };
+
+        const getStudentStats = (cardNo) => {
+            const studentRecords = records.value.filter(r => r.cardNo === cardNo && r.action === 'in');
+            let totalMins = 0;
+            let overstayCount = 0;
+            studentRecords.forEach(r => {
+                if (r.durationMins) totalMins += r.durationMins;
+                if (r.isOverstay) overstayCount++;
+            });
+            return {
+                totalTrips: studentRecords.length,
+                totalMins: totalMins,
+                overstayCount: overstayCount
+            };
+        };
+
+        const getStudentHistory = (cardNo) => {
+            return records.value
+                .filter(r => r.cardNo === cardNo)
+                .sort((a, b) => b.timestamp - a.timestamp)
+                .slice(0, 20); // Show latest 20
+        };
+
+        // --- Helpers ---
+        const getHouseColorClass = (house) => `house-${house}`;
+        const formatTime = (ts) => new Date(ts).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const formatDateTime = (ts) => new Date(ts).toLocaleString([], {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+        const getDuration = (ts) => Math.round((Date.now() - ts) / 60000);
+
+        // --- Lifecycle ---
+        onMounted(() => {
+            if (isConfigured.value) initFirebase();
+            
+            setInterval(() => {
+                currentTime.value = new Date().toLocaleTimeString();
+            }, 1000);
+
+            // Global keydown for Gate USB reader
+            document.addEventListener('keydown', (e) => {
+                if (currentView.value === 'gate' && !showSettings.value && !showAuthModal.value) {
+                    if (document.activeElement !== cardInput.value && (e.key.length === 1 || e.key === 'Enter')) {
+                        focusInput();
+                    }
+                }
+            });
+            
+            focusInput();
+        });
+
+        return {
+            currentView, showAuthModal, isAuthenticated, pendingView, inputAuthPin,
+            showSettings, firebaseConfigStr, gateId, gateMode, adminPin,
+            isConfigured, gateModeLabel,
+            inputCardNo, currentStudent, feedbackMsg, feedbackType, overstayWarning, currentTime, cardInput,
+            querySearchText, queriedStudent, querySearched,
+            activeSessions,
+            switchView, verifyAuth, cancelAuth, saveSettings,
+            processCard, recordAction, getHouseColorClass,
+            importStudents, exportRecords,
+            performQuery, isStudentOut, getSession, getStudentStats, getStudentHistory,
+            formatTime, formatDateTime, getDuration
+        };
+    }
+}).mount('#app');
+</script>
+</body>
+</html>
