@@ -3,34 +3,38 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Gate Pass System 進出記錄系統</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%23ffb224%22/><text x=%2250%22 y=%2270%22 font-size=%2256%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-weight=%22900%22 fill=%22%23241500%22>G</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;900&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding:30px;
- font-family:'IBM Plex Mono',monospace;color:#eef3fb;
- background:radial-gradient(1000px 500px at 85% -10%,rgba(75,139,255,.15),transparent 60%),radial-gradient(800px 480px at -5% 110%,rgba(255,178,36,.12),transparent 60%),#0b1322}
-h1{font-family:Archivo,'Noto Sans TC';font-weight:900;font-size:clamp(30px,6vw,54px);letter-spacing:.04em;text-align:center}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:30px;
+ font-family:'IBM Plex Mono',monospace;color:#f2f6ff;
+ background:radial-gradient(1100px 550px at 85% -10%,rgba(75,139,255,.18),transparent 60%),radial-gradient(900px 520px at -5% 110%,rgba(255,178,36,.14),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
+h1{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(30px,6vw,54px);letter-spacing:.04em;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+h1::before{content:'G';display:grid;place-items:center;width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#ffb224,#ff8a3d);
+ color:#241500;font-size:40px;box-shadow:0 16px 44px rgba(255,150,40,.4)}
 h1 b{color:#ffb224}
-h1 span{display:block;font-size:.32em;color:#8fa1c5;font-weight:400;letter-spacing:.3em;margin-top:8px}
-.board{width:min(680px,94vw);border:1px solid #25385c;border-radius:14px;overflow:hidden;background:#101b31;box-shadow:0 30px 80px rgba(0,0,0,.5)}
-.row{display:flex;align-items:center;gap:18px;padding:20px 26px;border-bottom:1px solid #1d2d4d;text-decoration:none;color:inherit;transition:.15s}
+h1 span{font-size:.3em;color:#6d7ea6;font-weight:400;letter-spacing:.32em}
+.board{width:min(680px,94vw);border:1px solid rgba(148,180,255,.16);border-radius:24px;overflow:hidden;
+ background:linear-gradient(180deg,rgba(17,29,54,.88),rgba(10,19,36,.92));box-shadow:0 30px 80px rgba(2,8,20,.55);backdrop-filter:blur(14px)}
+.row{display:flex;align-items:center;gap:18px;padding:22px 28px;border-bottom:1px solid rgba(148,180,255,.1);text-decoration:none;color:inherit;transition:.2s}
 .row:last-child{border-bottom:0}
 .row:hover{background:rgba(255,178,36,.06)}
-.tag{width:12px;height:12px;border-radius:3px}
-.row .name{font-family:Archivo;font-weight:900;font-size:22px;letter-spacing:.06em;flex:1}
-.row .name span{display:block;font:400 12px 'Noto Sans TC';color:#8fa1c5;letter-spacing:.2em;margin-top:2px}
-.row .go{color:#ffb224;font-size:20px;transition:.15s}
+.tag{width:12px;height:12px;border-radius:4px;box-shadow:0 0 12px currentColor}
+.row .name{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:22px;letter-spacing:.06em;flex:1}
+.row .name span{display:block;font:400 12px 'Noto Sans TC';color:#6d7ea6;letter-spacing:.22em;margin-top:3px}
+.row .go{color:#ffb224;font-size:20px;transition:.2s}
 .row:hover .go{transform:translateX(6px)}
-p.note{font-size:12px;color:#5d6f95;text-align:center;max-width:620px;line-height:1.7}
+p.note{font-size:12px;color:#6d7ea6;text-align:center;max-width:620px;line-height:1.8}
 </style>
 </head>
 <body>
-<h1>G<b>A</b>TE PASS SYSTEM<span>陸運會・水運會 封閉區進出記錄</span></h1>
+<h1>G<b>A</b>TE<span>陸運會・水運會 封閉區進出記錄</span></h1>
 <div class="board">
-  <a class="row" href="gate.html"><span class="tag" style="background:#ffb224"></span><span class="name">GATE<span>閘口 · 拍卡／手動輸入</span></span><span class="go">≫</span></a>
-  <a class="row" href="admin.html"><span class="tag" style="background:#4b8bff"></span><span class="name">ADMIN<span>管理 · 場景／匯入匯出</span></span><span class="go">≫</span></a>
-  <a class="row" href="enquiry.html"><span class="tag" style="background:#37c978"></span><span class="name">ENQUIRY<span>老師查詢</span></span><span class="go">≫</span></a>
+  <a class="row" href="gate.html"><span class="tag" style="color:#ffb224;background:#ffb224"></span><span class="name">GATE<span>閘口 · 拍卡／手動輸入</span></span><span class="go">≫</span></a>
+  <a class="row" href="admin.html"><span class="tag" style="color:#4b8bff;background:#4b8bff"></span><span class="name">ADMIN<span>管理 · 場景／匯入匯出</span></span><span class="go">≫</span></a>
+  <a class="row" href="enquiry.html"><span class="tag" style="color:#2fd37f;background:#2fd37f"></span><span class="name">ENQUIRY<span>老師查詢</span></span><span class="go">≫</span></a>
 </div>
 <p class="note">All pages require the shared staff password 所有頁面需輸入共用密碼 · Data stored in Firebase Realtime Database 資料存於 Firebase</p>
 </body>
