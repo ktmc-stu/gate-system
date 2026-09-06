@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Enquiry · 查詢</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b1322;--panel:#121e35;--panel2:#0d1729;--line:#25385c;--text:#eef3fb;--dim:#8fa1c5;--faint:#5d6f95;--amber:#ffb224;--green:#37c978;--red:#ff5d55;--blue:#4b8bff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
+ background:radial-gradient(1000px 480px at 90% -10%,rgba(55,201,120,.12),transparent 60%),radial-gradient(800px 480px at -6% 110%,rgba(75,139,255,.12),transparent 60%),var(--ink)}
+.mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 26px;border-bottom:1px solid var(--line);background:rgba(9,15,29,.65);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+.brand{font-family:Archivo;font-weight:900;font-size:21px;letter-spacing:.05em}.brand b{color:var(--green)}.brand span{font-size:12px;color:var(--dim);font-weight:500;margin-left:8px;letter-spacing:.15em}
+.clock{font-family:'IBM Plex Mono';font-weight:600;font-size:18px;letter-spacing:.08em}
+.btn{padding:11px 18px;border-radius:9px;border:0;font-weight:800;font-size:13.5px;cursor:pointer}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--dim)}
+main{max-width:900px;margin:0 auto;padding:30px 20px}
+.searchbar{display:flex;gap:10px;flex-wrap:wrap}
+#q{flex:1;min-width:240px;background:#0c1526;border:2px solid #31477a;color:var(--text);border-radius:12px;padding:16px 18px;font-size:17px;font-family:'IBM Plex Mono',monospace;outline:none;transition:.15s}
+#q:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(55,201,120,.12)}
+.chipbtn{background:none;border:1px solid var(--line);color:var(--dim);padding:0 20px;border-radius:12px;font-weight:700;cursor:pointer;font-size:14px}
+.chipbtn.on,.chipbtn:hover{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.07)}
+.hint{font-size:12.5px;color:var(--faint);margin-top:10px}
+#res{margin-top:24px}
+.detail{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:26px;animation:up .35s ease}
+@keyframes up{from{opacity:0;transform:translateY(12px)}}
+.grid2{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.house{width:120px;aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.house .hl{font-family:Archivo;font-weight:900;font-size:62px;line-height:1}.house .hs{font:700 10px 'IBM Plex Mono';letter-spacing:.3em;opacity:.85;margin-top:4px}
+.row{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(49,71,114,.6);padding:8px 2px;font-size:14.5px}
+.row .k{color:var(--dim)}.row .v{font-weight:700}
+.status{margin-top:18px;border-radius:12px;padding:16px 18px;font-weight:800;font-size:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.status.out{border:2px solid var(--amber);background:rgba(255,178,36,.1);color:var(--amber)}
+.status.in{border:2px solid var(--green);background:rgba(55,201,120,.1);color:var(--green)}
+.status small{font-weight:600;font-size:.75em;opacity:.9}
+.mini{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.pill{font:600 12px 'IBM Plex Mono';border:1px solid var(--line);border-radius:99px;padding:8px 14px;color:var(--dim)}
+.pill b{color:var(--text)}
+.flagline{margin-top:14px;border:2px solid var(--amber);color:var(--amber);background:rgba(255,178,36,.1);border-radius:10px;padding:10px 14px;font-weight:800;font-size:14px}
+h3.sec{font-family:Archivo;font-weight:800;font-size:15px;margin:22px 0 10px;letter-spacing:.04em}h3.sec span{color:var(--dim);font-weight:500;font-size:.8em;margin-left:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font:600 10px 'IBM Plex Mono';letter-spacing:.14em;color:var(--faint);text-align:left;padding:8px;border-bottom:1px solid var(--line);text-transform:uppercase}
+td{padding:7px 8px;border-bottom:1px solid rgba(37,56,92,.5)}
+.list{display:grid;gap:9px}
+.litem{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:12px;padding:13px 16px;cursor:pointer;transition:.15s;animation:up .3s ease both}
+.litem:hover{border-color:var(--green);transform:translateX(3px)}
+.hbar{width:6px;align-self:stretch;border-radius:4px}
+.dot{width:9px;height:9px;border-radius:50%;margin-left:auto}
+.dot.in{background:var(--green)}.dot.out{background:var(--amber);box-shadow:0 0 8px var(--amber);animation:led 1.6s infinite}
+@keyframes led{50%{opacity:.4}}
+.back{background:none;border:0;color:var(--dim);font-weight:700;cursor:pointer;font-size:14px;margin-bottom:14px}
+.back:hover{color:var(--green)}
+.empty{text-align:center;color:var(--faint);padding:50px 0;font-size:15px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">G<b>A</b>TE ENQUIRY<span>老師查詢</span></div>
+  <time class="clock" id="clock">--:--:--</time>
+  <button class="btn ghost" data-signout>Sign Out 登出</button>
+</header>
+<main>
+  <div class="searchbar">
+    <input id="q" placeholder="Student ID / Card / Class — e.g. 25001 · A123456 · 3B 12" autocomplete="off">
+    <button class="chipbtn" id="btnOut">Currently Out 正在外出</button>
+  </div>
+  <div class="hint">Enter Student ID, card number, or class (e.g. “3B” or “3B 12”). 輸入學生編號、卡號或班別查詢。</div>
+  <div id="res"><div class="empty">Search to begin 請輸入查詢</div></div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+let students={},live={},counters={},booted=false,tickDetail=null;
+const $=id=>document.getElementById(id);
+const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
+
+requireAuth(function init(){
+  if(booted)return;booted=true;
+  bindSignOut();
+  setInterval(()=>{$('clock').textContent=fmtClock(Date.now());tickElapsed();},1000);
+  db.ref('students').on('value',s=>{students=s.val()||{};});
+  db.ref('live').on('value',s=>{live=s.val()||{};tickElapsed();});
+  db.ref('counters').on('value',s=>{counters=s.val()||{};});
+
+  let deb;
+  $('q').addEventListener('input',()=>{clearTimeout(deb);deb=setTimeout(()=>doSearch($('q').value),220);});
+  $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(deb);doSearch($('q').value);}});
+  $('btnOut').onclick=()=>{$('q').value='';$('btnOut').classList.add('on');renderOutList();};
+
+  function doSearch(raw){
+    $('btnOut').classList.remove('on');
+    const q=raw.trim().toUpperCase();
+    if(!q){$('res').innerHTML='<div class="empty">Search to begin 請輸入查詢</div>';return;}
+    let list=[];
+    if(students[q])list=[students[q]];
+    else{
+      const bySid=Object.values(students).filter(s=>String(s.sid||'').toUpperCase()===q);
+      if(bySid.length)list=bySid;
+      else{
+        const tk=q.split(/\s+/);
+        list=Object.values(students).filter(s=>{
+          if(tk.length>=2&&String(s.cls||'').toUpperCase()===tk[0]&&String(s.no||'').toUpperCase()===tk[1])return true;
+          return [s.sid,s.card,s.cls].some(v=>String(v||'').toUpperCase().includes(q))||String(s.no||'')===q;
+        }).sort(byClsNo).slice(0,60);
+      }
+    }
+    if(!list.length){$('res').innerHTML=`<div class="empty">No match 未找到 “${esc(q)}”</div>`;return;}
+    if(list.length===1)renderDetail(list[0]);else renderList(list);
+  }
+  function renderList(list){
+    tickDetail=null;
+    $('res').innerHTML=`<div class="list">`+list.map(s=>{
+      const m=houseMeta(s.house),out=!!live[s.card];
+      return `<div class="litem" data-card="${esc(s.card)}">
+        <span class="hbar" style="background:${m.color}"></span>
+        <span class="mono dim" style="font-size:12px">${esc(s.house||'?')}</span>
+        <b class="mono">${esc(s.sid)}</b>
+        <span class="dim" style="font-size:13px">${esc(s.cls)} · No.${esc(s.no)}</span>
+        ${out?`<span class="dim mono" style="font-size:12px" data-el="${esc(s.card)}">${fmtHM(live[s.card].outAt)}</span><span class="dot out"></span>`:'<span class="dot in"></span>'}
+      </div>`;}).join('')+`</div>`;
+    document.querySelectorAll('.litem').forEach(el=>el.onclick=()=>{
+      const st=students[el.dataset.card]; if(st)renderDetail(st);
+    });
+  }
+  function renderOutList(){
+    const cards=Object.keys(live);
+    if(!cards.length){$('res').innerHTML='<div class="empty">Nobody is out 沒有學生正在外出</div>';return;}
+    const list=cards.map(c=>students[c]).filter(Boolean).sort(byClsNo);
+    renderList(list);
+  }
+  function tickElapsed(){document.querySelectorAll('[data-el]').forEach(el=>{
+    const l=live[el.dataset.el];if(l)el.textContent=fmtHM(l.outAt)+' · '+fmtDur(Date.now()-l.outAt);});}
+  function renderDetail(st){
+    tickDetail=st.card;
+    const m=houseMeta(st.house),l=live[st.card];
+    const cnt=counters[st.card]?.outCount||0;
+    $('res').innerHTML=`<div class="detail">
+      <button class="back" id="backBtn">← Back 返回</button>
+      <div class="grid2">
+        <div class="house" style="background:${m.color};color:${m.text}"><span class="hl">${esc(st.house||'?')}</span><span class="hs">HOUSE 社</span></div>
+        <div>
+          <div class="row"><span class="k">Student ID 學生編號</span><span class="v mono">${esc(st.sid||'—')}</span></div>
+          <div class="row"><span class="k">Class 班別</span><span class="v">${esc(st.cls||'—')}</span></div>
+          <div class="row"><span class="k">Class Number 學號</span><span class="v">${esc(st.no||'—')}</span></div>
+          <div class="row"><span class="k">Card 卡號</span><span class="v mono" style="font-size:13px">${esc(st.card)}</span></div>
+        </div>
+      </div>
+      ${l?`<div class="status out">● OUT 外出中 <small>since ${fmtClock(l.outAt)} · <span data-el="${esc(st.card)}">${fmtDur(Date.now()-l.outAt)}</span> · ${esc(l.gate||'')}</small></div>`
+         :`<div class="status in">● IN 在校</div>`}
+      <div class="mini"><span class="pill">TOTAL EXITS 外出次數 <b>${cnt}</b></span></div>
+      ${st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:''}
+      <h3 class="sec">Recent Records<span>最近記錄</span></h3>
+      <div id="hist"><div class="dim" style="font-size:13px">Loading…</div></div>
+    </div>`;
+    $('backBtn').onclick=()=>doSearch($('q').value||'');
+    db.ref('records').orderByChild('card').equalTo(st.card).limitToLast(12).once('value').then(s=>{
+      const rows=[];s.forEach(c=>rows.push(c.val()));rows.sort((a,b)=>b.outAt-a.outAt);
+      $('hist').innerHTML=rows.length?`<table><tr><th>Date</th><th>Out 出</th><th>In 入</th><th>Duration 時長</th><th>Flag</th></tr>`+
+        rows.map(r=>`<tr><td class="mono">${fmtDate(r.outAt)}</td><td class="mono">${fmtHM(r.outAt)}</td>
+          <td class="mono">${r.inAt?fmtHM(r.inAt):'<span class="dim">未返</span>'}</td>
+          <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
+        :`<div class="dim" style="font-size:13px">No records 暫無記錄</div>`;
+    });
+  }
+});
+</script>
+</body>
+</html>
