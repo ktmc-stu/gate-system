@@ -96,5 +96,11 @@ function requireAuth(onReady){
     else{ booted ? location.reload() : showLock(); }
   });
 }
-function bindSignOut(){document.querySelectorAll('[data-signout]').forEach(b=>b.addEventListener('click',()=>auth.signOut()));}
+function bindSignOut(){} /* 保留空函式，相容頁面呼叫 */
+/* 登出：事件委託，三個頁面即時有效 */
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-signout]')){
+    auth.signOut().then(()=>location.reload());
+  }
+});
 function watchThreshold(cb){db.ref('config/overlongMin').on('value',s=>{const v=s.val();cb(v&&v>0?v:15);});}
