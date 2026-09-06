@@ -189,6 +189,32 @@ requireAuth(function init(){
     });
   }
 });
+   function renderBoard(){
+    tickDetail=null;
+    const d=new Date();d.setHours(0,0,0,0);
+    db.ref('records').orderByChild('outAt').startAt(d.getTime()).once('value').then(s=>{
+      const recs=[];s.forEach(c=>recs.push(c.val()));recs.sort((a,b)=>b.outAt-a.outAt);
+      const counts={};recs.forEach(r=>counts[r.card]=(counts[r.card]||0)+1);
+      const outCards=Object.keys(live);
+      const returned=recs.filter(r=>r.inAt).slice(0,80);
+      const over=recs.filter(r=>r.overlong).length;
+      $('res').innerHTML=`
+        <div class="mini" style="margin:0 0 18px">
+          <span class="pill">TODAY TRIPS 今日外出 <b>${recs.length}</b></span>
+          <span class="pill">OUT NOW 正在外面 <b>${outCards.length}</b></span>
+          <span class="pill">OVERLONG 超時 <b>${over}</b></span>
+        </div>
+        <h3 class="sec">Currently Outside<span>正在外面</span></h3>
+        ${outCards.length?`<table><tr><th>Student</th><th>Class</th><th>House</th><th>Purpose 目的</th><th>Out 離開</th><th>Elapsed 已外出</th><th>Device 裝置</th><th>Trips 次數</th></tr>`+
+          outCards.map(c=>{const st=students[c],l=live[c];if(!st)return '';const pm=purposeMeta(l.purpose);
+            return `<tr><td class="mono">${esc(st.sid)}</td><td>${esc(st.cls)} · ${esc(st.no)}</td><td>${esc(st.house||'')}</td><td>${pm.icon} ${pm.zh}</td><td class="mono">${fmtHM(l.outAt)}</td><td class="mono" data-el="${esc(c)}">${fmtDur(Date.now()-l.outAt)}</td><td>${esc(l.gate||'')}</td><td>×${counts[c]||1}</td></tr>`;}).join('')+`</table>`
+         :`<div class="empty">Nobody is outside 沒有學生正在外面</div>`}
+        <h3 class="sec">Returned Today<span>今日已返回（最近 80 筆）</span></h3>
+        ${returned.length?`<table><tr><th>Student</th><th>Class</th><th>Purpose 目的</th><th>Out 離開</th><th>In 返回</th><th>Duration 時長</th><th>Device 裝置</th><th></th></tr>`+
+          returned.map(r=>`<tr><td class="mono">${esc(r.sid)}</td><td>${esc(r.cls)} · ${esc(r.no)}</td><td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td><td class="mono">${fmtHM(r.outAt)}</td><td class="mono">${fmtHM(r.inAt)}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${esc(r.gateIn||'')}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
+         :`<div class="empty">No returns yet 暫無返回記錄</div>`}`;
+    });
+  }
 </script>
 </body>
 </html>
