@@ -45,19 +45,31 @@ function sound(kind){
 }
 
 /* ---- 密碼鎖（通用密碼 = Firebase 職員帳號）---- */
+/* favicon（順手解決 404）*/
+(function(){const l=document.createElement('link');l.rel='icon';
+l.href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%23ffb224%22/><text x=%2250%22 y=%2270%22 font-size=%2256%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-weight=%22900%22 fill=%22%23241500%22>G</text></svg>';
+document.head.appendChild(l);})();
+/* 登入鎖 */
 (function(){const s=document.createElement('style');s.textContent=
-`#lock{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(7,12,24,.95);backdrop-filter:blur(8px)}
-#lock form{width:min(380px,92vw);background:#121e35;border:1px solid #25385c;border-radius:14px;padding:34px 30px;box-shadow:0 30px 80px rgba(0,0,0,.5);font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:#eef3fb;animation:lk .3s ease}
-@keyframes lk{from{opacity:0;transform:translateY(12px)}}
-#lock .mk{font-family:Archivo,'Noto Sans TC',sans-serif;font-weight:900;font-size:30px;letter-spacing:.06em}
+`#lock{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;
+ background:radial-gradient(900px 500px at 70% -10%,rgba(75,139,255,.2),transparent 60%),radial-gradient(700px 500px at 10% 110%,rgba(255,178,36,.16),transparent 60%),rgba(5,9,18,.94);backdrop-filter:blur(10px)}
+#lock form{width:min(400px,92vw);border-radius:26px;padding:38px 32px;border:1px solid rgba(148,180,255,.2);
+ background:linear-gradient(180deg,rgba(23,37,66,.96),rgba(10,19,36,.98));box-shadow:0 40px 100px rgba(0,0,0,.6);
+ font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:#f2f6ff;animation:lk .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes lk{from{opacity:0;transform:translateY(16px) scale(.97)}}
+#lock .mk{display:flex;align-items:center;gap:12px;font-family:Archivo,'Noto Sans TC',sans-serif;font-weight:900;font-size:28px;letter-spacing:.06em}
+#lock .mk::before{content:'G';display:grid;place-items:center;width:46px;height:46px;border-radius:14px;flex:none;
+ background:linear-gradient(135deg,#ffb224,#ff8a3d);color:#241500;font-size:25px;box-shadow:0 8px 24px rgba(255,150,40,.4)}
 #lock .mk b{color:#ffb224}
-#lock h1{font-size:15px;margin:14px 0 4px;font-weight:700}
-#lock h1 span{color:#8fa1c5;font-weight:500;margin-left:6px}
-#lock input{width:100%;margin:16px 0 12px;padding:13px 14px;border-radius:9px;border:1px solid #31477a;background:#0c1526;color:#eef3fb;font-size:16px;outline:none}
-#lock input:focus{border-color:#ffb224}
-#lock button{width:100%;padding:13px;border:0;border-radius:9px;background:#ffb224;color:#241a00;font-weight:800;font-size:15px;cursor:pointer;letter-spacing:.05em}
+#lock h1{font-size:16px;margin:18px 0 2px;font-weight:700}
+#lock h1 span{color:#6d7ea6;font-weight:500;margin-left:8px;font-size:.85em}
+#lock input{width:100%;margin:18px 0 14px;padding:15px 16px;border-radius:14px;border:1px solid rgba(148,180,255,.3);
+ background:rgba(0,0,0,.35);color:#f2f6ff;font-size:16px;outline:none;transition:.2s}
+#lock input:focus{border-color:#ffb224;box-shadow:0 0 0 4px rgba(255,178,36,.18)}
+#lock button{width:100%;padding:15px;border:0;border-radius:14px;background:linear-gradient(180deg,#ffc95e,#ff9a2e);
+ color:#2a1800;font-weight:900;font-size:15px;letter-spacing:.08em;cursor:pointer;box-shadow:0 12px 30px rgba(255,150,40,.35)}
 #lock button:active{transform:scale(.98)}
-#lock p.err{color:#ff8d88;font-size:13px;margin-top:10px;min-height:1em}`;
+#lock p.err{color:#ff8d88;font-size:13px;margin-top:12px;min-height:1.2em}`;
 document.head.appendChild(s);})();
 
 function showLock(){
