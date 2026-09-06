@@ -317,10 +317,11 @@ requireAuth(function init(){
   function loadRecords(){
     $('btnLoad').disabled=true;
     fetchRecords().then(rows=>{
-      $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+
+      $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>目的</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+
         rows.slice(0,200).map(r=>{const m=houseMeta(r.house);return `<tr>
           <td class="mono">${fmtDate(r.outAt)}</td><td>${esc(r.sid)}</td><td>${esc(r.cls)}</td><td>${esc(r.no)}</td>
           <td><span class="hchip" style="--hc:${m.color}">${esc(r.house||'?')}</span></td>
+          <td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td>
           <td class="mono">${fmtHM(r.outAt)} <span class="dim">${esc(r.gateOut||'')}</span></td>
           <td class="mono">${r.inAt?fmtHM(r.inAt)+' ':''}<span class="dim">${esc(r.gateIn||'')}${r.inAt?'':' · STILL OUTSIDE 未返'}</span></td>
           <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td>
@@ -334,8 +335,8 @@ requireAuth(function init(){
     const btn=$('btnExpRec');btn.disabled=true;btn.textContent='Loading…';
     fetchRecords().then(rows=>{
       rows.sort((a,b)=>a.outAt-b.outAt);
-      const data=rows.map(r=>{const sm=scenarioMeta(r.scenario);return {
-        'Event 活動':`${sm.zh} ${sm.en}`,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Class 班別':r.cls,'Class Number 學號':r.no,'House 社':r.house,'Card 卡號':r.card,
+      const data=rows.map(r=>{const sm=scenarioMeta(r.scenario),pm=purposeMeta(r.purpose);return {
+        'Event 活動':`${sm.zh} ${sm.en}`,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Class 班別':r.cls,'Class Number 學號':r.no,'House 社':r.house,'Purpose 目的':r.purpose?`${pm.zh} ${pm.en}`:'','Card 卡號':r.card,'Scanned Value 掃描值':r.code||r.card,
         'Gate Out 離開閘口':r.gateOut||'','Out Time 離開時間':r.outAt?fmtClock(r.outAt):'','Gate In 返回閘口':r.gateIn||'',
         'In Time 返回時間':r.inAt?fmtClock(r.inAt):'STILL OUTSIDE 仍未返回','Duration 在外時間':r.durationSec!=null?fmtDur(r.durationSec*1000):'',
         'Overlong 超時':r.overlong?'YES 是':''};});
@@ -347,10 +348,11 @@ requireAuth(function init(){
   $('btnExpSum').onclick=()=>{
     fetchRecords().then(rows=>{
       const map={};
-      rows.forEach(r=>{const k=r.sid||r.card;const e=map[k]||(map[k]={sid:r.sid,cls:r.cls,no:r.no,house:r.house,n:0,sec:0,over:0});
-        e.n++;e.sec+=r.durationSec||0;if(r.overlong)e.over++;});
+      rows.forEach(r=>{const k=r.sid||r.card;const e=map[k]||(map[k]={sid:r.sid,cls:r.cls,no:r.no,house:r.house,n:0,sec:0,over:0,t:0,f:0,o:0});
+        e.n++;e.sec+=r.durationSec||0;if(r.overlong)e.over++;
+        if(r.purpose==='toilet')e.t++;else if(r.purpose==='food')e.f++;else e.o++;});
       const data=Object.values(map).sort((a,b)=>b.n-a.n).map(e=>({'Student ID 學生編號':e.sid,'Class 班別':e.cls,'No. 學號':e.no,'House 社':e.house,
-        'Total Exits 外出次數':e.n,'Total Time Outside 總在外時間':fmtDur(e.sec*1000),'Overlong 超時次數':e.over}));
+        'Total Exits 外出次數':e.n,'Toilet 廁所':e.t,'Food 小食':e.f,'Other 其他':e.o,'Total Time Outside 總在外時間':fmtDur(e.sec*1000),'Overlong 超時次數':e.over}));
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Summary');
       XLSX.writeFile(wb,`gate-summary_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
     });
