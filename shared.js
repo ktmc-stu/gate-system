@@ -73,7 +73,19 @@ function showLock(){
   el.querySelector('#lockForm').addEventListener('submit',e=>{
     e.preventDefault();
     auth.signInWithEmailAndPassword(STAFF_EMAIL, el.querySelector('#lockPwd').value)
-      .catch(()=>{el.querySelector('#lockErr').textContent='Incorrect password or network error 密碼錯誤或網絡問題';});
+      .catch(err=>{
+        const code=(err&&err.code)||'unknown';
+        const msg={
+          'auth/operation-not-allowed':'未啟用 Email/Password：去 Authentication → Sign-in method 啟用',
+          'auth/user-not-found':'帳號不存在：去 Authentication → 使用者 → 新增使用者',
+          'auth/wrong-password':'密碼錯誤',
+          'auth/invalid-credential':'電郵或密碼不符（檢查 config.js 嘅 STAFF_EMAIL 是否同所建帳號完全一致）',
+          'auth/invalid-email':'STAFF_EMAIL 格式有誤',
+          'auth/network-request-failed':'網絡錯誤，或 config.js 網址有誤',
+          'auth/invalid-api-key':'config.js 嘅 apiKey 錯誤'
+        }[code];
+        el.querySelector('#lockErr').textContent = msg || ('錯誤：'+code);
+      });
   });
   setTimeout(()=>el.querySelector('#lockPwd').focus(),60);
 }
