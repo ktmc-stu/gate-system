@@ -12,7 +12,7 @@
 body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
  background:radial-gradient(1000px 480px at 90% -10%,rgba(55,201,120,.12),transparent 60%),radial-gradient(800px 480px at -6% 110%,rgba(75,139,255,.12),transparent 60%),var(--ink)}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
-.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 26px;border-bottom:1px solid var(--line);background:rgba(9,15,29,.65);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 26px;border-bottom:1px solid var(--line);background:rgba(9,15,29,.65);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);flex-wrap:wrap}
 .brand{font-family:Archivo;font-weight:900;font-size:21px;letter-spacing:.05em}.brand b{color:var(--green)}.brand span{font-size:12px;color:var(--dim);font-weight:500;margin-left:8px;letter-spacing:.15em}
 .clock{font-family:'IBM Plex Mono';font-weight:600;font-size:18px;letter-spacing:.08em}
 .btn{padding:11px 18px;border-radius:9px;border:0;font-weight:800;font-size:13.5px;cursor:pointer}
@@ -36,7 +36,7 @@ main{max-width:900px;margin:0 auto;padding:30px 20px}
 .status{margin-top:18px;border-radius:12px;padding:16px 18px;font-weight:800;font-size:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .status.out{border:2px solid var(--amber);background:rgba(255,178,36,.1);color:var(--amber)}
 .status.in{border:2px solid var(--green);background:rgba(55,201,120,.1);color:var(--green)}
-.status small{font-weight:600;font-size:.75em;opacity:.9}
+.status small{font-weight:600;font-size:.72em;opacity:.9}
 .mini{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .pill{font:600 12px 'IBM Plex Mono';border:1px solid var(--line);border-radius:99px;padding:8px 14px;color:var(--dim)}
 .pill b{color:var(--text)}
@@ -66,7 +66,7 @@ td{padding:7px 8px;border-bottom:1px solid rgba(37,56,92,.5)}
 <main>
   <div class="searchbar">
     <input id="q" placeholder="Student ID / Card / Class — e.g. 25001 · A123456 · 3B 12" autocomplete="off">
-    <button class="chipbtn" id="btnOut">Currently Out 正在外出</button>
+    <button class="chipbtn" id="btnOut">Currently Outside 正在外面</button>
   </div>
   <div class="hint">Enter Student ID, card number, or class (e.g. “3B” or “3B 12”). 輸入學生編號、卡號或班別查詢。</div>
   <div id="res"><div class="empty">Search to begin 請輸入查詢</div></div>
@@ -78,7 +78,7 @@ td{padding:7px 8px;border-bottom:1px solid rgba(37,56,92,.5)}
 <script src="config.js"></script>
 <script src="shared.js"></script>
 <script>
-let students={},live={},counters={},booted=false,tickDetail=null;
+let students={},live={},counters={},scenario='track',booted=false,tickDetail=null;
 const $=id=>document.getElementById(id);
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
 
@@ -89,6 +89,7 @@ requireAuth(function init(){
   db.ref('students').on('value',s=>{students=s.val()||{};});
   db.ref('live').on('value',s=>{live=s.val()||{};tickElapsed();});
   db.ref('counters').on('value',s=>{counters=s.val()||{};});
+  watchScenario(v=>{scenario=v;});
 
   let deb;
   $('q').addEventListener('input',()=>{clearTimeout(deb);deb=setTimeout(()=>doSearch($('q').value),220);});
@@ -132,7 +133,7 @@ requireAuth(function init(){
   }
   function renderOutList(){
     const cards=Object.keys(live);
-    if(!cards.length){$('res').innerHTML='<div class="empty">Nobody is out 沒有學生正在外出</div>';return;}
+    if(!cards.length){$('res').innerHTML='<div class="empty">Nobody is outside 沒有學生正在外面</div>';return;}
     const list=cards.map(c=>students[c]).filter(Boolean).sort(byClsNo);
     renderList(list);
   }
@@ -140,6 +141,7 @@ requireAuth(function init(){
     const l=live[el.dataset.el];if(l)el.textContent=fmtHM(l.outAt)+' · '+fmtDur(Date.now()-l.outAt);});}
   function renderDetail(st){
     tickDetail=st.card;
+    const sc=scenarioMeta(scenario);
     const m=houseMeta(st.house),l=live[st.card];
     const cnt=counters[st.card]?.outCount||0;
     $('res').innerHTML=`<div class="detail">
@@ -153,9 +155,9 @@ requireAuth(function init(){
           <div class="row"><span class="k">Card 卡號</span><span class="v mono" style="font-size:13px">${esc(st.card)}</span></div>
         </div>
       </div>
-      ${l?`<div class="status out">● OUT 外出中 <small>since ${fmtClock(l.outAt)} · <span data-el="${esc(st.card)}">${fmtDur(Date.now()-l.outAt)}</span> · ${esc(l.gate||'')}</small></div>`
-         :`<div class="status in">● IN 在校</div>`}
-      <div class="mini"><span class="pill">TOTAL EXITS 外出次數 <b>${cnt}</b></span></div>
+      ${l?`<div class="status out">● ${sc.out.en} ${sc.out.zh} <small>since 離開 ${fmtClock(l.outAt)} · <span data-el="${esc(st.card)}">${fmtDur(Date.now()-l.outAt)}</span> · ${esc(l.gate||'')}</small></div>`
+         :`<div class="status in">● ${sc.in.en} ${sc.in.zh}</div>`}
+      <div class="mini"><span class="pill">TOTAL TRIPS OUT 外出次數 <b>${cnt}</b></span></div>
       ${st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:''}
       <h3 class="sec">Recent Records<span>最近記錄</span></h3>
       <div id="hist"><div class="dim" style="font-size:13px">Loading…</div></div>
@@ -163,7 +165,7 @@ requireAuth(function init(){
     $('backBtn').onclick=()=>doSearch($('q').value||'');
     db.ref('records').orderByChild('card').equalTo(st.card).limitToLast(12).once('value').then(s=>{
       const rows=[];s.forEach(c=>rows.push(c.val()));rows.sort((a,b)=>b.outAt-a.outAt);
-      $('hist').innerHTML=rows.length?`<table><tr><th>Date</th><th>Out 出</th><th>In 入</th><th>Duration 時長</th><th>Flag</th></tr>`+
+      $('hist').innerHTML=rows.length?`<table><tr><th>Date</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>`+
         rows.map(r=>`<tr><td class="mono">${fmtDate(r.outAt)}</td><td class="mono">${fmtHM(r.outAt)}</td>
           <td class="mono">${r.inAt?fmtHM(r.inAt):'<span class="dim">未返</span>'}</td>
           <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
