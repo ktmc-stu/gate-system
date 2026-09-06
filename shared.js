@@ -115,4 +115,11 @@ document.addEventListener('click',e=>{
     auth.signOut().then(()=>location.reload());
   }
 });
+/* ---- 外出目的 ---- */
+const PURPOSES={
+  toilet:{en:'Toilet',zh:'廁所',icon:'🚻'},
+  food:  {en:'Food',  zh:'小食部',icon:'🍱'},
+  other: {en:'Other', zh:'其他',icon:'📌'}
+};
+function purposeMeta(p){return PURPOSES[p]||{en:'—',zh:'—',icon:'·'};}
 function watchThreshold(cb){db.ref('config/overlongMin').on('value',s=>{const v=s.val();cb(v&&v>0?v:15);});}
