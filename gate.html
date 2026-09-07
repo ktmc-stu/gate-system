@@ -2,118 +2,126 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Gate · 閘口</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#081120;--panel:rgba(17,29,54,.86);--panel2:rgba(10,19,36,.9);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.28);
+:root{--panel:rgba(17,29,54,.86);--panel2:rgba(10,19,36,.9);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.28);
  --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--amber-d:#ff8a3d;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;--shadow:0 20px 60px rgba(2,8,20,.55)}
 *{margin:0;padding:0;box-sizing:border-box}
-html{color-scheme:dark}
-body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;
+html{color-scheme:dark;height:100%}
+body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);height:100dvh;overflow:hidden;display:flex;flex-direction:column;
  background:radial-gradient(1200px 600px at 85% -10%,rgba(75,139,255,.18),transparent 60%),radial-gradient(1000px 600px at -10% 110%,rgba(255,178,36,.14),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
- background-image:linear-gradient(rgba(160,190,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(160,190,255,.05) 1px,transparent 1px);
- background-size:44px 44px;mask-image:radial-gradient(ellipse 90% 70% at 50% 35%,#000 20%,transparent 75%)}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
-::selection{background:rgba(255,178,36,.35)}
-.top{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--line);background:rgba(8,14,26,.72);backdrop-filter:blur(14px)}
-.gsign{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:22px;letter-spacing:.08em}
-.gsign::before{content:'G';display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--amber),var(--amber-d));color:#241500;font-size:20px;box-shadow:0 6px 18px rgba(255,150,40,.35)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 16px;border-bottom:1px solid var(--line);background:rgba(8,14,26,.72);backdrop-filter:blur(14px);flex:none}
+.gsign{display:flex;align-items:center;gap:10px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(16px,2.4vh,22px);letter-spacing:.08em}
+.gsign::before{content:'G';display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--amber),var(--amber-d));color:#241500;font-size:18px;box-shadow:0 6px 18px rgba(255,150,40,.35)}
 .gsign b{color:var(--amber);font-weight:800}
-.gsign .zh{font-size:12px;color:var(--faint);letter-spacing:.3em;font-weight:500}
+.gsign .zh{font-size:11px;color:var(--faint);letter-spacing:.3em;font-weight:500}
 .led{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:led 2.2s infinite}
 @keyframes led{50%{opacity:.4}}
-.gmid{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.modebadge{font:600 11px 'IBM Plex Mono';letter-spacing:.12em;padding:7px 14px;border-radius:99px;color:var(--amber);border:1px solid rgba(255,178,36,.35);background:rgba(255,178,36,.1)}
-.conn{display:flex;align-items:center;gap:7px;font:600 11px 'IBM Plex Mono';letter-spacing:.1em;color:var(--faint)}
+.gmid{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.modebadge{font:600 10px 'IBM Plex Mono';letter-spacing:.1em;padding:5px 11px;border-radius:99px;color:var(--amber);border:1px solid rgba(255,178,36,.35);background:rgba(255,178,36,.1);white-space:nowrap}
+.conn{display:flex;align-items:center;gap:6px;font:600 10px 'IBM Plex Mono';letter-spacing:.1em;color:var(--faint)}
 .conn i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
 .conn.on{color:var(--green)}.conn.on i{background:var(--green);box-shadow:0 0 10px var(--green)}
 .conn.off{color:var(--red)}.conn.off i{background:var(--red)}
-.gright{display:flex;align-items:center;gap:14px}
-.nowout{font:600 11px 'IBM Plex Mono';letter-spacing:.12em;color:var(--dim)}
-.nowout b{color:var(--amber);font-size:17px;margin-left:4px}
-.clock{font-family:'IBM Plex Mono';font-weight:600;font-size:20px;letter-spacing:.06em}
-.iconbtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--dim);font-size:17px;cursor:pointer;transition:.2s}
-.iconbtn:hover{color:var(--amber);border-color:rgba(255,178,36,.5);transform:rotate(30deg)}
-main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;z-index:2}
-.board{width:min(1020px,96vw);min-height:min(620px,78vh);position:relative;display:flex;flex-direction:column;justify-content:center;gap:20px;
- padding:clamp(24px,4.5vw,50px);border-radius:26px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2));
+.gright{display:flex;align-items:center;gap:12px}
+.nowout{font:600 10px 'IBM Plex Mono';letter-spacing:.1em;color:var(--dim);white-space:nowrap}
+.nowout b{color:var(--amber);font-size:15px}
+.clock{font-family:'IBM Plex Mono';font-weight:600;font-size:clamp(14px,2.2vh,20px)}
+.iconbtn{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--dim);font-size:16px;cursor:pointer;transition:.2s}
+.iconbtn:hover{color:var(--amber);border-color:rgba(255,178,36,.5)}
+main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
+.board{flex:1;min-height:0;width:100%;max-width:1060px;margin:0 auto;position:relative;display:flex;flex-direction:column;gap:clamp(8px,1.5vh,16px);
+ padding:clamp(12px,2.2vh,28px);border-radius:22px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2));
  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px);overflow:hidden}
-.board>*{position:relative;animation:up .4s cubic-bezier(.2,.8,.3,1) both}
-@keyframes up{from{opacity:0;transform:translateY(14px)}}
-.micro{font:600 11px 'IBM Plex Mono';letter-spacing:.3em;color:var(--faint)}
-.ready-word{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(44px,8vw,92px);line-height:1;text-shadow:0 0 40px rgba(255,178,36,.25)}
-.cursor{display:inline-block;width:.42em;height:.8em;background:linear-gradient(180deg,var(--amber),var(--amber-d));margin-left:.12em;border-radius:4px;animation:blink 1.1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
-.ready-sub{font-size:clamp(16px,2.2vw,22px);font-weight:600;color:var(--dim)}
-.ready-sub .zh{color:var(--faint);font-size:.82em;margin-left:10px}
-#reader{width:min(360px,82vw);margin:2px auto 0;border-radius:20px;overflow:hidden;border:1px solid var(--line2);background:#000;box-shadow:0 16px 44px rgba(0,0,0,.5)}
-#reader video{object-fit:cover}
+.board>*{position:relative;animation:up .35s cubic-bezier(.2,.8,.3,1) both}
+@keyframes up{from{opacity:0;transform:translateY(10px)}}
+.micro{font:600 10px 'IBM Plex Mono';letter-spacing:.24em;color:var(--faint);flex:none}
+/* 鏡頭置頂 */
+#reader{flex:none;height:clamp(140px,32vh,320px);width:min(440px,92vw);margin:0 auto;border-radius:18px;overflow:hidden;border:1px solid var(--line2);background:#000;box-shadow:0 14px 40px rgba(0,0,0,.5)}
+#reader video{width:100%!important;height:100%!important;object-fit:cover}
 #reader__dashboard,#reader__filescan_input{display:none!important}
-.camerr{min-height:1.2em;font-size:12.5px;color:var(--red);text-align:center}
-.ready-foot{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
-.pill{font:600 12px 'IBM Plex Mono';letter-spacing:.06em;color:var(--dim);border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:99px;padding:9px 15px}
+.camerr{min-height:1.1em;font-size:12px;color:var(--red);text-align:center;flex:none}
+.ready-line{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;flex:none}
+.ready-word{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(28px,6vh,60px);line-height:1;text-shadow:0 0 34px rgba(255,178,36,.25)}
+.cursor{display:inline-block;width:.4em;height:.78em;background:linear-gradient(180deg,var(--amber),var(--amber-d));margin-left:.1em;border-radius:4px;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ready-sub{font-size:clamp(13px,2vh,19px);font-weight:600;color:var(--dim)}
+.ready-sub .zh{color:var(--faint);font-size:.85em;margin-left:8px}
+/* 手機格 */
+.slots-wrap{flex:none}
+.slots-head{display:flex;justify-content:space-between;align-items:center;font:700 11px 'IBM Plex Mono';letter-spacing:.14em;color:var(--dim);margin-bottom:6px}
+.slots-head .mono{color:var(--amber)}
+.slots{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(4px,.8vh,8px)}
+@media(max-width:560px){.slots{grid-template-columns:repeat(6,1fr)}}
+.slot{aspect-ratio:1;border-radius:9px;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;
+ font:700 clamp(10px,1.6vh,14px) 'IBM Plex Mono';color:var(--faint);background:rgba(255,255,255,.03);transition:.2s}
+.slot.occ{background:linear-gradient(180deg,#ffc95e,#ff9a2e);color:#2a1800;border-color:transparent;box-shadow:0 4px 14px rgba(255,150,40,.35)}
+.ready-foot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:auto;flex:none}
+.pill{font:600 11px 'IBM Plex Mono';letter-spacing:.05em;color:var(--dim);border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:99px;padding:7px 13px}
 .pill b{color:var(--text)}
-.ghostbtn{border:1px dashed var(--line2);background:none;color:var(--dim);border-radius:99px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
+.pill.slotpill{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.12);font-size:clamp(13px,2.2vh,18px);font-weight:800;padding:9px 18px}
+.ghostbtn{border:1px dashed var(--line2);background:none;color:var(--dim);border-radius:99px;padding:8px 16px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.2s}
 .ghostbtn:hover{color:var(--amber);border-color:var(--amber);background:rgba(255,178,36,.08)}
-.grid2{display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,4vw,44px);align-items:center}
+.grid2{display:grid;grid-template-columns:auto 1fr;gap:clamp(14px,3vw,36px);align-items:center;min-height:0}
 @media(max-width:680px){.grid2{grid-template-columns:1fr;justify-items:center}.info{width:100%}}
-.house{width:clamp(140px,18vw,200px);aspect-ratio:1;border-radius:24px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
- box-shadow:0 18px 50px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.35),inset 0 -14px 30px rgba(0,0,0,.25);animation:houseIn .5s cubic-bezier(.2,1.4,.4,1)}
+.house{width:clamp(96px,17vh,180px);aspect-ratio:1;border-radius:20px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ box-shadow:0 14px 40px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.35),inset 0 -12px 26px rgba(0,0,0,.25);animation:houseIn .45s cubic-bezier(.2,1.4,.4,1)}
 .house::before{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 90% at 20% 0%,rgba(255,255,255,.35),transparent 45%)}
 @keyframes houseIn{from{transform:scale(.55) rotate(-6deg);opacity:0}}
-.house .hl{font-family:'Archivo';font-weight:900;font-size:clamp(72px,11vw,120px);line-height:1;text-shadow:0 4px 18px rgba(0,0,0,.3)}
-.house .hs{font:700 12px 'IBM Plex Mono';letter-spacing:.4em;opacity:.9;margin-top:8px}
-.info{display:grid;gap:2px;min-width:0}
-.row{display:flex;justify-content:space-between;gap:14px;padding:10px 2px;border-bottom:1px solid var(--line)}
-.row .k{color:var(--dim);font-size:14px}.row .k i{font-style:normal;color:var(--faint);font-size:.85em;margin-left:6px}
-.row .v{font-weight:700;font-size:clamp(16px,2vw,20px)}
-.row .v.small{font-size:13px;color:var(--dim);font-weight:500}
-.flagline{margin-top:12px;border:1.5px solid var(--amber);color:var(--amber);background:rgba(255,178,36,.12);border-radius:14px;padding:11px 15px;font-weight:800;font-size:15px;animation:flash 1.4s infinite}
+.house .hl{font-family:'Archivo';font-weight:900;font-size:clamp(52px,9vh,104px);line-height:1;text-shadow:0 4px 16px rgba(0,0,0,.3)}
+.house .hs{font:700 10px 'IBM Plex Mono';letter-spacing:.36em;opacity:.9;margin-top:6px}
+.info{display:grid;gap:0;min-width:0}
+.row{display:flex;justify-content:space-between;gap:12px;padding:clamp(5px,1vh,10px) 2px;border-bottom:1px solid var(--line)}
+.row .k{color:var(--dim);font-size:clamp(11px,1.7vh,14px)}.row .k i{font-style:normal;color:var(--faint);font-size:.85em;margin-left:5px}
+.row .v{font-weight:700;font-size:clamp(13px,2.2vh,19px)}
+.row .v.small{font-size:clamp(11px,1.7vh,13px);color:var(--dim);font-weight:500}
+.flagline{margin-top:clamp(6px,1vh,12px);border:1.5px solid var(--amber);color:var(--amber);background:rgba(255,178,36,.12);border-radius:12px;padding:clamp(7px,1.2vh,12px) 14px;font-weight:800;font-size:clamp(12px,1.9vh,15px);animation:flash 1.4s infinite}
 @keyframes flash{50%{opacity:.55}}
-.stamp{position:absolute;top:clamp(16px,3vw,32px);right:clamp(18px,3vw,36px);z-index:3;font-family:'Archivo';font-weight:900;
- font-size:clamp(34px,5.5vw,56px);letter-spacing:.08em;padding:8px 22px;border:5px solid currentColor;border-radius:16px;transform:rotate(-8deg);
+.stamp{position:absolute;top:clamp(10px,2vh,26px);right:clamp(12px,2.5vw,30px);z-index:3;font-family:'Archivo';font-weight:900;
+ font-size:clamp(26px,5vh,52px);letter-spacing:.08em;padding:6px 18px;border:4px solid currentColor;border-radius:14px;transform:rotate(-8deg);
  background:rgba(8,14,26,.55);backdrop-filter:blur(4px);animation:stampIn .4s cubic-bezier(.2,1.6,.4,1)}
 @keyframes stampIn{from{transform:rotate(-8deg) scale(2.2);opacity:0}}
-.s-out{color:var(--amber);box-shadow:0 0 40px rgba(255,178,36,.25)}
-.s-in{color:var(--green);box-shadow:0 0 40px rgba(47,211,127,.25)}
-.s-warn{color:var(--red);box-shadow:0 0 40px rgba(255,93,85,.25)}
-.alert{border:1.5px solid var(--red);background:rgba(255,93,85,.14);color:#ffd9d7;border-radius:16px;padding:15px 20px;font-weight:800;font-size:clamp(15px,2vw,19px);animation:flash 1.1s infinite}
-.okline{color:var(--green);font-weight:700;letter-spacing:.05em}
-.dur-line{font-family:'Archivo';font-weight:900;font-size:clamp(30px,4.5vw,46px);margin-top:8px}
-.dur-line span{display:block;font:600 11px 'IBM Plex Mono';letter-spacing:.25em;color:var(--faint);margin-top:6px}
-.warn-title{font-family:'Archivo';font-weight:900;font-size:clamp(24px,3.4vw,36px);color:var(--red);margin-top:6px}
-.warn-title span{display:block;font-size:.5em;font-weight:500;font-family:'Noto Sans TC';color:var(--dim);margin-top:6px}
-.nf{font-family:'Archivo';font-weight:900;font-size:clamp(28px,4.5vw,46px)}
-.nf span{display:block;font-size:.42em;font-weight:500;color:var(--dim);margin-top:8px}
+.s-out{color:var(--amber);box-shadow:0 0 34px rgba(255,178,36,.25)}
+.s-in{color:var(--green);box-shadow:0 0 34px rgba(47,211,127,.25)}
+.s-warn{color:var(--red);box-shadow:0 0 34px rgba(255,93,85,.25)}
+.alert{border:1.5px solid var(--red);background:rgba(255,93,85,.14);color:#ffd9d7;border-radius:14px;padding:clamp(9px,1.6vh,16px) 18px;font-weight:800;font-size:clamp(13px,2.2vh,18px);animation:flash 1.1s infinite}
+.okline{color:var(--green);font-weight:700;letter-spacing:.05em;font-size:clamp(12px,2vh,15px)}
+.dur-line{font-family:'Archivo';font-weight:900;font-size:clamp(22px,4.6vh,44px);margin-top:clamp(4px,1vh,10px)}
+.dur-line span{display:block;font:600 10px 'IBM Plex Mono';letter-spacing:.24em;color:var(--faint);margin-top:4px}
+.warn-title{font-family:'Archivo';font-weight:900;font-size:clamp(20px,3.6vh,34px);color:var(--red);margin-top:4px}
+.warn-title span{display:block;font-size:.5em;font-weight:500;font-family:'Noto Sans TC';color:var(--dim);margin-top:4px}
+.nf{font-family:'Archivo';font-weight:900;font-size:clamp(24px,4.6vh,44px)}
+.nf span{display:block;font-size:.42em;font-weight:500;color:var(--dim);margin-top:6px}
 .center{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
-.purp{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.purp{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(8px,1.4vw,14px);flex:none}
 @media(max-width:620px){.purp{grid-template-columns:1fr}}
-.pbtn{border:1px solid var(--line2);border-radius:18px;background:rgba(255,255,255,.04);padding:18px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:30px;transition:.15s;color:var(--text)}
-.pbtn b{font-family:'Archivo';font-size:18px;letter-spacing:.06em}
-.pbtn span{font-size:12px;color:var(--faint)}
+.pbtn{border:1px solid var(--line2);border-radius:16px;background:rgba(255,255,255,.04);padding:clamp(10px,2vh,18px) 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:clamp(20px,3.4vh,30px);transition:.15s;color:var(--text)}
+.pbtn b{font-family:'Archivo';font-size:clamp(14px,2.2vh,18px);letter-spacing:.06em}
+.pbtn span{font-size:11px;color:var(--faint)}
 .pbtn:active{transform:scale(.97)}
 .pbtn.t:hover{border-color:var(--blue);background:rgba(75,139,255,.12)}
 .pbtn.f:hover{border-color:var(--amber);background:rgba(255,178,36,.12)}
 .pbtn.o:hover{border-color:var(--green);background:rgba(47,211,127,.1)}
-.foot-hint{font-size:12px;color:var(--faint);text-align:center;letter-spacing:.12em}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(410px,94vw);z-index:60;padding:28px;overflow:auto;background:rgba(10,18,34,.92);
+.foot-hint{font-size:11px;color:var(--faint);text-align:center;letter-spacing:.12em;margin-top:auto;flex:none}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(400px,94vw);z-index:60;padding:24px;overflow:auto;background:rgba(10,18,34,.94);
  backdrop-filter:blur(20px);border-left:1px solid var(--line);transform:translateX(105%);transition:transform .3s cubic-bezier(.3,1,.4,1)}
 .drawer.open{transform:none;box-shadow:-40px 0 90px rgba(0,0,0,.6)}
-.drawer h2{font-family:'Archivo';font-size:22px;font-weight:800}
+.drawer h2{font-family:'Archivo';font-size:20px;font-weight:800}
 .drawer h2 span{font-size:.6em;color:var(--faint);font-weight:500;margin-left:8px}
-.drawer label{display:block;margin:18px 0 8px;font-size:13px;color:var(--dim);font-weight:600}
-.drawer input[type=text]{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line2);background:rgba(255,255,255,.05);color:var(--text);font-size:15px;outline:none;transition:.2s}
+.drawer label{display:block;margin:16px 0 7px;font-size:13px;color:var(--dim);font-weight:600}
+.drawer input[type=text]{width:100%;padding:12px 13px;border-radius:12px;border:1px solid var(--line2);background:rgba(255,255,255,.05);color:var(--text);font-size:15px;outline:none}
 .drawer input[type=text]:focus{border-color:var(--amber);box-shadow:0 0 0 4px rgba(255,178,36,.15)}
-.mode{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px;cursor:pointer;transition:.2s;background:rgba(255,255,255,.02)}
+.mode{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:9px;cursor:pointer;transition:.2s;background:rgba(255,255,255,.02)}
 .mode:has(input:checked){border-color:rgba(255,178,36,.6);background:rgba(255,178,36,.08)}
 .mode input{margin-top:3px;accent-color:var(--amber)}
-.mode b{display:block;font-size:14px}.mode span{font-size:12px;color:var(--faint)}
-.note{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--faint);line-height:1.7}
-.drawer-btns{display:flex;gap:10px;margin-top:24px}
-.btn{border:0;border-radius:12px;padding:13px 20px;font-weight:800;font-size:14px;cursor:pointer;transition:.2s}
+.mode b{display:block;font-size:13.5px}.mode span{font-size:11.5px;color:var(--faint)}
+.note{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--faint);line-height:1.7}
+.drawer-btns{display:flex;gap:10px;margin-top:20px}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:800;font-size:14px;cursor:pointer;transition:.2s}
 .btn.primary{background:linear-gradient(180deg,#ffc95e,#ff9a2e);color:#2a1800;flex:1;box-shadow:0 10px 26px rgba(255,150,40,.3)}
 .btn.ghost{background:none;border:1px solid var(--line);color:var(--dim)}
 .btn.ghost:hover{color:var(--red);border-color:var(--red)}
@@ -121,15 +129,16 @@ main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;
 .xbtn:hover{color:var(--text)}
 .overlay{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(4,8,16,.7);backdrop-filter:blur(6px)}
 .overlay.open{display:flex}
-.pad{width:min(390px,94vw);border-radius:24px;padding:24px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(23,37,66,.95),rgba(10,19,36,.95));box-shadow:var(--shadow);animation:up .25s ease}
-.pad-head{display:flex;justify-content:space-between;align-items:center;font-family:'Archivo';font-weight:800;font-size:18px}
+.pad{width:min(380px,94vw);border-radius:22px;padding:22px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(23,37,66,.96),rgba(10,19,36,.96));box-shadow:var(--shadow);animation:up .25s ease}
+.pad-head{display:flex;justify-content:space-between;align-items:center;font-family:'Archivo';font-weight:800;font-size:17px}
 .pad-head span{font-size:.65em;color:var(--faint);font-weight:500;margin-left:6px}
-.pad-disp{margin:16px 0 6px;min-height:56px;display:flex;align-items:center;padding:0 16px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid var(--line2);font-size:24px;letter-spacing:.12em}
-.pad-hint{font-size:12px;color:var(--faint);margin-bottom:14px}
-.pad-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.pad-keys button{padding:16px 0;font-size:20px;font-weight:700;border-radius:14px;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);transition:.15s}
+.pad-disp{margin:14px 0 5px;min-height:52px;display:flex;align-items:center;padding:0 15px;border-radius:13px;background:rgba(0,0,0,.35);border:1px solid var(--line2);font-size:22px;letter-spacing:.12em}
+.pad-hint{font-size:11.5px;color:var(--faint);margin-bottom:12px}
+.pad-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.pad-keys button{padding:14px 0;font-size:19px;font-weight:700;border-radius:13px;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text)}
 .pad-keys button:active{background:var(--amber);color:#241500;border-color:var(--amber)}
-.pad .go{width:100%;margin-top:14px;padding:16px;border:0;border-radius:14px;cursor:pointer;background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f;font-weight:900;font-size:16px;letter-spacing:.06em}
+.pad .go{width:100%;margin-top:12px;padding:15px;border:0;border-radius:13px;cursor:pointer;background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f;font-weight:900;font-size:15px;letter-spacing:.06em}
+@media(max-height:620px){#reader{height:26vh}.ready-sub{display:none}.slots-head{margin-bottom:4px}}
 </style>
 </head>
 <body>
@@ -141,7 +150,7 @@ main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;
     <span class="modebadge" id="modeBadge">—</span>
     <span class="conn" id="conn"><i></i><span id="connTx">…</span></span>
   </div>
-  <div class="gright"><span class="nowout">NOW OUTSIDE 正在外面 <b id="nowOut">0</b></span><time class="clock mono" id="clock">--:--:--</time><button class="iconbtn" id="btnSet" title="Settings 設定">⚙</button></div>
+  <div class="gright"><span class="nowout">OUT 外面 <b id="nowOut">0</b></span><time class="clock mono" id="clock">--:--:--</time><button class="iconbtn" id="btnSet" title="Settings 設定">⚙</button></div>
 </header>
 
 <main><section class="board" id="board"></section></main>
@@ -150,14 +159,14 @@ main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <h2>Device Settings<span>裝置設定</span></h2><button class="xbtn" id="drawerClose">✕</button>
   </div>
-  <label>Device / Gate Name 裝置／閘口名稱（recorded as Device ID 會記錄為裝置 ID）</label>
-  <input type="text" id="gName" maxlength="24" placeholder="e.g. Stand Exit A">
-  <label style="margin-top:22px">Mode 模式</label>
-  <label class="mode"><input type="radio" name="gmode" value="auto"><div><b>AUTO 自動（建議）</b><span>Scan = go out; scan again = return 掃碼自動判斷外出／返回</span></div></label>
+  <label>Gate Name 閘口名稱（= Phone Slots identity 手機格身份；同名稱＝同一閘共享 12 格）</label>
+  <input type="text" id="gName" maxlength="24" placeholder="e.g. Gate A">
+  <label style="margin-top:20px">Mode 模式</label>
+  <label class="mode"><input type="radio" name="gmode" value="auto"><div><b>AUTO 自動（建議）</b><span>Scan = out; scan again = return 掃碼自動判斷外出／返回</span></div></label>
   <label class="mode"><input type="radio" name="gmode" value="out"><div><b>OUT Only 只登記外出</b><span>This device only registers exits 本裝置只處理離開</span></div></label>
   <label class="mode"><input type="radio" name="gmode" value="in"><div><b>IN Only 只登記返回</b><span>This device only registers returns 本裝置只處理返回</span></div></label>
-  <label class="mode" style="margin-top:16px"><input type="checkbox" id="gSound"><div><b>Sound 聲音提示</b><span>Beep on scan 掃描嗶聲</span></div></label>
-  <div class="note">Overlong threshold 超時時限：<b><span id="thNote">15</span> min</b>（於 Admin 設定 set in Admin）<br>Event scenario 活動場景由 Admin 統一設定。</div>
+  <label class="mode" style="margin-top:14px"><input type="checkbox" id="gSound"><div><b>Sound 聲音提示</b><span>Beep on scan 掃描嗶聲</span></div></label>
+  <div class="note">Device 裝置：<b id="devNote">—</b>（auto-detected 自動偵測）<br>Phone slots 手機格：本閘 12 格，滿格禁止外出。<br>Threshold 時限：<b><span id="thNote">15</span> min</b> · Scenario 場景由 Admin 設定。</div>
   <div class="drawer-btns"><button class="btn primary" id="saveCfg">Save 儲存</button><button class="btn ghost" data-signout>Sign Out 登出</button></div>
 </aside>
 
@@ -182,53 +191,91 @@ const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
-let threshold=15, scenario='track', students={}, liveMap={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null;
+/* 自動偵測裝置類型 */
+const DEV=(()=>{const ua=navigator.userAgent,t=('ontouchstart'in window)||navigator.maxTouchPoints>0;
+  if(/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&t))return'iPad / iPhone';
+  if(/Android/.test(ua))return'Android';
+  return'PC / Notebook';})();
+let threshold=15, scenario='track', students={}, liveMap={}, slotsMap={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null, slotsRef=null;
 const $=id=>document.getElementById(id), board=$('board');
+const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
 
 requireAuth(function init(){
   if(booted)return; booted=true;
   bindSignOut();
-  applyHeader(); toReady();
+  applyHeader(); subscribeSlots(); toReady();
   setInterval(()=>{$('clock').textContent=fmtClock(Date.now())},500);
+  $('devNote').textContent=DEV;
 
   db.ref('students').on('value',s=>{students=s.val()||{};});
   db.ref('live').on('value',s=>{liveMap=s.val()||{};const n=Object.keys(liveMap).length;$('nowOut').textContent=n;const pb=$('pillOutB');if(pb)pb.textContent=n;});
-  db.ref('.info/connected').on('value',s=>{const on=!!s.val();$('conn').className='conn '+(on?'on':'off');$('connTx').textContent=on?'LIVE 連線':'OFFLINE 離線';});
+  db.ref('.info/connected').on('value',s=>{const on=!!s.val();$('conn').className='conn '+(on?'on':'off');$('connTx').textContent=on?'LIVE':'OFFLINE';});
   watchThreshold(v=>{threshold=v;$('thNote').textContent=v;const p=$('pillThB');if(p)p.textContent=v+' min';});
   watchScenario(v=>{scenario=v;applyHeader();if(state==='ready')toReady();});
 
-  /* ---- QR scanner ---- */
+  /* ---- 手機格 ---- */
+  function subscribeSlots(){
+    if(slotsRef)slotsRef.off();
+    slotsRef=db.ref('slots/'+gateKey());
+    slotsRef.on('value',s=>{slotsMap=s.val()||{};refreshSlots();});
+  }
+  function freeCount(){let n=0;for(let i=1;i<=12;i++)if(!slotsMap[i])n++;return n;}
+  function refreshSlots(){
+    const g=$('slotsGrid');if(!g)return;
+    let c='';for(let i=1;i<=12;i++)c+=`<div class="slot${slotsMap[i]?' occ':''}">${i}</div>`;
+    g.innerHTML=c;
+    const f=$('slotFree');if(f)f.textContent=freeCount()+'/12 FREE';
+  }
+  function assignSlot(card,sid,recordId,now){
+    return new Promise(res=>{
+      const trySlot=i=>{
+        if(i>12){res(null);return;}
+        db.ref(`slots/${gateKey()}/${i}`).transaction(cur=>{
+          if(cur)return; return {card,sid,recordId,outAt:now};
+        }).then(r=>{ r.committed?res(i):trySlot(i+1); });
+      };
+      trySlot(1);
+    });
+  }
+
+  /* ---- QR scanner（自動鏡頭方向）---- */
   function startScanner(){
     if(state!=='ready'||!document.getElementById('reader'))return;
     if(!window.Html5Qrcode){const c=$('camErr');if(c)c.textContent='Scanner library not loaded 掃描庫未載入';return;}
     stopScanner();
+    const cam={fps:10,qrbox:(w,h)=>{const s=Math.min(w,h)*0.66;return{width:s,height:s};}};
+    const first=(DEV==='PC / Notebook')?'user':'environment';
     try{
       qr=new Html5Qrcode('reader');
-      qr.start({facingMode:'environment'},{fps:10,qrbox:{width:240,height:240}},
-        txt=>{ if(state!=='ready')return; stopScanner(); handleScan(txt); },
-        ()=>{}
-      ).catch(e=>{const c=$('camErr');if(c)c.textContent='Camera unavailable 相機不可用 — use Manual Entry 請用手動輸入';});
+      qr.start({facingMode:first},cam,onQr,()=>{})
+        .catch(()=>qr.start({facingMode:first==='user'?'environment':'user'},cam,onQr,()=>{}))
+        .catch(()=>qr.start({},cam,onQr,()=>{}))
+        .catch(()=>{const c=$('camErr');if(c)c.textContent='Camera unavailable 相機不可用 — Manual Entry 請用手動輸入';});
     }catch(e){}
   }
+  function onQr(txt){ if(state!=='ready')return; stopScanner(); handleScan(txt); }
   function stopScanner(){
     if(!qr)return; const q=qr; qr=null;
     if(q.isScanning){q.stop().then(()=>{try{q.clear()}catch(e){}}).catch(()=>{});}
     else{try{q.clear()}catch(e){}}
   }
 
-  /* ---- header / drawer ---- */
+  /* ---- drawer ---- */
   $('btnSet').onclick=()=>{ $('gName').value=cfg.name; document.querySelector(`input[name=gmode][value=${cfg.mode}]`).checked=true; $('gSound').checked=!cfg.muted; $('drawer').classList.add('open'); };
   $('drawerClose').onclick=()=>$('drawer').classList.remove('open');
   $('saveCfg').onclick=()=>{
+    const oldKey=gateKey();
     cfg.name=$('gName').value.trim()||'Gate A';
     cfg.mode=document.querySelector('input[name=gmode]:checked').value;
     cfg.muted=!$('gSound').checked; window.MUTED=cfg.muted;
     localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
-    applyHeader(); $('drawer').classList.remove('open'); toReady();
+    applyHeader(); $('drawer').classList.remove('open');
+    if(gateKey()!==oldKey)subscribeSlots();
+    toReady();
   };
   function applyHeader(){
     $('gShow').textContent=cfg.name;
-    $('modeBadge').textContent= cfg.mode==='auto' ? 'AUTO 自動' : cfg.mode==='out' ? 'OUT ONLY 只登記外出' : 'IN ONLY 只登記返回';
+    $('modeBadge').textContent= cfg.mode==='auto' ? 'AUTO 自動' : cfg.mode==='out' ? 'OUT ONLY 只出' : 'IN ONLY 只入';
     const sc=scenarioMeta(scenario);
     $('scBadge').textContent=`${sc.zh} ${sc.en.toUpperCase()}`;
   }
@@ -258,26 +305,29 @@ requireAuth(function init(){
   }
   function handleScan(raw){
     raw=String(raw||'').trim(); if(!raw)return;
-    pendingCode=raw;                       // 記錄掃描值
+    pendingCode=raw;
     const st=findStudent(raw);
     if(!st){showNotFound(raw);return;}
     const isOut=!!liveMap[st.card];
     if(cfg.mode==='out'){ isOut ? showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',liveMap[st.card]) : showPurpose(st); return; }
     if(cfg.mode==='in'){ isOut ? doIn(st) : showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null); return; }
-    isOut ? doIn(st) : showPurpose(st);    // AUTO：自動判斷
+    isOut ? doIn(st) : showPurpose(st);
   }
 
   function doOut(st,purpose){
     const card=st.card, now=Date.now();
     const recKey=db.ref('records').push().key;
-    db.ref('live/'+card).transaction(cur=>{
-      if(cur)return;
-      return {recordId:recKey,outAt:now,gate:cfg.name,purpose};
-    }).then(res=>{
-      if(!res.committed){showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',liveMap[card]||{outAt:now});return;}
-      db.ref('records/'+recKey).set({card,sid:st.sid,cls:st.cls,no:st.no,house:st.house,scenario,
-        code:pendingCode,purpose,gateOut:cfg.name,outAt:now,gateIn:null,inAt:null,durationSec:null,overlong:false});
-      db.ref('counters/'+card+'/outCount').transaction(v=>(v||0)+1).then(r=>showOut(st,r.snapshot.val()||1,!!st.overlongFlag,purpose));
+    assignSlot(card,st.sid,recKey,now).then(slot=>{
+      if(!slot){showWarn(st,'SLOTS FULL','本閘 12 個手機格已滿 — 不能外出',null);sound('warn');return;}
+      db.ref('live/'+card).transaction(cur=>{
+        if(cur)return;
+        return {recordId:recKey,outAt:now,gate:cfg.name,purpose,slot,slotGate:cfg.name};
+      }).then(res=>{
+        if(!res.committed){db.ref(`slots/${gateKey()}/${slot}`).set(null);showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',liveMap[card]||{outAt:now});return;}
+        db.ref('records/'+recKey).set({card,sid:st.sid,cls:st.cls,no:st.no,house:st.house,scenario,
+          code:pendingCode,purpose,slot,slotGate:cfg.name,gateOut:cfg.name,outAt:now,gateIn:null,inAt:null,durationSec:null,overlong:false});
+        db.ref('counters/'+card+'/outCount').transaction(v=>(v||0)+1).then(r=>showOut(st,r.snapshot.val()||1,!!st.overlongFlag,purpose,slot));
+      });
     });
   }
   function doIn(st){
@@ -291,7 +341,12 @@ requireAuth(function init(){
       upd['records/'+captured.recordId+'/durationSec']=Math.round(durMs/1000);
       upd['records/'+captured.recordId+'/overlong']=over;
       if(over)upd['students/'+card+'/overlongFlag']=true;
-      db.ref().update(upd).then(()=>showIn(st,durMs,over,captured.purpose));
+      let phoneNote='';
+      if(captured.slot){
+        if((captured.slotGate||cfg.name)===cfg.name){ upd[`slots/${gateKey()}/${captured.slot}`]=null; phoneNote=`📱 COLLECT PHONE 取回手機 · SLOT 格 #${captured.slot}`; }
+        else phoneNote=`📱 PHONE AT 手機存放於 ${captured.slotGate} #${captured.slot}`;
+      }
+      db.ref().update(upd).then(()=>showIn(st,durMs,over,captured.purpose,phoneNote));
     });
   }
 
@@ -304,22 +359,24 @@ requireAuth(function init(){
     <div class="row"><span class="k">Class Number<i>學號</i></span><span class="v">${esc(st.no||'—')}</span></div>
     <div class="row"><span class="k">Scanned<i>掃描值</i></span><span class="v mono small">${esc(st.card)}</span></div>`;
   const flagBadge=st=>st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:'';
+  const slotsStrip=()=>`<div class="slots-wrap"><div class="slots-head"><span>PHONE SLOTS 手機格 · ${esc(cfg.name)}</span><span class="mono" id="slotFree">${freeCount()}/12 FREE</span></div><div class="slots" id="slotsGrid"></div></div>`;
   function schedule(ms){clearTimeout(resetT);resetT=setTimeout(toReady,ms);}
   function toReady(){state='ready';pendingSt=null;clearTimeout(resetT);renderReady();}
   function renderReady(){
     const sc=scenarioMeta(scenario);
     board.innerHTML=`
-      <div class="micro">EVENT PASS TERMINAL · ${sc.en.toUpperCase()} ${sc.zh} · DEVICE ${esc(cfg.name)}</div>
-      <div class="ready-word">SCAN<span class="cursor"></span></div>
-      <div class="ready-sub">Scan student QR code<span class="zh">請掃描學生證 QR 碼</span></div>
+      <div class="micro">EVENT PASS · ${sc.en.toUpperCase()} ${sc.zh} · DEVICE ${esc(cfg.name)} · ${esc(DEV)}</div>
       <div id="reader"></div>
       <div class="camerr" id="camErr"></div>
+      <div class="ready-line"><div class="ready-word">SCAN<span class="cursor"></span></div>
+        <div class="ready-sub">Scan student QR<span class="zh">請掃描學生證 QR 碼</span></div></div>
+      ${slotsStrip()}
       <div class="ready-foot">
         <span class="pill">NOW OUTSIDE 正在外面 <b id="pillOutB">${Object.keys(liveMap).length}</b></span>
         <span class="pill">LIMIT 時限 <b id="pillThB">${threshold} min</b></span>
         <button class="ghostbtn" data-act="manual">Manual Entry 手動輸入</button>
       </div>`;
-    startScanner();
+    refreshSlots(); startScanner();
   }
   function showPurpose(st){
     state='choice';pendingSt=st;clearTimeout(resetT);resetT=setTimeout(toReady,90000);
@@ -331,31 +388,40 @@ requireAuth(function init(){
         <button class="pbtn f" data-purpose="food">🍱<b>FOOD</b><span>小食部</span></button>
         <button class="pbtn o" data-purpose="other">📌<b>OTHER</b><span>其他</span></button>
       </div>
+      ${slotsStrip()}
       <button class="ghostbtn" data-act="cancel" style="justify-self:center">Cancel 取消</button>`;
-    tone(880,.08);
+    refreshSlots(); tone(880,.08);
   }
-  function showOut(st,count,wasFlag,purpose){
+  function showOut(st,count,wasFlag,purpose,slot){
     state='out';pendingSt=null;const sc=scenarioMeta(scenario),pm=purposeMeta(purpose);
     board.innerHTML=`
       <div class="stamp s-out">OUT</div>
       <div class="micro">GOING ${sc.out.en} ${sc.out.zh} · RECORDED 已記錄</div>
       <div class="grid2">${houseBlock(st)}<div class="info">${rows(st)}${wasFlag?flagBadge(st):''}</div></div>
-      <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span><span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
-      <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
-    sound('out');schedule(8000);
+      <div class="ready-foot">
+        <span class="pill slotpill">📱 PHONE SLOT 手機格 #${slot}</span>
+        <span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span>
+        <span class="pill">TRIP <b>#${count}</b></span>
+        <span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span>
+      </div>
+      <div class="foot-hint">Hand over phone to slot 請將手機放入格位 · Tap to return 點一下返回</div>`;
+    sound('out');schedule(9000);
   }
-  function showIn(st,durMs,over,purpose){
+  function showIn(st,durMs,over,purpose,phoneNote){
     state='in';pendingSt=null;const sc=scenarioMeta(scenario),pm=purposeMeta(purpose);
     board.innerHTML=`
       <div class="stamp s-in">IN</div>
       <div class="micro">BACK ${sc.in.en} ${sc.in.zh} · RECORDED 已記錄</div>
       <div class="grid2">${houseBlock(st)}<div class="info">${rows(st)}
         <div class="dur-line">${fmtDur(durMs)}<span>TIME OUTSIDE 在外時間</span></div></div></div>
-      <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span></div>
+      <div class="ready-foot">
+        ${phoneNote?`<span class="pill slotpill">${phoneNote}</span>`:''}
+        <span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span>
+      </div>
       ${over?`<div class="alert">⏱ TIME EXCEEDED · OUT ≥ ${threshold} MIN — 外出時間過長，已作標記</div>`
             :`<div class="okline">✓ RETURNED ON TIME 準時返回</div>`}
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
-    sound(over?'warn':'in');schedule(over?12000:8000);
+    sound(over?'warn':'in');schedule(over?12000:9000);
   }
   function showWarn(st,title,zh,live){
     state='warn';pendingSt=null;
@@ -374,7 +440,7 @@ requireAuth(function init(){
       <div class="stamp s-warn">?</div>
       <div class="center">
         <div class="nf">NOT FOUND<span>未找到此 QR 值 / 學生編號</span></div>
-        <div class="mono dim" style="margin:10px 0 18px">“${esc(raw)}”</div>
+        <div class="mono dim" style="margin:8px 0 14px">“${esc(raw)}”</div>
         <button class="ghostbtn" data-act="manual">Manual Entry 手動輸入</button>
       </div>`;
     sound('err');schedule(9000);
