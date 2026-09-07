@@ -23,7 +23,7 @@ body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min
 .btn{border:0;border-radius:12px;padding:12px 20px;font-weight:800;font-size:13.5px;cursor:pointer}
 .btn.ghost{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim)}
 .btn.ghost:hover{color:var(--text);border-color:var(--line2)}
-main{max-width:940px;margin:0 auto;padding:34px 20px}
+main{max-width:960px;margin:0 auto;padding:34px 20px}
 .searchbar{display:flex;gap:10px;flex-wrap:wrap}
 #q{flex:1;min-width:240px;border:1.5px solid var(--line2);color:var(--text);border-radius:16px;padding:17px 18px 17px 50px;font-size:16px;
  font-family:'IBM Plex Mono',monospace;outline:none;transition:.2s;
@@ -173,7 +173,11 @@ requireAuth(function init(){
       </div>
       ${l?`<div class="status out">● ${sc.out.en} ${sc.out.zh} <small>since 離開 ${fmtClock(l.outAt)} · <span data-el="${esc(st.card)}">${fmtDur(Date.now()-l.outAt)}</span> · ${esc(l.gate||'')}</small></div>`
          :`<div class="status in">● ${sc.in.en} ${sc.in.zh}</div>`}
-      <div class="mini"><span class="pill">TOTAL TRIPS OUT 外出次數 <b>${cnt}</b></span></div>
+      <div class="mini">
+        <span class="pill">TOTAL TRIPS OUT 外出次數 <b>${cnt}</b></span>
+        ${l&&l.purpose?`<span class="pill">${purposeMeta(l.purpose).icon} ${purposeMeta(l.purpose).en} ${purposeMeta(l.purpose).zh}</span>`:''}
+        ${l&&l.slot?`<span class="pill">📱 SLOT 格 #${l.slot} · ${esc(l.slotGate||'')}</span>`:''}
+      </div>
       ${st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:''}
       <h3 class="sec">Recent Records<span>最近記錄</span></h3>
       <div id="hist"><div class="dim" style="font-size:13px">Loading…</div></div>
@@ -181,15 +185,14 @@ requireAuth(function init(){
     $('backBtn').onclick=()=>doSearch($('q').value||'');
     db.ref('records').orderByChild('card').equalTo(st.card).limitToLast(12).once('value').then(s=>{
       const rows=[];s.forEach(c=>rows.push(c.val()));rows.sort((a,b)=>b.outAt-a.outAt);
-      $('hist').innerHTML=rows.length?`<table><tr><th>Date</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>`+
-        rows.map(r=>`<tr><td class="mono">${fmtDate(r.outAt)}</td><td class="mono">${fmtHM(r.outAt)}</td>
+      $('hist').innerHTML=rows.length?`<table><tr><th>Date</th><th>目的</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>格位</th><th>Flag</th></tr>`+
+        rows.map(r=>`<tr><td class="mono">${fmtDate(r.outAt)}</td><td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td><td class="mono">${fmtHM(r.outAt)}</td>
           <td class="mono">${r.inAt?fmtHM(r.inAt):'<span class="dim">未返</span>'}</td>
-          <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
+          <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td class="mono">${r.slot?'#'+r.slot:'—'}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
         :`<div class="dim" style="font-size:13px">No records 暫無記錄</div>`;
     });
   }
-});
-   function renderBoard(){
+  function renderBoard(){
     tickDetail=null;
     const d=new Date();d.setHours(0,0,0,0);
     db.ref('records').orderByChild('outAt').startAt(d.getTime()).once('value').then(s=>{
@@ -205,16 +208,17 @@ requireAuth(function init(){
           <span class="pill">OVERLONG 超時 <b>${over}</b></span>
         </div>
         <h3 class="sec">Currently Outside<span>正在外面</span></h3>
-        ${outCards.length?`<table><tr><th>Student</th><th>Class</th><th>House</th><th>Purpose 目的</th><th>Out 離開</th><th>Elapsed 已外出</th><th>Device 裝置</th><th>Trips 次數</th></tr>`+
+        ${outCards.length?`<table><tr><th>Student</th><th>Class</th><th>House</th><th>Purpose 目的</th><th>Out 離開</th><th>Elapsed 已外出</th><th>Slot 格</th><th>Device 裝置</th><th>Trips 次數</th></tr>`+
           outCards.map(c=>{const st=students[c],l=live[c];if(!st)return '';const pm=purposeMeta(l.purpose);
-            return `<tr><td class="mono">${esc(st.sid)}</td><td>${esc(st.cls)} · ${esc(st.no)}</td><td>${esc(st.house||'')}</td><td>${pm.icon} ${pm.zh}</td><td class="mono">${fmtHM(l.outAt)}</td><td class="mono" data-el="${esc(c)}">${fmtDur(Date.now()-l.outAt)}</td><td>${esc(l.gate||'')}</td><td>×${counts[c]||1}</td></tr>`;}).join('')+`</table>`
+            return `<tr><td class="mono">${esc(st.sid)}</td><td>${esc(st.cls)} · ${esc(st.no)}</td><td>${esc(st.house||'')}</td><td>${pm.icon} ${pm.zh}</td><td class="mono">${fmtHM(l.outAt)}</td><td class="mono" data-el="${esc(c)}">${fmtDur(Date.now()-l.outAt)}</td><td class="mono">${l.slot?'#'+l.slot:'—'}</td><td>${esc(l.gate||'')}</td><td>×${counts[c]||1}</td></tr>`;}).join('')+`</table>`
          :`<div class="empty">Nobody is outside 沒有學生正在外面</div>`}
         <h3 class="sec">Returned Today<span>今日已返回（最近 80 筆）</span></h3>
-        ${returned.length?`<table><tr><th>Student</th><th>Class</th><th>Purpose 目的</th><th>Out 離開</th><th>In 返回</th><th>Duration 時長</th><th>Device 裝置</th><th></th></tr>`+
-          returned.map(r=>`<tr><td class="mono">${esc(r.sid)}</td><td>${esc(r.cls)} · ${esc(r.no)}</td><td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td><td class="mono">${fmtHM(r.outAt)}</td><td class="mono">${fmtHM(r.inAt)}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${esc(r.gateIn||'')}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
+        ${returned.length?`<table><tr><th>Student</th><th>Class</th><th>Purpose 目的</th><th>Out 離開</th><th>In 返回</th><th>Duration 時長</th><th>Slot 格</th><th>Device 裝置</th><th></th></tr>`+
+          returned.map(r=>`<tr><td class="mono">${esc(r.sid)}</td><td>${esc(r.cls)} · ${esc(r.no)}</td><td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td><td class="mono">${fmtHM(r.outAt)}</td><td class="mono">${fmtHM(r.inAt)}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td class="mono">${r.slot?'#'+r.slot:'—'}</td><td>${esc(r.gateIn||'')}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
          :`<div class="empty">No returns yet 暫無返回記錄</div>`}`;
     });
   }
+});
 </script>
 </body>
 </html>
