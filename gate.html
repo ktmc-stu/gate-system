@@ -201,7 +201,7 @@ const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
 requireAuth(function init(){
   if(booted)return; booted=true;
   bindSignOut();
-  applyHeader(); subscribeSlots(); toReady();
+  applyHeader(); subscribeSlots();
   setInterval(()=>{$('clock').textContent=fmtClock(Date.now())},500);
   $('devNote').textContent=DEV;
 
@@ -349,15 +349,15 @@ requireAuth(function init(){
   }
 
   /* ---- 畫面 ---- */
-  const houseBlock=st=>{const m=houseMeta(st.house);
-    return `<div class="house" style="background:${m.color};color:${m.text}"><span class="hl">${esc(st.house||'?')}</span><span class="hs">HOUSE 社</span></div>`;};
-  const rows=st=>`
+  function houseBlock(st){const m=houseMeta(st.house);
+    return `<div class="house" style="background:${m.color};color:${m.text}"><span class="hl">${esc(st.house||'?')}</span><span class="hs">HOUSE 社</span></div>`;}
+  function rows(st){return `
     <div class="row"><span class="k">Student ID<i>學生編號</i></span><span class="v mono">${esc(st.sid||'—')}</span></div>
     <div class="row"><span class="k">Class<i>班別</i></span><span class="v">${esc(st.cls||'—')}</span></div>
     <div class="row"><span class="k">Class Number<i>學號</i></span><span class="v">${esc(st.no||'—')}</span></div>
-    <div class="row"><span class="k">Scanned<i>掃描值</i></span><span class="v mono small">${esc(st.card)}</span></div>`;
-  const flagBadge=st=>st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:'';
-  const slotsStrip=()=>`<div class="slots-wrap"><div class="slots-head"><span>PHONE SLOTS 手機格 · ${esc(cfg.name)}</span><span class="mono" id="slotFree">${freeCount()}/12 FREE</span></div><div class="slots" id="slotsGrid"></div></div>`;
+    <div class="row"><span class="k">Scanned<i>掃描值</i></span><span class="v mono small">${esc(st.card)}</span></div>`;}
+  function flagBadge(st){return st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:'';}
+  function slotsStrip(){return `<div class="slots-wrap"><div class="slots-head"><span>PHONE SLOTS 手機格 · ${esc(cfg.name)}</span><span class="mono" id="slotFree">${freeCount()}/12 FREE</span></div><div class="slots" id="slotsGrid"></div></div>`;}
   function schedule(ms){clearTimeout(resetT);resetT=setTimeout(toReady,ms);}
   function toReady(){state='ready';pendingSt=null;clearTimeout(resetT);renderReady();}
   function renderReady(){
@@ -454,6 +454,8 @@ requireAuth(function init(){
       return;}
     if(state!=='ready'&&state!=='choice')toReady();
   });
+
+  toReady();
 });
 </script>
 </body>
