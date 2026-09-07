@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Admin · 管理</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#081120;--panel:rgba(17,29,54,.86);--panel2:rgba(10,19,36,.9);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.28);
  --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--amber-d:#ff8a3d;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;--shadow:0 20px 60px rgba(2,8,20,.55)}
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
 html{color-scheme:dark}
 body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
  background:radial-gradient(1100px 520px at 92% -10%,rgba(75,139,255,.16),transparent 60%),radial-gradient(900px 520px at -8% 110%,rgba(255,178,36,.12),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
@@ -17,7 +17,7 @@ body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min
 .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--line);
  background:rgba(8,14,26,.72);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
 .brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:20px;letter-spacing:.06em}
-.logo{width:32px;height:32px;object-fit:contain;border-radius:9px}
+.logo{width:36px;height:36px;object-fit:contain;border-radius:11px;flex:none}
 .brand b{color:var(--amber)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
 .tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:99px;padding:4px}
 .tab{border:0;background:none;color:var(--dim);padding:9px 20px;border-radius:99px;font-weight:700;font-size:13.5px;cursor:pointer;transition:.2s}
@@ -49,8 +49,8 @@ section.pane.on{display:block}
 .card h3{font-family:'Archivo';font-size:17px;font-weight:800;display:flex;align-items:center;gap:10px}
 .card h3::before{content:'';width:8px;height:8px;border-radius:3px;background:var(--amber)}
 .card h3 span{color:var(--faint);font-weight:500;font-size:.78em}
-.drop{border:2px dashed var(--line2);border-radius:18px;padding:38px 20px;text-align:center;color:var(--dim);cursor:pointer;transition:.2s;margin-top:16px}
-.drop::before{content:'';display:block;font-size:26px;color:var(--faint);margin-bottom:8px;transition:.2s}
+.drop{border:2px dashed var(--line2);border-radius:18px;padding:34px 20px;text-align:center;color:var(--dim);cursor:pointer;transition:.2s;margin-top:16px}
+.drop::before{content:'⬆';display:block;font-size:26px;color:var(--faint);margin-bottom:8px;transition:.2s}
 .drop:hover,.drop.over{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.06)}
 .drop:hover::before,.drop.over::before{color:var(--amber);transform:translateY(-3px)}
 .drop b{display:block;font-size:16px;color:var(--text);margin-bottom:4px}
@@ -80,7 +80,7 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
 </head>
 <body>
 <header class="top">
-  <div class="brand"><img class="logo" src="logo.png" onerror="this.remove()" alt="">G<b>A</b>TE ADMIN<span>管理</span></div>
+  <div class="brand"><img class="logo" src="logo.png" onerror="this.style.display='none'" alt="">G<b>A</b>TE ADMIN<span>管理</span></div>
   <nav class="tabs">
     <button class="tab on" data-tab="stu">Students<span>學生</span></button>
     <button class="tab" data-tab="rec">Records<span>記錄</span></button>
@@ -134,6 +134,9 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
         <label class="dim">From 由 <input type="date" id="dFrom"></label>
         <label class="dim">To 至 <input type="date" id="dTo"></label>
         <button class="btn ghost" id="btnLoad">Load 載入</button>
+        <button class="btn ghost" id="qToday">Today 今天</button>
+        <button class="btn ghost" id="q7">Last 7 Days 近7日</button>
+        <button class="btn ghost" id="qAll">All 全部</button>
         <button class="btn primary" id="btnExpRec">Export Excel 匯出記錄</button>
         <button class="btn green" id="btnExpSum">Summary 匯出統計</button>
       </div>
@@ -225,7 +228,7 @@ requireAuth(function init(){
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
     document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+t.dataset.tab));
-    if(t.dataset.tab==='rec'&&!$('recTable').innerHTML)loadRecords();
+    if(t.dataset.tab==='rec')loadRecords();
   });
 
   /* ---------- 匯入 ---------- */
@@ -321,31 +324,46 @@ requireAuth(function init(){
   });
 
   /* ---------- 記錄 ---------- */
-  function range(){const f=new Date($('dFrom').value+'T00:00:00').getTime(),t=new Date($('dTo').value+'T23:59:59.999').getTime();return[f,t];}
+  function range(){
+    let f=new Date(($('dFrom').value||fmtDate(Date.now()))+'T00:00:00').getTime();
+    let t=new Date(($('dTo').value||fmtDate(Date.now()))+'T23:59:59.999').getTime();
+    if(!isFinite(f))f=0;
+    if(!isFinite(t))t=Date.now()+86400000;
+    if(f>t){const x=f;f=t;t=x;}
+    return[f,t];
+  }
   function fetchRecords(){const[f,t]=range();
     return db.ref('records').orderByChild('outAt').startAt(f).endAt(t).once('value').then(s=>{
-      const rows=[];s.forEach(c=>rows.push(c.val()));rows.sort((a,b)=>b.outAt-a.outAt);return rows;});}
+      const rows=[];s.forEach(c=>rows.push(c.val()));rows.sort((a,b)=>(b.outAt||0)-(a.outAt||0));return rows;});}
+  function renderRecTable(rows){
+    $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>目的</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+
+      rows.slice(0,300).map(r=>{const m=houseMeta(r.house);return `<tr>
+        <td class="mono">${fmtDate(r.outAt)}</td><td>${esc(r.sid)}</td><td>${esc(r.cls)}</td><td>${esc(r.no)}</td>
+        <td><span class="hchip" style="--hc:${m.color}">${esc(r.house||'?')}</span></td>
+        <td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td>
+        <td class="mono">${fmtHM(r.outAt)} <span class="dim">${esc(r.gateOut||'')}</span></td>
+        <td class="mono">${r.inAt?fmtHM(r.inAt)+' ':''}<span class="dim">${esc(r.gateIn||'')}${r.inAt?'':' · STILL OUTSIDE 未返'}</span></td>
+        <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td>
+        <td>${r.overlong?'<span class="flagchip">⚠</span>':''}</td></tr>`;}).join('');
+    $('recCount').textContent=`${rows.length} records in range 範圍內記錄（顯示首 ${Math.min(rows.length,300)} 條）`;
+  }
   function loadRecords(){
     $('btnLoad').disabled=true;
-    fetchRecords().then(rows=>{
-      $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>目的</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+
-        rows.slice(0,200).map(r=>{const m=houseMeta(r.house);return `<tr>
-          <td class="mono">${fmtDate(r.outAt)}</td><td>${esc(r.sid)}</td><td>${esc(r.cls)}</td><td>${esc(r.no)}</td>
-          <td><span class="hchip" style="--hc:${m.color}">${esc(r.house||'?')}</span></td>
-          <td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td>
-          <td class="mono">${fmtHM(r.outAt)} <span class="dim">${esc(r.gateOut||'')}</span></td>
-          <td class="mono">${r.inAt?fmtHM(r.inAt)+' ':''}<span class="dim">${esc(r.gateIn||'')}${r.inAt?'':' · STILL OUTSIDE 未返'}</span></td>
-          <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td>
-          <td>${r.overlong?'<span class="flagchip">⚠</span>':''}</td></tr>`;}).join('');
-      $('recCount').textContent=`${rows.length} records in range 範圍內記錄（顯示首 200 條）`;
-      loadToday();
-    }).finally(()=>$('btnLoad').disabled=false);
+    $('recCount').textContent='Loading 載入中…';
+    fetchRecords().then(renderRecTable)
+      .catch(err=>{ $('recTable').innerHTML=''; $('recCount').textContent='載入失敗 Load failed: '+((err&&err.message)||err); })
+      .finally(()=>{ $('btnLoad').disabled=false; loadToday(); });
   }
   $('btnLoad').onclick=loadRecords;
+  $('dFrom').addEventListener('change',loadRecords);
+  $('dTo').addEventListener('change',loadRecords);
+  $('qToday').onclick=()=>{const t=fmtDate(Date.now());$('dFrom').value=t;$('dTo').value=t;loadRecords();};
+  $('q7').onclick=()=>{const d=new Date();d.setDate(d.getDate()-6);$('dFrom').value=fmtDate(d.getTime());$('dTo').value=fmtDate(Date.now());loadRecords();};
+  $('qAll').onclick=()=>{$('dFrom').value='2000-01-01';$('dTo').value=fmtDate(Date.now()+86400000);loadRecords();};
   $('btnExpRec').onclick=()=>{
     const btn=$('btnExpRec');btn.disabled=true;btn.textContent='Loading…';
     fetchRecords().then(rows=>{
-      rows.sort((a,b)=>a.outAt-b.outAt);
+      rows.sort((a,b)=>(a.outAt||0)-(b.outAt||0));
       const data=rows.map(r=>{const sm=scenarioMeta(r.scenario),pm=purposeMeta(r.purpose);return {
         'Event 活動':`${sm.zh} ${sm.en}`,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Class 班別':r.cls,'Class Number 學號':r.no,'House 社':r.house,
         'Purpose 目的':r.purpose?`${pm.zh} ${pm.en}`:'','Card 卡號':r.card,'Scanned Value 掃描值':r.code||r.card,
