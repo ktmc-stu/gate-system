@@ -236,27 +236,48 @@ requireAuth(function init(){
     });
   }
 
-  /* ---- QR scanner（自動鏡頭方向）---- */
+  /* ---- QR scanner（強化版：逐鏡頭嘗試＋明確錯誤＋iOS 修正）---- */
   function startScanner(){
     if(state!=='ready'||!document.getElementById('reader'))return;
-    if(!window.Html5Qrcode){const c=$('camErr');if(c)c.textContent='Scanner library not loaded 掃描庫未載入';return;}
     stopScanner();
+    if(!window.Html5Qrcode){camFail('lib');return;}
+    if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){camFail('nosupport');return;}
     const cam={fps:10,qrbox:(w,h)=>{const s=Math.min(w,h)*0.66;return{width:s,height:s};}};
-    const first=(DEV==='PC / Notebook')?'user':'environment';
-    try{
+    const order=(DEV==='PC / Notebook')?['user','environment']:['environment','user'];
+    let lastErr=null, idx=0;
+    const attempt=()=>{
       qr=new Html5Qrcode('reader');
-      qr.start({facingMode:first},cam,onQr,()=>{})
-        .catch(()=>qr.start({facingMode:first==='user'?'environment':'user'},cam,onQr,()=>{}))
-        .catch(()=>qr.start({},cam,onQr,()=>{}))
-        .catch(()=>{const c=$('camErr');if(c)c.textContent='Camera unavailable 相機不可用 — Manual Entry 請用手動輸入';});
-    }catch(e){}
+      qr.start({facingMode:{ideal:order[idx]}},cam,
+        txt=>{if(state!=='ready')return;stopScanner();handleScan(txt);},
+        ()=>{})
+      .then(()=>{
+        const v=document.querySelector('#reader video');
+        if(v){v.setAttribute('playsinline','');v.setAttribute('muted','');v.muted=true;v.play&&v.play().catch(()=>{});}
+      })
+      .catch(e=>{
+        lastErr=e; idx++;
+        if(idx<order.length){try{qr.clear()}catch(_){} attempt();}
+        else camFail(lastErr&&lastErr.name);
+      });
+    };
+    attempt();
   }
-  function onQr(txt){ if(state!=='ready')return; stopScanner(); handleScan(txt); }
+  function camFail(reason){
+    const c=$('camErr');if(!c)return;
+    let m='Camera unavailable 相機不可用';
+    if(reason==='lib')m='Scanner library not loaded 掃描庫未載入';
+    else if(reason==='nosupport')m='此瀏覽器不支援相機 — 請改用 Safari／系統瀏覽器或電腦 This browser has no camera API';
+    else if(reason==='NotAllowedError'||reason==='PermissionDeniedError')m='相機權限被拒 — 請於瀏覽器網站設定允許（iPhone：設定→Safari→相機）Permission denied';
+    else if(reason==='NotFoundError'||reason==='DevicesNotFoundError')m='搵唔到相機 No camera found';
+    c.innerHTML=`${m} · <button class="ghostbtn" data-act="camretry">Retry 重試</button>`;
+  }
   function stopScanner(){
     if(!qr)return; const q=qr; qr=null;
     if(q.isScanning){q.stop().then(()=>{try{q.clear()}catch(e){}}).catch(()=>{});}
     else{try{q.clear()}catch(e){}}
   }
+  /* iOS／Android 切走 App 後返嚟，自動重開鏡頭 */
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&state==='ready')startScanner(); });
 
   /* ---- drawer ---- */
   $('btnSet').onclick=()=>{ $('gName').value=cfg.name; document.querySelector(`input[name=gmode][value=${cfg.mode}]`).checked=true; $('gSound').checked=!cfg.muted; $('drawer').classList.add('open'); };
@@ -451,6 +472,7 @@ requireAuth(function init(){
     if(b){const a=b.dataset.act;
       if(a==='manual')openPad();
       else if(a==='cancel')toReady();
+      else if(a==='camretry')startScanner();
       return;}
     if(state!=='ready'&&state!=='choice')toReady();
   });
