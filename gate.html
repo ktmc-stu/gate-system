@@ -281,41 +281,29 @@ requireAuth(function init(){
   function refreshHousePill(){ const p=$('pillHouse'); if(p)p.textContent=houseLabel(); }
   function houseAllowed(st){ const hs=gateHouses(); if(!hs.length)return true; return hs.includes(String(st.house||'').toUpperCase()); }
 
-  /* ---- QR scanner ---- */
+  /* ---- QR scanner（原始配置：單實例＋三段後備，全設備適用）---- */
   function startScanner(){
     if(state!=='ready'||!document.getElementById('reader'))return;
     stopScanner();
     const c=$('camErr');if(c)c.innerHTML='';
-    if(!window.isSecureContext){camFail('需要 HTTPS 連線 Not a secure context');return;}
     if(!window.Html5Qrcode){camFail('掃描庫未載入 Scanner library not loaded');return;}
-    if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){
-      camFail('此瀏覽器不支援相機 No camera API — 請改用 Safari／系統瀏覽器或電腦');return;}
     const cam={fps:10,qrbox:(w,h)=>{const s=Math.min(w,h)*0.66;return{width:s,height:s};}};
-    const order=(DEV==='PC / Notebook')?['user','environment']:['environment','user'];
-    let idx=0;
-    const attempt=()=>{
-      try{qr=new Html5Qrcode('reader');}catch(e){camFail('初始化失敗 Init error: '+e);return;}
-      qr.start({facingMode:{ideal:order[idx]}},cam,
-        txt=>{if(state!=='ready')return;stopScanner();handleScan(txt,false);},
-        ()=>{})
-      .then(()=>{
-        const v=document.querySelector('#reader video');
-        if(v){v.setAttribute('playsinline','');v.setAttribute('muted','');v.muted=true;v.play&&v.play().catch(()=>{});}
-      })
-      .catch(e=>{
-        idx++;
-        if(idx<order.length){try{qr.clear()}catch(_){} setTimeout(attempt,150);}
-        else camFail(errMsg(e));
-      });
-    };
-    attempt();
+    qr=new Html5Qrcode('reader');
+    const ok=()=>{const v=document.querySelector('#reader video');
+      if(v){v.setAttribute('playsinline','');v.setAttribute('muted','');v.muted=true;v.play&&v.play().catch(()=>{});}};
+    qr.start({facingMode:'environment'},cam,onQr,()=>{})
+      .catch(()=>qr.start({facingMode:'user'},cam,onQr,()=>{}))
+      .catch(()=>qr.start({},cam,onQr,()=>{}))
+      .then(ok)
+      .catch(e=>camFail(errMsg(e)));
   }
+  function onQr(txt){ if(state!=='ready')return; stopScanner(); handleScan(txt,false); }
   function errMsg(e){
+    if(typeof e==='string')return '相機錯誤 Camera error: '+e.slice(0,120);
     const n=(e&&e.name)||'';
-    if(n==='NotAllowedError'||n==='PermissionDeniedError')return '相機權限被拒 Permission denied — iPhone：設定→Safari→相機→允許；Android：網址列鎖頭→網站設定→相機→允許';
+    if(n==='NotAllowedError'||n==='PermissionDeniedError')return '相機權限被拒 Permission denied — iPhone：設定→Safari→相機→允許；Android：網址列鎖頭→網站設定→相機';
     if(n==='NotFoundError'||n==='DevicesNotFoundError')return '搵唔到相機 No camera found';
     if(n==='NotReadableError'||n==='TrackStartError')return '相機被其他程式占用 Camera in use by another app';
-    if(n==='OverconstrainedError')return '相機規格不符 Overconstrained — 請 Retry';
     return '相機錯誤 Camera error ['+n+'] '+(((e&&e.message)||'').slice(0,90));
   }
   function camFail(m){const c=$('camErr');if(c)c.innerHTML=`${m} · <button class="ghostbtn" data-act="camretry">Retry 重試</button>`;}
