@@ -17,7 +17,7 @@ body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min
 .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--line);
  background:rgba(8,14,26,.72);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
 .brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:20px;letter-spacing:.06em}
-.brand::before{content:'G';display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#5ce8a4,#1fb86b);color:#03230f;font-size:19px;box-shadow:0 6px 18px rgba(47,211,127,.3)}
+.logo{width:32px;height:32px;object-fit:contain;border-radius:9px}
 .brand b{color:var(--green)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
 .clock{font-family:'IBM Plex Mono';font-weight:600;font-size:18px;letter-spacing:.06em}
 .btn{border:0;border-radius:12px;padding:12px 20px;font-weight:800;font-size:13.5px;cursor:pointer}
@@ -73,7 +73,7 @@ td{padding:8px 9px;border-bottom:1px solid var(--line)}
 </head>
 <body>
 <header class="top">
-  <div class="brand">G<b>A</b>TE ENQUIRY<span>老師查詢</span></div>
+  <div class="brand"><img class="logo" src="logo.png" onerror="this.remove()" alt="">G<b>A</b>TE ENQUIRY<span>老師查詢</span></div>
   <time class="clock" id="clock">--:--:--</time>
   <button class="btn ghost" data-signout>Sign Out 登出</button>
 </header>
