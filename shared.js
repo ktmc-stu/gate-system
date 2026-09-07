@@ -22,6 +22,14 @@ const SCENARIOS = {
 function scenarioMeta(k){ return SCENARIOS[k] || SCENARIOS.track; }
 function watchScenario(cb){ db.ref('config/scenario').on('value',s=>cb(s.val()==='swim'?'swim':'track')); }
 
+/* ---- 外出目的 ---- */
+const PURPOSES={
+  toilet:{en:'Toilet',zh:'廁所',icon:'🚻'},
+  food:  {en:'Food',  zh:'小食部',icon:'🍱'},
+  other: {en:'Other', zh:'其他',icon:'📌'}
+};
+function purposeMeta(p){return PURPOSES[p]||{en:'—',zh:'—',icon:'·'};}
+
 const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pad2 = n=>String(n).padStart(2,'0');
 function fmtClock(ts){const d=new Date(ts);return `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;}
@@ -44,12 +52,10 @@ function sound(kind){
   else if(kind==='err'){tone(220,.18,'square',.06);}
 }
 
+/* favicon（用你上載嘅 logo.png）*/
+(function(){const l=document.createElement('link');l.rel='icon';l.href='logo.png';document.head.appendChild(l);})();
+
 /* ---- 密碼鎖（通用密碼 = Firebase 職員帳號）---- */
-/* favicon（順手解決 404）*/
-(function(){const l=document.createElement('link');l.rel='icon';
-l.href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%23ffb224%22/><text x=%2250%22 y=%2270%22 font-size=%2256%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-weight=%22900%22 fill=%22%23241500%22>G</text></svg>';
-document.head.appendChild(l);})();
-/* 登入鎖 */
 (function(){const s=document.createElement('style');s.textContent=
 `#lock{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;
  background:radial-gradient(900px 500px at 70% -10%,rgba(75,139,255,.2),transparent 60%),radial-gradient(700px 500px at 10% 110%,rgba(255,178,36,.16),transparent 60%),rgba(5,9,18,.94);backdrop-filter:blur(10px)}
@@ -58,8 +64,7 @@ document.head.appendChild(l);})();
  font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:#f2f6ff;animation:lk .35s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes lk{from{opacity:0;transform:translateY(16px) scale(.97)}}
 #lock .mk{display:flex;align-items:center;gap:12px;font-family:Archivo,'Noto Sans TC',sans-serif;font-weight:900;font-size:28px;letter-spacing:.06em}
-#lock .mk::before{content:'G';display:grid;place-items:center;width:46px;height:46px;border-radius:14px;flex:none;
- background:linear-gradient(135deg,#ffb224,#ff8a3d);color:#241500;font-size:25px;box-shadow:0 8px 24px rgba(255,150,40,.4)}
+#lock .mk img{width:44px;height:44px;object-fit:contain;border-radius:12px;flex:none}
 #lock .mk b{color:#ffb224}
 #lock h1{font-size:16px;margin:18px 0 2px;font-weight:700}
 #lock h1 span{color:#6d7ea6;font-weight:500;margin-left:8px;font-size:.85em}
@@ -76,7 +81,7 @@ function showLock(){
   if(document.getElementById('lock'))return;
   const el=document.createElement('div');el.id='lock';
   el.innerHTML=`<form id="lockForm">
-    <div class="mk">G<b>A</b>TE <span style="font-size:12px;color:#8fa1c5;letter-spacing:.2em">EVENT PASS SYSTEM 進出記錄系統</span></div>
+    <div class="mk"><img src="logo.png" onerror="this.remove()" alt="">G<b>A</b>TE <span style="font-size:12px;color:#8fa1c5;letter-spacing:.2em">EVENT PASS SYSTEM 進出記錄系統</span></div>
     <h1>Staff Access<span>職員登入</span></h1>
     <input id="lockPwd" type="password" placeholder="Password 密碼" autocomplete="current-password" required>
     <button type="submit">UNLOCK 進入</button>
@@ -108,18 +113,9 @@ function requireAuth(onReady){
     else{ booted ? location.reload() : showLock(); }
   });
 }
-function bindSignOut(){} /* 保留空函式，相容頁面呼叫 */
 /* 登出：事件委託，三個頁面即時有效 */
+function bindSignOut(){}
 document.addEventListener('click',e=>{
-  if(e.target.closest('[data-signout]')){
-    auth.signOut().then(()=>location.reload());
-  }
+  if(e.target.closest('[data-signout]')){ auth.signOut().then(()=>location.reload()); }
 });
-/* ---- 外出目的 ---- */
-const PURPOSES={
-  toilet:{en:'Toilet',zh:'廁所',icon:'🚻'},
-  food:  {en:'Food',  zh:'小食部',icon:'🍱'},
-  other: {en:'Other', zh:'其他',icon:'📌'}
-};
-function purposeMeta(p){return PURPOSES[p]||{en:'—',zh:'—',icon:'·'};}
 function watchThreshold(cb){db.ref('config/overlongMin').on('value',s=>{const v=s.val();cb(v&&v>0?v:15);});}
