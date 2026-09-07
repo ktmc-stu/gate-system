@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Gate · 閘口</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#081120;--panel:rgba(17,29,54,.86);--panel2:rgba(10,19,36,.9);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.28);
  --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--amber-d:#ff8a3d;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;--shadow:0 20px 60px rgba(2,8,20,.55)}
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
 html{color-scheme:dark}
 body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;
  background:radial-gradient(1200px 600px at 85% -10%,rgba(75,139,255,.18),transparent 60%),radial-gradient(1000px 600px at -10% 110%,rgba(255,178,36,.14),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
@@ -67,6 +67,17 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .slotbig b{font-family:'Archivo';font-weight:900;font-size:clamp(64px,14vh,120px);line-height:1;color:var(--amber);text-shadow:0 0 44px rgba(255,178,36,.55);animation:houseIn .45s cubic-bezier(.2,1.4,.4,1)}
 .slotbig span{font:700 clamp(11px,1.7vh,14px) 'IBM Plex Mono';letter-spacing:.26em;color:var(--dim);text-align:center}
 .slotbig.green b{color:var(--green);text-shadow:0 0 44px rgba(47,211,127,.55)}
+/* 放行信號 */
+.sigwrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0 auto}
+.signal{width:clamp(120px,26vh,210px);aspect-ratio:1;animation:pop .45s cubic-bezier(.2,1.5,.4,1)}
+.signal svg{width:100%;height:100%;display:block}
+.signal.go{filter:drop-shadow(0 0 42px rgba(47,211,127,.55))}
+.signal.stop{filter:drop-shadow(0 0 42px rgba(255,93,85,.55));animation:pop .45s cubic-bezier(.2,1.5,.4,1),flash 1.2s infinite .5s}
+.signal.caution{filter:drop-shadow(0 0 42px rgba(255,178,36,.5));animation:pop .45s cubic-bezier(.2,1.5,.4,1),flash 1.4s infinite .5s}
+@keyframes pop{from{transform:scale(.35);opacity:0}}
+.siglabel{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(18px,3.2vh,28px);letter-spacing:.12em;text-align:center}
+.siglabel.go{color:var(--green)}.siglabel.stop{color:var(--red)}.siglabel.caution{color:var(--amber)}
+.sigsub{font-size:clamp(12px,1.9vh,15px);color:var(--dim);text-align:center;font-weight:600;max-width:560px}
 /* 候選名單 */
 .cands{display:grid;gap:8px;max-height:46vh;overflow:auto;width:100%}
 .cand{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.03);cursor:pointer;font-size:15px;color:var(--text);text-align:left}
@@ -95,13 +106,6 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .row .v.small{font-size:13px;color:var(--dim);font-weight:500}
 .flagline{margin-top:12px;border:1.5px solid var(--amber);color:var(--amber);background:rgba(255,178,36,.12);border-radius:14px;padding:11px 15px;font-weight:800;font-size:15px;animation:flash 1.4s infinite}
 @keyframes flash{50%{opacity:.55}}
-.stamp{position:absolute;top:clamp(16px,3vw,32px);right:clamp(18px,3vw,36px);z-index:3;font-family:'Archivo';font-weight:900;
- font-size:clamp(34px,5.5vw,56px);letter-spacing:.08em;padding:8px 22px;border:5px solid currentColor;border-radius:16px;transform:rotate(-8deg);
- background:rgba(8,14,26,.55);backdrop-filter:blur(4px);animation:stampIn .4s cubic-bezier(.2,1.6,.4,1)}
-@keyframes stampIn{from{transform:rotate(-8deg) scale(2.2);opacity:0}}
-.s-out{color:var(--amber);box-shadow:0 0 40px rgba(255,178,36,.25)}
-.s-in{color:var(--green);box-shadow:0 0 40px rgba(47,211,127,.25)}
-.s-warn{color:var(--red);box-shadow:0 0 40px rgba(255,93,85,.25)}
 .alert{border:1.5px solid var(--red);background:rgba(255,93,85,.14);color:#ffd9d7;border-radius:16px;padding:15px 20px;font-weight:800;font-size:clamp(15px,2vw,19px);animation:flash 1.1s infinite}
 .okline{color:var(--green);font-weight:700;letter-spacing:.05em}
 .dur-line{font-family:'Archivo';font-weight:900;font-size:clamp(30px,4.5vw,46px);margin-top:8px}
@@ -280,7 +284,7 @@ requireAuth(function init(){
   function refreshHousePill(){ const p=$('pillHouse'); if(p)p.textContent=houseLabel(); }
   function houseAllowed(st){ const hs=gateHouses(); if(!hs.length)return true; return hs.includes(String(st.house||'').toUpperCase()); }
 
-  /* ---- QR scanner（保留原始成功配置，加三段後備）---- */
+  /* ---- QR scanner（單實例＋三段後備）---- */
   function startScanner(){
     if(state!=='ready'||!document.getElementById('reader'))return;
     if(!window.Html5Qrcode){const c=$('camErr');if(c)c.innerHTML='Scanner library not loaded 掃描庫未載入';return;}
@@ -362,7 +366,7 @@ requireAuth(function init(){
     else if(e.key==='Enter'){$('padGo').click();}
     else if(e.key==='Escape')closePad();});
 
-  /* ---- 搜尋：QR 精確；手動支援卡號／學號／班別+學號／班別 ---- */
+  /* ---- 搜尋 ---- */
   function findStudent(q){
     q=String(q||'').trim().toUpperCase(); if(!q)return null;
     if(students[q])return students[q];
@@ -444,14 +448,21 @@ requireAuth(function init(){
   }
 
   /* ---- 畫面 ---- */
-  const houseBlock=st=>{const m=houseMeta(st.house);
-    return `<div class="house" style="background:${m.color};color:${m.text}"><span class="hl">${esc(st.house||'?')}</span><span class="hs">HOUSE 社</span></div>`;};
-  const rows=st=>`
+  const SIG={
+    go:{cls:'go',label:'PASS 放行',svg:'<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#2fd37f"/><path d="M50 20 L76 48 H62 V80 H38 V48 H24 Z" fill="#fff"/></svg>'},
+    stop:{cls:'stop',label:'STOP 禁止通過',svg:'<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#ff5d55"/><path d="M34 34 L66 66 M66 34 L34 66" stroke="#fff" stroke-width="13" stroke-linecap="round" fill="none"/></svg>'},
+    caution:{cls:'caution',label:'CAUTION 注意',svg:'<svg viewBox="0 0 100 100"><path d="M50 7 L97 89 H3 Z" fill="#ffb224" stroke="#ffb224" stroke-width="7" stroke-linejoin="round"/><rect x="44.5" y="33" width="11" height="31" rx="5" fill="#141414"/><circle cx="50" cy="75" r="6.5" fill="#141414"/></svg>'}
+  };
+  function signal(type,sub){const s=SIG[type]||SIG.go;
+    return `<div class="sigwrap"><div class="signal ${s.cls}">${s.svg}</div><div class="siglabel ${s.cls}">${s.label}</div>${sub?`<div class="sigsub">${sub}</div>`:''}</div>`;}
+  function houseBlock(st){const m=houseMeta(st.house);
+    return `<div class="house" style="background:${m.color};color:${m.text}"><span class="hl">${esc(st.house||'?')}</span><span class="hs">HOUSE 社</span></div>`;}
+  function rows(st){return `
     <div class="row"><span class="k">Student ID<i>學生編號</i></span><span class="v mono">${esc(st.sid||'—')}</span></div>
     <div class="row"><span class="k">Class<i>班別</i></span><span class="v">${esc(st.cls||'—')}</span></div>
     <div class="row"><span class="k">Class Number<i>學號</i></span><span class="v">${esc(st.no||'—')}</span></div>
-    <div class="row"><span class="k">Scanned<i>掃描值</i></span><span class="v mono small">${esc(st.card)}</span></div>`;
-  const flagBadge=st=>st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:'';
+    <div class="row"><span class="k">Scanned<i>掃描值</i></span><span class="v mono small">${esc(st.card)}</span></div>`;}
+  function flagBadge(st){return st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:'';}
   function slotsStrip(){return `<div class="slots-wrap"><div class="slots-head"><span>PHONE SLOTS 手機格 · ${esc(cfg.name)}</span><span class="mono" id="slotFree">${freeCount()}/12 FREE</span></div><div class="slots" id="slotsGrid"></div></div>`;}
   function schedule(ms){clearTimeout(resetT);resetT=setTimeout(toReady,ms);}
   function toReady(){state='ready';pendingSt=null;clearTimeout(resetT);renderReady();}
@@ -498,49 +509,50 @@ requireAuth(function init(){
   function showOut(st,count,wasFlag,purpose,slot){
     state='out';pendingSt=null;const sc=scenarioMeta(scenario),pm=purposeMeta(purpose);
     board.innerHTML=`
-      <div class="stamp s-out">OUT</div>
       <div class="micro">GOING ${sc.out.en} ${sc.out.zh} · RECORDED 已記錄</div>
+      ${signal(wasFlag?'caution':'go', wasFlag?'⚠ 曾外出時間過長 PREVIOUSLY OVERLONG — 請留意返回時間':'手續完成 · 請放行 PROCEED')}
       <div class="slotbig"><b>#${slot}</b><span>PHONE SLOT 手機格 · PUT PHONE IN 請放入手機</span></div>
-      <div class="grid2">${houseBlock(st)}<div class="info">${rows(st)}${wasFlag?flagBadge(st):''}</div></div>
+      <div class="grid2">${houseBlock(st)}<div class="info">${rows(st)}</div></div>
       <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span><span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
-    sound('out');schedule(9000);
+    sound(wasFlag?'warn':'out');schedule(wasFlag?11000:9000);
   }
   function showIn(st,durMs,over,purpose,phone){
     state='in';pendingSt=null;const sc=scenarioMeta(scenario),pm=purposeMeta(purpose);
-    const phoneHtml=phone?(phone.own
-      ?`<div class="slotbig green"><b>#${phone.slot}</b><span>COLLECT PHONE 取回手機</span></div>`
-      :`<div class="alert">📱 手機存放於其他閘 PHONE AT ${esc(phone.gate)} #${phone.slot}</div>`)
-      :'';
+    const otherPhone=phone&&!phone.own;
+    const sig=(over||otherPhone)?'caution':'go';
+    const sub=over?`⏱ 外出時間過長 TIME EXCEEDED ≥ ${threshold} MIN — 已標記`
+      :otherPhone?`📱 手機存放於其他閘 PHONE AT ${esc(phone.gate)} #${phone.slot}`
+      :'準時返回 ON TIME · 請放行 PROCEED';
+    const phoneHtml=phone&&phone.own?`<div class="slotbig green"><b>#${phone.slot}</b><span>COLLECT PHONE 取回手機</span></div>`:'';
     board.innerHTML=`
-      <div class="stamp s-in">IN</div>
       <div class="micro">BACK ${sc.in.en} ${sc.in.zh} · RECORDED 已記錄</div>
+      ${signal(sig,sub)}
       ${phoneHtml}
       <div class="grid2">${houseBlock(st)}<div class="info">${rows(st)}
         <div class="dur-line">${fmtDur(durMs)}<span>TIME OUTSIDE 在外時間</span></div></div></div>
       <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span></div>
-      ${over?`<div class="alert">⏱ TIME EXCEEDED · OUT ≥ ${threshold} MIN — 外出時間過長，已作標記</div>`
-            :`<div class="okline">✓ RETURNED ON TIME 準時返回</div>`}
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
     sound(over?'warn':'in');schedule(over?12000:9000);
   }
   function showWarn(st,title,zh,live){
     state='warn';pendingSt=null;
+    const type=(title==='NO OUT RECORD')?'caution':'stop';
     board.innerHTML=`
-      <div class="stamp s-warn">!</div>
       <div class="micro">ATTENTION · 請注意</div>
+      ${signal(type)}
+      <div class="warn-title" style="text-align:center;${type==='caution'?'color:var(--amber);':''}">${title}<span>${zh}</span></div>
       <div class="grid2">${houseBlock(st)}<div class="info">${rows(st)}
-        <div class="warn-title">${title}<span>${zh}</span></div>
         ${live?`<span class="pill mono">OUT since 離開於 ${fmtClock(live.outAt)} · ${fmtDur(Date.now()-live.outAt)}</span>`:''}</div></div>
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
-    sound('err');schedule(10000);
+    sound(type==='stop'?'err':'warn');schedule(10000);
   }
   function showNotFound(raw){
     state='warn';pendingSt=null;
     board.innerHTML=`
-      <div class="stamp s-warn">?</div>
+      ${signal('stop')}
       <div class="center">
-        <div class="nf">NOT FOUND<span>未找到此 QR 值 / 學生資料</span></div>
+        <div class="nf">NOT FOUND<span>未找到此 QR 值 / 學生資料 — 禁止通過 DO NOT ADMIT</span></div>
         <div class="mono dim" style="margin:10px 0 18px">“${esc(raw)}”</div>
         <button class="ghostbtn" data-act="manual">Manual Entry 手動輸入</button>
       </div>`;
