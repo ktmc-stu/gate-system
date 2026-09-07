@@ -152,9 +152,13 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
       </div>
       <div class="setrow">
         <button class="btn primary" id="btnScen">Save Scenario 儲存場景</button>
-        <button class="btn green" id="btnStartDay">Start Event Day 開始活動（所有人視為在內）</button>
+        <button class="btn green" id="btnStartDay">Start Event Day 開始活動（所有人視為在內・清空手機格）</button>
       </div>
       <p class="dim" style="font-size:12.5px;margin-top:10px">Switching scenario updates all gate devices instantly. 轉換場景後所有閘口裝置即時同步。每筆記錄會蓋上當時場景。</p>
+    </div>
+    <div class="card">
+      <h3>Phone Slots<span>手機格占用（即時・所有閘口）</span></h3>
+      <div id="slotsOverview" class="dim" style="font-size:13.5px;line-height:2">—</div>
     </div>
     <div class="card">
       <h3>Overlong Threshold<span>超時時限</span></h3>
@@ -196,9 +200,16 @@ requireAuth(function init(){
   watchThreshold(v=>$('thIn').value=v);
   watchScenario(v=>{const el=document.querySelector(`input[name=scen][value=${v}]`);if(el)el.checked=true;});
   $('btnScen').onclick=()=>db.ref('config/scenario').set(document.querySelector('input[name=scen]:checked').value).then(()=>toast('Scenario saved 已儲存場景'));
+  db.ref('slots').on('value',s=>{
+    const all=s.val()||{},gates=Object.keys(all),el=$('slotsOverview');
+    if(el)el.innerHTML=gates.length?gates.map(g=>{
+      const occ=Object.values(all[g]||{}).filter(Boolean);
+      return `<div><b class="mono">${esc(g)}</b> — ${occ.length}/12 占用：${occ.map(o=>esc(o.sid||o.card)).join(', ')||'（全空）'}</div>`;
+    }).join(''):'（無占用 No occupancy）';
+  });
   $('btnStartDay').onclick=()=>{
-    if(confirm('Start event day? All current OUTSIDE states will be cleared (everyone treated as inside).\n開始活動？所有外出狀態將清除（全部學生視為在內）。'))
-      db.ref('live').remove().then(()=>toast('Event day started 活動已開始'));
+    if(confirm('Start event day? All OUTSIDE states and phone slots will be cleared.\n開始活動？所有外出狀態及手機格將清空（全部學生視為在內）。'))
+      Promise.all([db.ref('live').remove(),db.ref('slots').remove()]).then(()=>toast('Event day started 活動已開始（手機格已清空）'));
   };
   loadToday();
 
@@ -235,7 +246,7 @@ requireAuth(function init(){
       const iH=colIdx(hdr,['house','社'],sk);
       cols=[iC,iS,iCl,iN,iH];hi=r;break;
     }
-    if(hi<0){hi=0;cols=[0,1,2,3,4];} // 冇表頭 → 假設欄位次序
+    if(hi<0){hi=0;cols=[0,1,2,3,4];}
     const seen=new Set(),list=[],issues=[];
     for(let r=hi+1;r<arr.length;r++){
       const row=arr[r]||[];
@@ -302,9 +313,9 @@ requireAuth(function init(){
   }
   $('sFilter').oninput=renderStudents;
   $('stuTable').addEventListener('click',e=>{
-    const f=e.target.closest('[data-flag]'),d=e.target.closest('[data-del]');
+    const f=e.target.closest('[data-flag]'),dd=e.target.closest('[data-del]');
     if(f)db.ref('students/'+f.dataset.flag+'/overlongFlag').set(false).then(()=>toast('Flag cleared 已重設標記'));
-    if(d){const c=d.dataset.del,s=students[c];
+    if(dd){const c=dd.dataset.del,s=students[c];
       if(confirm(`Delete ${s?.sid||c} (${s?.cls||''}) ? 確定刪除？`)){
         const upd={};upd['students/'+c]=null;upd['live/'+c]=null;db.ref().update(upd);}}
   });
@@ -336,11 +347,14 @@ requireAuth(function init(){
     fetchRecords().then(rows=>{
       rows.sort((a,b)=>a.outAt-b.outAt);
       const data=rows.map(r=>{const sm=scenarioMeta(r.scenario),pm=purposeMeta(r.purpose);return {
-        'Event 活動':`${sm.zh} ${sm.en}`,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Class 班別':r.cls,'Class Number 學號':r.no,'House 社':r.house,'Purpose 目的':r.purpose?`${pm.zh} ${pm.en}`:'','Card 卡號':r.card,'Scanned Value 掃描值':r.code||r.card,
+        'Event 活動':`${sm.zh} ${sm.en}`,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Class 班別':r.cls,'Class Number 學號':r.no,'House 社':r.house,
+        'Purpose 目的':r.purpose?`${pm.zh} ${pm.en}`:'','Card 卡號':r.card,'Scanned Value 掃描值':r.code||r.card,
+        'Phone Slot 手機格':r.slot?`${r.slotGate||''} #${r.slot}`:'',
         'Gate Out 離開閘口':r.gateOut||'','Out Time 離開時間':r.outAt?fmtClock(r.outAt):'','Gate In 返回閘口':r.gateIn||'',
         'In Time 返回時間':r.inAt?fmtClock(r.inAt):'STILL OUTSIDE 仍未返回','Duration 在外時間':r.durationSec!=null?fmtDur(r.durationSec*1000):'',
         'Overlong 超時':r.overlong?'YES 是':''};});
-      const ws=XLSX.utils.json_to_sheet(data);ws['!cols']=[{wch:24},{wch:11},{wch:12},{wch:8},{wch:8},{wch:6},{wch:12},{wch:14},{wch:10},{wch:14},{wch:10},{wch:12},{wch:10}];
+      const ws=XLSX.utils.json_to_sheet(data);
+      ws['!cols']=[{wch:22},{wch:11},{wch:12},{wch:8},{wch:8},{wch:6},{wch:12},{wch:12},{wch:14},{wch:12},{wch:14},{wch:10},{wch:14},{wch:10},{wch:12},{wch:10}];
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');
       XLSX.writeFile(wb,`gate-records_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
     }).finally(()=>{btn.disabled=false;btn.textContent='Export Excel 匯出記錄';});
@@ -363,8 +377,8 @@ requireAuth(function init(){
   function arm(btn,fn,label){btn.onclick=()=>{
     if(btn.classList.contains('armed')){fn();btn.classList.remove('armed');btn.textContent=label;}
     else{btn.classList.add('armed');btn.textContent='Confirm? 確定執行？再按一次';setTimeout(()=>{btn.classList.remove('armed');btn.textContent=label;},3500);}};}
-  arm($('btnWipeRec'),()=>{db.ref('records').remove();db.ref('live').remove();toast('Records cleared 已清除記錄');},'Clear All Records 清除所有記錄');
-  arm($('btnWipeStu'),()=>{db.ref('students').remove();db.ref('counters').remove();db.ref('live').remove();toast('Students cleared 已清除學生');},'Clear All Students 清除所有學生');
+  arm($('btnWipeRec'),()=>{db.ref('records').remove();db.ref('live').remove();db.ref('slots').remove();toast('Records cleared 已清除記錄');},'Clear All Records 清除所有記錄');
+  arm($('btnWipeStu'),()=>{db.ref('students').remove();db.ref('counters').remove();db.ref('live').remove();db.ref('slots').remove();toast('Students cleared 已清除學生');},'Clear All Students 清除所有學生');
 });
 </script>
 </body>
