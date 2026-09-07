@@ -51,7 +51,6 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
 @keyframes blink{50%{opacity:0}}
 .ready-sub{font-size:clamp(13px,2vh,19px);font-weight:600;color:var(--dim)}
 .ready-sub .zh{color:var(--faint);font-size:.85em;margin-left:8px}
-/* 手機格：大數字、顯眼 */
 .slots-wrap{flex:none}
 .slots-head{display:flex;justify-content:space-between;align-items:center;font:800 clamp(12px,1.9vh,16px) 'IBM Plex Mono';letter-spacing:.14em;color:var(--dim);margin-bottom:8px}
 .slots-head .mono{color:var(--amber);font-size:clamp(14px,2.2vh,18px)}
@@ -60,7 +59,6 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
 .slot{aspect-ratio:1;border-radius:12px;border:2px solid var(--line2);display:flex;align-items:center;justify-content:center;
  font:900 clamp(18px,3.4vh,30px) 'Archivo';color:var(--dim);background:rgba(255,255,255,.04);transition:.2s}
 .slot.occ{background:linear-gradient(180deg,#ffc95e,#ff9a2e);color:#2a1800;border-color:transparent;box-shadow:0 6px 18px rgba(255,150,40,.45)}
-/* 分配格位：超大字 */
 .slotbig{display:flex;flex-direction:column;align-items:center;gap:4px;margin:0 auto}
 .slotbig b{font-family:'Archivo';font-weight:900;font-size:clamp(64px,14vh,120px);line-height:1;color:var(--amber);text-shadow:0 0 44px rgba(255,178,36,.55);animation:houseIn .45s cubic-bezier(.2,1.4,.4,1)}
 .slotbig span{font:700 clamp(11px,1.7vh,14px) 'IBM Plex Mono';letter-spacing:.26em;color:var(--dim);text-align:center}
@@ -68,6 +66,7 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
 .ready-foot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:auto;flex:none}
 .pill{font:600 11px 'IBM Plex Mono';letter-spacing:.05em;color:var(--dim);border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:99px;padding:7px 13px}
 .pill b{color:var(--text)}
+.pill.house b{color:var(--amber);font-family:'Archivo';font-size:13px}
 .ghostbtn{border:1px dashed var(--line2);background:none;color:var(--dim);border-radius:99px;padding:8px 16px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.2s}
 .ghostbtn:hover{color:var(--amber);border-color:var(--amber);background:rgba(255,178,36,.08)}
 .grid2{display:grid;grid-template-columns:auto 1fr;gap:clamp(14px,3vw,36px);align-items:center;min-height:0}
@@ -101,7 +100,6 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
 .nf{font-family:'Archivo';font-weight:900;font-size:clamp(24px,4.6vh,44px)}
 .nf span{display:block;font-size:.42em;font-weight:500;color:var(--dim);margin-top:6px}
 .center{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
-/* 候選名單 */
 .cands{display:grid;gap:8px;max-height:36vh;overflow:auto;width:100%}
 .cand{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.03);cursor:pointer;font-size:15px;color:var(--text);text-align:left}
 .cand:active,.cand:hover{background:rgba(255,178,36,.12);border-color:var(--amber)}
@@ -130,6 +128,10 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
 .mode:has(input:checked){border-color:rgba(255,178,36,.6);background:rgba(255,178,36,.08)}
 .mode input{margin-top:3px;accent-color:var(--amber)}
 .mode b{display:block;font-size:13.5px}.mode span{font-size:11.5px;color:var(--faint)}
+.houses{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.hsel{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px 16px;cursor:pointer;font:900 17px 'Archivo';color:var(--dim);background:rgba(255,255,255,.03);margin:0}
+.hsel input{accent-color:var(--amber)}
+.hsel:has(input:checked){border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.12)}
 .note{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--faint);line-height:1.7}
 .drawer-btns{display:flex;gap:10px;margin-top:20px}
 .btn{border:0;border-radius:12px;padding:12px 18px;font-weight:800;font-size:14px;cursor:pointer;transition:.2s}
@@ -145,6 +147,8 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
 .pad-head span{font-size:.65em;color:var(--faint);font-weight:500;margin-left:6px}
 .pad-disp{margin:14px 0 5px;min-height:52px;display:flex;align-items:center;padding:0 15px;border-radius:13px;background:rgba(0,0,0,.35);border:1px solid var(--line2);font-size:22px;letter-spacing:.12em}
 .pad-hint{font-size:11.5px;color:var(--faint);margin-bottom:12px;line-height:1.6}
+.pad input[type=password]{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line2);background:rgba(0,0,0,.35);color:var(--text);font-size:16px;outline:none;margin:12px 0 6px}
+.pad input[type=password]:focus{border-color:var(--amber);box-shadow:0 0 0 4px rgba(255,178,36,.15)}
 .pad-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .pad-keys button{padding:14px 0;font-size:19px;font-weight:700;border-radius:13px;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text)}
 .pad-keys button:active{background:var(--amber);color:#241500;border-color:var(--amber)}
@@ -161,18 +165,26 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
     <span class="modebadge" id="modeBadge">—</span>
     <span class="conn" id="conn"><i></i><span id="connTx">…</span></span>
   </div>
-  <div class="gright"><span class="nowout">OUT 外面 <b id="nowOut">0</b></span><time class="clock mono" id="clock">--:--:--</time><button class="iconbtn" id="btnSet" title="Settings 設定">⚙</button></div>
+  <div class="gright"><span class="nowout">OUT 外面 <b id="nowOut">0</b></span><time class="clock mono" id="clock">--:--:--</time><button class="iconbtn" id="btnSet" title="Settings 設定（需密碼）">⚙</button></div>
 </header>
 
 <main><section class="board" id="board"></section></main>
 
 <aside class="drawer" id="drawer">
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
-    <h2>Device Settings<span>裝置設定</span></h2><button class="xbtn" id="drawerClose">✕</button>
+    <h2>Device Settings<span>裝置設定（已解鎖）</span></h2><button class="xbtn" id="drawerClose">✕</button>
   </div>
   <label>Gate Name 閘口名稱（= Phone Slots identity 手機格身份；同名稱＝同一閘共享 12 格）</label>
   <input type="text" id="gName" maxlength="24" placeholder="e.g. Gate A">
-  <label style="margin-top:20px">Mode 模式</label>
+  <label style="margin-top:20px">Houses Served 本閘服務社（每閘兩社・專屬不可共用）</label>
+  <div class="houses">
+    <label class="hsel"><input type="checkbox" name="gh" value="K">K</label>
+    <label class="hsel"><input type="checkbox" name="gh" value="T">T</label>
+    <label class="hsel"><input type="checkbox" name="gh" value="M">M</label>
+    <label class="hsel"><input type="checkbox" name="gh" value="C">C</label>
+  </div>
+  <p class="dim" style="font-size:11.5px;margin-top:8px">其他社學生喺本閘掃碼會被拒絕。留空＝不限社 Leave empty = all Houses</p>
+  <label style="margin-top:18px">Mode 模式</label>
   <label class="mode"><input type="radio" name="gmode" value="auto"><div><b>AUTO 自動（建議）</b><span>Scan = out; scan again = return 掃碼自動判斷外出／返回</span></div></label>
   <label class="mode"><input type="radio" name="gmode" value="out"><div><b>OUT Only 只登記外出</b><span>This device only registers exits 本裝置只處理離開</span></div></label>
   <label class="mode"><input type="radio" name="gmode" value="in"><div><b>IN Only 只登記返回</b><span>This device only registers returns 本裝置只處理返回</span></div></label>
@@ -180,6 +192,15 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
   <div class="note">Device 裝置：<b id="devNote">—</b>（auto-detected 自動偵測）<br>Phone slots 手機格：本閘 12 格，滿格禁止外出。<br>Threshold 時限：<b><span id="thNote">15</span> min</b> · Scenario 場景由 Admin 設定。</div>
   <div class="drawer-btns"><button class="btn primary" id="saveCfg">Save 儲存</button><button class="btn ghost" data-signout>Sign Out 登出</button></div>
 </aside>
+
+<div class="overlay" id="setOv">
+  <div class="pad">
+    <div class="pad-head"><div>Settings Lock<span>設定需要密碼</span></div><button class="xbtn" id="setClose">✕</button></div>
+    <input type="password" id="setPwd" placeholder="Staff password 職員密碼" autocomplete="current-password">
+    <p class="camerr" id="setErr"></p>
+    <button class="go" id="setGo">UNLOCK 解鎖設定</button>
+  </div>
+</div>
 
 <div class="overlay" id="padOv">
   <div class="pad">
@@ -206,7 +227,7 @@ const DEV=(()=>{const ua=navigator.userAgent,t=('ontouchstart'in window)||naviga
   if(/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&t))return'iPad / iPhone';
   if(/Android/.test(ua))return'Android';
   return'PC / Notebook';})();
-let threshold=15, scenario='track', students={}, liveMap={}, slotsMap={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null, slotsRef=null;
+let threshold=15, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
 const $=id=>document.getElementById(id), board=$('board');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
@@ -214,7 +235,7 @@ const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)
 requireAuth(function init(){
   if(booted)return; booted=true;
   bindSignOut();
-  applyHeader(); subscribeSlots();
+  applyHeader(); subscribeSlots(); subscribeGateCfg();
   setInterval(()=>{$('clock').textContent=fmtClock(Date.now())},500);
   $('devNote').textContent=DEV;
 
@@ -249,7 +270,18 @@ requireAuth(function init(){
     });
   }
 
-  /* ---- QR scanner（強化版：真實錯誤訊息＋重試＋iOS 修正）---- */
+  /* ---- 閘口社分配 ---- */
+  function subscribeGateCfg(){
+    if(gateCfgRef)gateCfgRef.off();
+    gateCfgRef=db.ref('config/gates/'+gateKey());
+    gateCfgRef.on('value',s=>{gateCfg=s.val()||{};refreshHousePill();});
+  }
+  function gateHouses(){ return gateCfg&&gateCfg.houses ? String(gateCfg.houses).split(',').map(x=>x.trim().toUpperCase()).filter(Boolean) : []; }
+  function houseLabel(){ const hs=gateHouses(); return hs.length?hs.join(' '):'ALL 全社'; }
+  function refreshHousePill(){ const p=$('pillHouse'); if(p)p.textContent=houseLabel(); }
+  function houseAllowed(st){ const hs=gateHouses(); if(!hs.length)return true; return hs.includes(String(st.house||'').toUpperCase()); }
+
+  /* ---- QR scanner ---- */
   function startScanner(){
     if(state!=='ready'||!document.getElementById('reader'))return;
     stopScanner();
@@ -294,8 +326,27 @@ requireAuth(function init(){
   }
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&state==='ready')startScanner(); });
 
-  /* ---- drawer ---- */
-  $('btnSet').onclick=()=>{ $('gName').value=cfg.name; document.querySelector(`input[name=gmode][value=${cfg.mode}]`).checked=true; $('gSound').checked=!cfg.muted; $('drawer').classList.add('open'); };
+  /* ---- 設定鎖（密碼）---- */
+  $('btnSet').onclick=()=>{ $('setPwd').value='';$('setErr').textContent='';$('setOv').classList.add('open');setTimeout(()=>$('setPwd').focus(),60); };
+  $('setClose').onclick=()=>$('setOv').classList.remove('open');
+  function tryUnlock(){
+    const pwd=$('setPwd').value;
+    $('setErr').textContent='';
+    auth.signInWithEmailAndPassword(STAFF_EMAIL,pwd)
+      .then(()=>{ $('setOv').classList.remove('open'); openDrawer(); })
+      .catch(()=>{ $('setErr').textContent='密碼錯誤 Incorrect password'; });
+  }
+  $('setGo').onclick=tryUnlock;
+  $('setPwd').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
+
+  function openDrawer(){
+    $('gName').value=cfg.name;
+    document.querySelector(`input[name=gmode][value=${cfg.mode}]`).checked=true;
+    $('gSound').checked=!cfg.muted;
+    const hs=gateHouses();
+    document.querySelectorAll('input[name=gh]').forEach(i=>{i.checked=hs.includes(i.value);});
+    $('drawer').classList.add('open');
+  }
   $('drawerClose').onclick=()=>$('drawer').classList.remove('open');
   $('saveCfg').onclick=()=>{
     const oldKey=gateKey();
@@ -303,8 +354,11 @@ requireAuth(function init(){
     cfg.mode=document.querySelector('input[name=gmode]:checked').value;
     cfg.muted=!$('gSound').checked; window.MUTED=cfg.muted;
     localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
+    const hs=[...document.querySelectorAll('input[name=gh]:checked')].map(i=>i.value).join(',');
+    db.ref('config/gates/'+gateKey()).update({houses:hs});
     applyHeader(); $('drawer').classList.remove('open');
-    if(gateKey()!==oldKey)subscribeSlots();
+    if(gateKey()!==oldKey){subscribeSlots();subscribeGateCfg();}
+    refreshHousePill();
     toReady();
   };
   function applyHeader(){
@@ -330,7 +384,7 @@ requireAuth(function init(){
     else if(e.key==='Enter'){$('padGo').click();}
     else if(e.key==='Escape')closePad();});
 
-  /* ---- 搜尋：QR 用精確；手動支援卡號／學號／班別+學號／班別 ---- */
+  /* ---- 搜尋 ---- */
   function findStudent(q){
     q=String(q||'').trim().toUpperCase(); if(!q)return null;
     if(students[q])return students[q];
@@ -351,6 +405,11 @@ requireAuth(function init(){
     return out.sort(byClsNo).slice(0,12);
   }
   function proceed(st){
+    if(!houseAllowed(st)){
+      const hs=gateHouses();
+      showWarn(st,'WRONG GATE',`此閘口只限 ${hs.join(' / ')} 社使用 — 請往正確閘口 This gate serves House ${hs.join('/')} only`,null);
+      sound('warn');return;
+    }
     const isOut=!!liveMap[st.card];
     if(cfg.mode==='out'){ isOut?showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',liveMap[st.card]):showPurpose(st); return; }
     if(cfg.mode==='in'){ isOut?doIn(st):showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null); return; }
@@ -428,6 +487,7 @@ requireAuth(function init(){
         <div class="ready-sub">Scan student QR<span class="zh">請掃描學生證 QR 碼</span></div></div>
       ${slotsStrip()}
       <div class="ready-foot">
+        <span class="pill house">HOUSE 社 <b id="pillHouse">${houseLabel()}</b></span>
         <span class="pill">NOW OUTSIDE 正在外面 <b id="pillOutB">${Object.keys(liveMap).length}</b></span>
         <span class="pill">LIMIT 時限 <b id="pillThB">${threshold} min</b></span>
         <button class="ghostbtn" data-act="manual">Manual Entry 手動輸入</button>
