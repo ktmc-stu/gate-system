@@ -62,7 +62,8 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 @media(max-width:560px){.slots{grid-template-columns:repeat(6,1fr)}}
 .slot{aspect-ratio:1;border-radius:12px;border:2px solid var(--line2);display:flex;align-items:center;justify-content:center;
  font:900 clamp(18px,3.4vh,30px) 'Archivo';color:var(--dim);background:rgba(255,255,255,.04);transition:.2s}
-.slot.occ{background:linear-gradient(180deg,#ffc95e,#ff9a2e);color:#2a1800;border-color:transparent;box-shadow:0 6px 18px rgba(255,150,40,.45)}
+.slot.occ{background:linear-gradient(180deg,#ffc95e,#ff9a2e);color:#2a1800;border-color:transparent;box-shadow:0 6px 18px rgba(255,150,40,.45);cursor:pointer}
+.slot.occ.over{background:linear-gradient(180deg,#ff9a8a,#ff5d55);color:#fff;box-shadow:0 6px 18px rgba(255,93,85,.5);animation:flash 1.4s infinite}
 .slotbig{display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px auto}
 .slotbig b{font-family:'Archivo';font-weight:900;font-size:clamp(64px,14vh,120px);line-height:1;color:var(--amber);text-shadow:0 0 44px rgba(255,178,36,.55);animation:houseIn .45s cubic-bezier(.2,1.4,.4,1)}
 .slotbig span{font:700 clamp(11px,1.7vh,14px) 'IBM Plex Mono';letter-spacing:.26em;color:var(--dim);text-align:center}
@@ -125,6 +126,9 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .pbtn.f:hover{border-color:var(--amber);background:rgba(255,178,36,.12)}
 .pbtn.o:hover{border-color:var(--green);background:rgba(47,211,127,.1)}
 .foot-hint{font-size:12px;color:var(--faint);text-align:center;letter-spacing:.12em}
+.minitable{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+.minitable th{font:600 10px 'IBM Plex Mono';letter-spacing:.12em;color:var(--faint);text-align:left;padding:6px;border-bottom:1px solid var(--line2)}
+.minitable td{padding:6px;border-bottom:1px solid var(--line)}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:min(410px,94vw);z-index:60;padding:28px;overflow:auto;background:rgba(10,18,34,.92);
  backdrop-filter:blur(20px);border-left:1px solid var(--line);transform:translateX(105%);transition:transform .3s cubic-bezier(.3,1,.4,1)}
 .drawer.open{transform:none;box-shadow:-40px 0 90px rgba(0,0,0,.6)}
@@ -145,6 +149,7 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .drawer-btns{display:flex;gap:10px;margin-top:24px}
 .btn{border:0;border-radius:12px;padding:13px 20px;font-weight:800;font-size:14px;cursor:pointer;transition:.2s}
 .btn.primary{background:linear-gradient(180deg,#ffc95e,#ff9a2e);color:#2a1800;flex:1;box-shadow:0 10px 26px rgba(255,150,40,.3)}
+.btn.green{background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f;box-shadow:0 10px 26px rgba(47,211,127,.25)}
 .btn.ghost{background:none;border:1px solid var(--line);color:var(--dim)}
 .btn.ghost:hover{color:var(--red);border-color:var(--red)}
 .xbtn{background:none;border:0;color:var(--faint);font-size:18px;cursor:pointer}
@@ -152,6 +157,7 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .overlay{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(4,8,16,.7);backdrop-filter:blur(6px);padding:20px}
 .overlay.open{display:flex}
 .pad{width:min(390px,94vw);border-radius:24px;padding:24px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(23,37,66,.95),rgba(10,19,36,.95));box-shadow:var(--shadow);animation:up .25s ease}
+.pad.wide{width:min(560px,94vw);max-height:88vh;overflow:auto}
 .pad-head{display:flex;justify-content:space-between;align-items:center;font-family:'Archivo';font-weight:800;font-size:18px}
 .pad-head span{font-size:.65em;color:var(--faint);font-weight:500;margin-left:6px}
 .pad-disp{margin:16px 0 6px;min-height:56px;display:flex;align-items:center;padding:0 16px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid var(--line2);font-size:24px;letter-spacing:.12em}
@@ -161,6 +167,7 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .pad-keys button:active{background:var(--amber);color:#241500;border-color:var(--amber)}
 .pad .go{width:100%;margin-top:14px;padding:16px;border:0;border-radius:14px;cursor:pointer;background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f;font-weight:900;font-size:16px;letter-spacing:.06em}
 .pad-err{min-height:1.2em;font-size:12.5px;color:var(--red);text-align:center;margin-top:8px}
+.sd-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -196,17 +203,28 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
   <label class="mode"><input type="radio" name="gmode" value="out"><div><b>OUT Only 只登記外出</b><span>This device only registers exits 本裝置只處理離開</span></div></label>
   <label class="mode"><input type="radio" name="gmode" value="in"><div><b>IN Only 只登記返回</b><span>This device only registers returns 本裝置只處理返回</span></div></label>
   <label class="mode" style="margin-top:16px"><input type="checkbox" id="gSound"><div><b>Sound 聲音提示</b><span>Beep on scan 掃描嗶聲</span></div></label>
-  <div class="note">Phone slots 手機格：本閘 12 格，滿格禁止外出。<br>Overlong threshold 超時時限：<b><span id="thNote">15</span> min</b>（於 Admin 設定）<br>Event scenario 活動場景由 Admin 統一設定。</div>
+  <div class="note">Phone slots 手機格：本閘 12 格，滿格禁止外出；㩒占用格可睇佔用人資料。<br>Overlong threshold 超時時限：<b><span id="thNote">15</span> min</b>（於 Admin 設定）<br>Event scenario 活動場景由 Admin 統一設定。</div>
   <div class="drawer-btns"><button class="btn primary" id="saveCfg">Save 儲存</button><button class="btn ghost" data-signout>Sign Out 登出</button></div>
 </aside>
 
 <div class="overlay" id="setOv">
   <div class="pad">
-    <div class="pad-head"><div>Settings Lock<span>設定需要密碼</span></div><button class="xbtn" id="setClose">✕</button></div>
-    <p class="dim" style="font-size:12px;margin:8px 0">輸入職員密碼以解鎖設定 Enter staff password to unlock settings</p>
+    <div class="pad-head"><div>Settings Lock<span>需要密碼</span></div><button class="xbtn" id="setClose">✕</button></div>
+    <p class="dim" id="setMsg" style="font-size:12px;margin:8px 0">輸入職員密碼以解鎖設定 Enter staff password to unlock settings</p>
     <input type="password" id="setPwd" placeholder="Staff password 職員密碼" autocomplete="current-password">
     <p class="pad-err" id="setErr"></p>
-    <button class="go" id="setGo">UNLOCK 解鎖設定</button>
+    <button class="go" id="setGo">UNLOCK 解鎖</button>
+  </div>
+</div>
+
+<div class="overlay" id="slotOv">
+  <div class="pad wide">
+    <div class="pad-head"><div id="sdTitle">SLOT 手機格 #—</div><button class="xbtn" id="sdClose">✕</button></div>
+    <div id="sdBody"></div>
+    <div class="sd-actions">
+      <button class="btn green" id="sdIn">Manual Return 手動返回（釋放格位）</button>
+      <button class="btn ghost" id="sdCancel">Close 關閉</button>
+    </div>
   </div>
 </div>
 
@@ -231,7 +249,7 @@ const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
-let threshold=15, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
+let threshold=15, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
 const $=id=>document.getElementById(id), board=$('board');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
@@ -241,25 +259,38 @@ requireAuth(function init(){
   bindSignOut();
   applyHeader(); subscribeSlots(); subscribeGateCfg(); toReady();
   setInterval(()=>{$('clock').textContent=fmtClock(Date.now())},500);
+  setInterval(()=>refreshSlots(),20000);
 
   db.ref('students').on('value',s=>{students=s.val()||{};});
   db.ref('live').on('value',s=>{liveMap=s.val()||{};const n=Object.keys(liveMap).length;$('nowOut').textContent=n;const pb=$('pillOutB');if(pb)pb.textContent=n;});
+  db.ref('counters').on('value',s=>{countersMap=s.val()||{};});
   db.ref('.info/connected').on('value',s=>{const on=!!s.val();$('conn').className='conn '+(on?'on':'off');$('connTx').textContent=on?'LIVE 連線':'OFFLINE 離線';});
-  watchThreshold(v=>{threshold=v;$('thNote').textContent=v;const p=$('pillThB');if(p)p.textContent=v+' min';});
+  watchThreshold(v=>{threshold=v;$('thNote').textContent=v;const p=$('pillThB');if(p)p.textContent=v+' min';refreshSlots();});
   watchScenario(v=>{scenario=v;applyHeader();if(state==='ready')toReady();});
 
   /* ---- 手機格 ---- */
   function subscribeSlots(){
     if(slotsRef)slotsRef.off();
     slotsRef=db.ref('slots/'+gateKey());
-    slotsRef.on('value',s=>{slotsMap=s.val()||{};refreshSlots();});
+    slotsRef.on('value',s=>{
+      slotsMap=s.val()||{};refreshSlots();
+      if($('slotOv').classList.contains('open')){
+        if(sdSlot&&slotsMap[sdSlot])openSlotDetail(sdSlot); else closeSlotDetail();
+      }
+    });
   }
   function freeCount(){let n=0;for(let i=1;i<=12;i++)if(!slotsMap[i])n++;return n;}
+  function overCount(){const lim=threshold*60000;let n=0;for(let i=1;i<=12;i++){const o=slotsMap[i];if(o&&o.outAt&&(Date.now()-o.outAt)>=lim)n++;}return n;}
   function refreshSlots(){
     const g=$('slotsGrid');if(!g)return;
-    let c='';for(let i=1;i<=12;i++)c+=`<div class="slot${slotsMap[i]?' occ':''}">${i}</div>`;
+    const lim=threshold*60000;let c='';
+    for(let i=1;i<=12;i++){const o=slotsMap[i];
+      const over=o&&o.outAt&&(Date.now()-o.outAt)>=lim;
+      c+=`<div class="slot${o?' occ':''}${over?' over':''}" data-slot="${i}">${i}</div>`;}
     g.innerHTML=c;
     const f=$('slotFree');if(f)f.textContent=freeCount()+'/12 FREE';
+    const ov=$('slotOver');if(ov){const n=overCount();
+      if(n>0){ov.style.display='inline';ov.textContent=`⚠ ${n} OVER`;}else ov.style.display='none';}
   }
   function assignSlot(card,sid,recordId,now){
     return new Promise(res=>{
@@ -272,6 +303,65 @@ requireAuth(function init(){
       trySlot(1);
     });
   }
+
+  /* ---- 格位詳情 ---- */
+  let sdCard=null, sdSlot=null, sdTimer=null;
+  function openSlotDetail(i){
+    const o=slotsMap[i]; if(!o)return;
+    sdCard=o.card; sdSlot=i;
+    const st=students[o.card]||{card:o.card,sid:o.sid||'—',cls:'—',no:'—',house:''};
+    const live=liveMap[o.card];
+    const outAt=(live&&live.outAt)||o.outAt||null;
+    const cnt=(countersMap[o.card]&&countersMap[o.card].outCount)||0;
+    const pm=purposeMeta(live?live.purpose:null);
+    const m=houseMeta(st.house);
+    $('sdTitle').textContent=`SLOT 手機格 #${i} · ${cfg.name}`;
+    $('sdBody').innerHTML=`
+      <div class="grid2" style="gap:18px">
+        <div class="house" style="width:110px;background:${m.color};color:${m.text}"><span class="hl" style="font-size:56px">${esc(st.house||'?')}</span><span class="hs">HOUSE 社</span></div>
+        <div class="info">
+          <div class="row"><span class="k">Student ID<i>學生編號</i></span><span class="v mono">${esc(st.sid||'—')}</span></div>
+          <div class="row"><span class="k">Class<i>班別</i></span><span class="v">${esc(st.cls||'—')} · No.${esc(st.no||'—')}</span></div>
+          <div class="row"><span class="k">Scanned<i>掃描值</i></span><span class="v mono small">${esc(st.card)}</span></div>
+          <div class="row"><span class="k">Purpose<i>目的</i></span><span class="v">${pm.icon} ${pm.zh} ${pm.en}</span></div>
+          <div class="row"><span class="k">Out<i>出去時間</i></span><span class="v mono">${outAt?fmtClock(outAt):'—'}</span></div>
+          <div class="row"><span class="k">Elapsed<i>已經出去</i></span><span class="v mono" id="sdElapsed" style="color:var(--amber)">${outAt?fmtDur(Date.now()-outAt):'—'}</span></div>
+          <div class="row"><span class="k">Trips<i>外出次數</i></span><span class="v">#${cnt}</span></div>
+          <div class="row"><span class="k">Device<i>登記裝置</i></span><span class="v mono small">${esc((live&&live.gate)||cfg.name)}</span></div>
+        </div>
+      </div>
+      ${outAt&&(Date.now()-outAt)>=threshold*60000?`<div class="alert" style="margin-top:12px">⏱ CURRENTLY OVERLONG 現時已超時 ≥ ${threshold} MIN</div>`:''}
+      ${st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:''}
+      <h4 style="font-family:'Archivo';font-size:13px;letter-spacing:.08em;margin:14px 0 4px;color:var(--dim)">TODAY'S TRIPS 今日記錄</h4>
+      <div id="sdTrips" class="dim" style="font-size:12px">Loading…</div>`;
+    $('slotOv').classList.add('open');
+    clearInterval(sdTimer);
+    sdTimer=setInterval(()=>{const el=$('sdElapsed');if(el&&outAt)el.textContent=fmtDur(Date.now()-outAt);},1000);
+    loadSlotTrips(o.card);
+  }
+  function closeSlotDetail(){ $('slotOv').classList.remove('open'); clearInterval(sdTimer); sdTimer=null; sdCard=null; sdSlot=null; }
+  function loadSlotTrips(card){
+    const d=new Date();d.setHours(0,0,0,0);
+    db.ref('records').orderByChild('card').equalTo(card).once('value').then(s=>{
+      const rows=[];s.forEach(c=>{const r=c.val();if(r&&r.outAt>=d.getTime())rows.push(r);});
+      rows.sort((a,b)=>b.outAt-a.outAt);
+      const el=$('sdTrips');if(!el)return;
+      el.innerHTML=rows.length?`<table class="minitable"><tr><th>Out 出</th><th>In 返</th><th>時長</th><th>目的</th><th></th></tr>`+
+        rows.slice(0,6).map(r=>`<tr><td class="mono">${fmtHM(r.outAt)}</td><td class="mono">${r.inAt?fmtHM(r.inAt):'未返'}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${r.purpose?purposeMeta(r.purpose).icon:''}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
+        :'<span class="dim">今日暫無其他記錄 No other trips today</span>';
+    });
+  }
+  $('sdClose').onclick=closeSlotDetail;
+  $('sdCancel').onclick=closeSlotDetail;
+  $('sdIn').onclick=()=>{
+    const card=sdCard; if(!card)return;
+    askPassword('輸入職員密碼以執行「手動返回」 Enter staff password for Manual Return', ()=>{
+      closeSlotDetail();
+      const st=students[card];
+      if(st)doIn(st);
+    });
+  };
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('slotOv').classList.contains('open'))closeSlotDetail(); });
 
   /* ---- 閘口社分配 ---- */
   function subscribeGateCfg(){
@@ -305,14 +395,23 @@ requireAuth(function init(){
     else{try{q.clear()}catch(e){}}
   }
 
-  /* ---- 設定密碼鎖 ---- */
-  $('btnSet').onclick=()=>{ $('setPwd').value='';$('setErr').textContent='';$('setOv').classList.add('open');setTimeout(()=>$('setPwd').focus(),60); };
-  $('setClose').onclick=()=>$('setOv').classList.remove('open');
+  /* ---- 密碼鎖（設定／敏感操作共用）---- */
+  let pwCallback=null;
+  function askPassword(msg,onOk){
+    pwCallback=onOk;
+    const m=$('setMsg'); if(m&&msg)m.textContent=msg;
+    $('setPwd').value='';$('setErr').textContent='';
+    $('setOv').classList.add('open');setTimeout(()=>$('setPwd').focus(),60);
+  }
+  $('btnSet').onclick=()=>{ askPassword('輸入職員密碼以解鎖設定 Enter staff password to unlock settings', null); };
+  $('setClose').onclick=()=>{ $('setOv').classList.remove('open'); pwCallback=null; };
   function tryUnlock(){
     const pwd=$('setPwd').value;
     $('setErr').textContent='';
     auth.signInWithEmailAndPassword(STAFF_EMAIL,pwd)
-      .then(()=>{ $('setOv').classList.remove('open'); openDrawer(); })
+      .then(()=>{ $('setOv').classList.remove('open');
+        if(pwCallback){const cb=pwCallback;pwCallback=null;cb();}
+        else openDrawer(); })
       .catch(err=>{
         const code=(err&&err.code)||'';
         $('setErr').textContent = code==='auth/wrong-password'||code==='auth/invalid-credential' ? '密碼錯誤 Incorrect password' : '登入失敗 Login failed ['+code+']';
@@ -463,7 +562,7 @@ requireAuth(function init(){
     <div class="row"><span class="k">Class Number<i>學號</i></span><span class="v">${esc(st.no||'—')}</span></div>
     <div class="row"><span class="k">Scanned<i>掃描值</i></span><span class="v mono small">${esc(st.card)}</span></div>`;}
   function flagBadge(st){return st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:'';}
-  function slotsStrip(){return `<div class="slots-wrap"><div class="slots-head"><span>PHONE SLOTS 手機格 · ${esc(cfg.name)}</span><span class="mono" id="slotFree">${freeCount()}/12 FREE</span></div><div class="slots" id="slotsGrid"></div></div>`;}
+  function slotsStrip(){return `<div class="slots-wrap"><div class="slots-head"><span>PHONE SLOTS 手機格 · ${esc(cfg.name)}（㩒格睇資料）</span><span><span class="mono" id="slotOver" style="color:var(--red);margin-right:10px;display:none"></span><span class="mono" id="slotFree">${freeCount()}/12 FREE</span></span></div><div class="slots" id="slotsGrid"></div></div>`;}
   function schedule(ms){clearTimeout(resetT);resetT=setTimeout(toReady,ms);}
   function toReady(){state='ready';pendingSt=null;clearTimeout(resetT);renderReady();}
   function renderReady(){
@@ -560,6 +659,8 @@ requireAuth(function init(){
   }
 
   board.addEventListener('click',e=>{
+    const sl=e.target.closest('[data-slot]');
+    if(sl){ const i=parseInt(sl.dataset.slot,10); if(slotsMap[i])openSlotDetail(i); return; }
     const cd=e.target.closest('[data-cand]');
     if(cd){const st=students[cd.dataset.cand];if(st)proceed(st);return;}
     const p=e.target.closest('[data-purpose]');
