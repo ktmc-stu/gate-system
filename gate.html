@@ -16,7 +16,7 @@ body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);hei
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
 .top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 16px;border-bottom:1px solid var(--line);background:rgba(8,14,26,.72);backdrop-filter:blur(14px);flex:none}
 .gsign{display:flex;align-items:center;gap:10px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(16px,2.4vh,22px);letter-spacing:.08em}
-.gsign::before{content:'G';display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--amber),var(--amber-d));color:#241500;font-size:18px;box-shadow:0 6px 18px rgba(255,150,40,.35)}
+.logo{width:32px;height:32px;object-fit:contain;border-radius:9px}
 .gsign b{color:var(--amber);font-weight:800}
 .gsign .zh{font-size:11px;color:var(--faint);letter-spacing:.3em;font-weight:500}
 .led{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:led 2.2s infinite}
@@ -40,7 +40,6 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
 .board>*{position:relative;animation:up .35s cubic-bezier(.2,.8,.3,1) both}
 @keyframes up{from{opacity:0;transform:translateY(10px)}}
 .micro{font:600 10px 'IBM Plex Mono';letter-spacing:.24em;color:var(--faint);flex:none}
-/* 鏡頭置頂 */
 #reader{flex:none;height:clamp(140px,32vh,320px);width:min(440px,92vw);margin:0 auto;border-radius:18px;overflow:hidden;border:1px solid var(--line2);background:#000;box-shadow:0 14px 40px rgba(0,0,0,.5)}
 #reader video{width:100%!important;height:100%!important;object-fit:cover}
 #reader__dashboard,#reader__filescan_input{display:none!important}
@@ -51,7 +50,6 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
 @keyframes blink{50%{opacity:0}}
 .ready-sub{font-size:clamp(13px,2vh,19px);font-weight:600;color:var(--dim)}
 .ready-sub .zh{color:var(--faint);font-size:.85em;margin-left:8px}
-/* 手機格 */
 .slots-wrap{flex:none}
 .slots-head{display:flex;justify-content:space-between;align-items:center;font:700 11px 'IBM Plex Mono';letter-spacing:.14em;color:var(--dim);margin-bottom:6px}
 .slots-head .mono{color:var(--amber)}
@@ -144,7 +142,7 @@ main{flex:1;min-height:0;display:flex;padding:clamp(8px,1.6vh,20px)}
 <body>
 
 <header class="top">
-  <div class="gsign"><span class="led"></span>GATE&nbsp;<b id="gShow">—</b><span class="zh">閘口</span></div>
+  <div class="gsign"><img class="logo" src="logo.png" onerror="this.remove()" alt=""><span class="led"></span>GATE&nbsp;<b id="gShow">—</b><span class="zh">閘口</span></div>
   <div class="gmid">
     <span class="modebadge" id="scBadge" style="color:var(--green);border-color:var(--green);background:rgba(55,201,120,.08)">—</span>
     <span class="modebadge" id="modeBadge">—</span>
