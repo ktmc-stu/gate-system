@@ -17,7 +17,7 @@ body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min
 .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--line);
  background:rgba(8,14,26,.72);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
 .brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:20px;letter-spacing:.06em}
-.brand::before{content:'G';display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--amber),var(--amber-d));color:#241500;font-size:19px;box-shadow:0 6px 18px rgba(255,150,40,.35)}
+.logo{width:32px;height:32px;object-fit:contain;border-radius:9px}
 .brand b{color:var(--amber)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
 .tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:99px;padding:4px}
 .tab{border:0;background:none;color:var(--dim);padding:9px 20px;border-radius:99px;font-weight:700;font-size:13.5px;cursor:pointer;transition:.2s}
@@ -50,7 +50,7 @@ section.pane.on{display:block}
 .card h3::before{content:'';width:8px;height:8px;border-radius:3px;background:var(--amber)}
 .card h3 span{color:var(--faint);font-weight:500;font-size:.78em}
 .drop{border:2px dashed var(--line2);border-radius:18px;padding:38px 20px;text-align:center;color:var(--dim);cursor:pointer;transition:.2s;margin-top:16px}
-.drop::before{content:'⬆';display:block;font-size:26px;color:var(--faint);margin-bottom:8px;transition:.2s}
+.drop::before{content:'';display:block;font-size:26px;color:var(--faint);margin-bottom:8px;transition:.2s}
 .drop:hover,.drop.over{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.06)}
 .drop:hover::before,.drop.over::before{color:var(--amber);transform:translateY(-3px)}
 .drop b{display:block;font-size:16px;color:var(--text);margin-bottom:4px}
@@ -80,7 +80,7 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
 </head>
 <body>
 <header class="top">
-  <div class="brand">G<b>A</b>TE ADMIN<span>管理</span></div>
+  <div class="brand"><img class="logo" src="logo.png" onerror="this.remove()" alt="">G<b>A</b>TE ADMIN<span>管理</span></div>
   <nav class="tabs">
     <button class="tab on" data-tab="stu">Students<span>學生</span></button>
     <button class="tab" data-tab="rec">Records<span>記錄</span></button>
