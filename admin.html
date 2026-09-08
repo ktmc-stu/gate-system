@@ -377,7 +377,7 @@ requireAuth(function init(){
   function renderStudents(){
     const q=$('sFilter').value.trim().toUpperCase();
     const list=Object.values(students).filter(s=>!q||[s.card,s.sid,s.cls,s.no].some(v=>String(v||'').toUpperCase().includes(q))).sort(byClsNo);
-    const show=list.slice(0,400);
+    const show=list;
     $('stuTable').innerHTML='<tr><th>Card 卡號</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>Flag 標記</th><th></th></tr>'+
       show.map(s=>{const m=houseMeta(s.house);return `<tr>
         <td class="mono">${esc(s.card)}</td><td>${esc(s.sid)}</td><td>${esc(s.cls)}</td><td>${esc(s.no)}</td>
