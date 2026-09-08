@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gate Pass System · Presentation 簡報</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b1322;--panel:rgba(17,29,54,.9);--line:rgba(148,180,255,.16);--text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);background:radial-gradient(1200px 600px at 85% -10%,rgba(75,139,255,.16),transparent 60%),radial-gradient(1000px 600px at -8% 110%,rgba(255,178,36,.12),transparent 60%),var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.deck{width:min(1180px,96vw)}
+.slide{display:none;aspect-ratio:16/9;flex-direction:column;justify-content:center;gap:clamp(10px,2.2vh,22px);padding:clamp(30px,5vw,70px);border-radius:26px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),rgba(10,19,36,.92));box-shadow:0 30px 90px rgba(0,0,0,.5)}
+.slide.on{display:flex;animation:in .45s cubic-bezier(.2,.8,.3,1)}
+@keyframes in{from{opacity:0;transform:translateY(16px)}}
+.kicker{font:600 clamp(10px,1.4vh,13px) 'IBM Plex Mono';letter-spacing:.3em;color:var(--amber)}
+h1{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(34px,7vh,64px);line-height:1.05}
+h2{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(26px,5vh,44px);line-height:1.1}
+.zh{display:block;color:var(--dim);font-weight:500;font-size:clamp(13px,2.2vh,19px);margin-top:6px;line-height:1.6}
+.sub{color:var(--dim);font-size:clamp(14px,2.4vh,20px);line-height:1.7}
+ul{list-style:none;display:flex;flex-direction:column;gap:clamp(8px,1.8vh,16px)}
+li{font-size:clamp(14px,2.5vh,21px);line-height:1.55;padding-left:26px;position:relative}
+li::before{content:'≫';position:absolute;left:0;color:var(--amber)}
+li .zh{font-size:clamp(12px,1.9vh,15px)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,3vw,30px)}
+.box{border:1px solid var(--line);border-radius:16px;padding:clamp(12px,2.4vh,22px);background:rgba(255,255,255,.03)}
+.box b{font-family:'Archivo';font-size:clamp(15px,2.6vh,22px)}
+.box p{color:var(--dim);font-size:clamp(12px,2vh,16px);margin-top:6px;line-height:1.6}
+table{width:100%;border-collapse:collapse;font-size:clamp(11px,2vh,16px)}
+th{font:600 clamp(9px,1.5vh,12px) 'IBM Plex Mono';letter-spacing:.12em;color:var(--faint);text-align:left;padding:8px;border-bottom:1px solid var(--line);text-transform:uppercase}
+td{padding:8px;border-bottom:1px solid rgba(148,180,255,.1);vertical-align:top}
+td .zh{font-size:clamp(10px,1.6vh,13px);margin-top:2px}
+.sig{display:flex;align-items:center;gap:18px}
+.sig svg{width:clamp(44px,9vh,72px);height:clamp(44px,9vh,72px);flex:none}
+.sig b{font-family:'Archivo';font-size:clamp(15px,2.6vh,22px)}
+.sig p{color:var(--dim);font-size:clamp(11px,1.9vh,15px);margin-top:3px;line-height:1.55}
+.steps{counter-reset:st;display:flex;flex-direction:column;gap:clamp(8px,1.8vh,16px)}
+.steps li{padding-left:52px}
+.steps li::before{counter-increment:st;content:counter(st);position:absolute;left:0;top:0;width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--amber),#ff8a3d);color:#241500;font:900 18px 'Archivo';display:flex;align-items:center;justify-content:center}
+.logo{width:clamp(56px,11vh,96px);object-fit:contain;border-radius:18px}
+.nav{position:fixed;bottom:16px;right:20px;display:flex;gap:8px;z-index:9}
+.nav button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--dim);font-size:18px;cursor:pointer}
+.nav button:hover{color:var(--amber);border-color:var(--amber)}
+.counter{position:fixed;bottom:26px;left:24px;font:600 13px 'IBM Plex Mono';color:var(--faint);letter-spacing:.15em;z-index:9}
+@media print{body{overflow:visible;background:#fff}.slide{display:flex!important;page-break-after:always;aspect-ratio:auto;min-height:96vh;border-color:#ccc;background:#fff;color:#111}.zh,.sub,.box p,.sig p,li .zh,td .zh{color:#444}.kicker{color:#8a6d00}.nav,.counter{display:none}li::before{color:#8a6d00}}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<div class="slide on">
+  <img class="logo" src="logo.png" onerror="this.style.display='none'" alt="">
+  <div class="kicker">SPORTS DAY · SWIMMING GALA · CLOSED-AREA CONTROL</div>
+  <h1>Gate Pass System<span class="zh">陸運會・水運會 進出記錄系統</span></h1>
+  <div class="sub">QR scanning · phone-slot custody · overlong alerts · live enquiry<span class="zh">QR 掃碼登記・手機格保管・超時警示・即時查詢</span></div>
+</div>
+
+<div class="slide">
+  <div class="kicker">WHY 背景</div>
+  <h2>What the system solves<span class="zh">系統解決之問題</span></h2>
+  <ul>
+    <li>Know who is inside the stand / venue at all times.<span class="zh">隨時掌握看台／場館內之學生人數與名單。</span></li>
+    <li>Every exit (toilet / tuck shop) recorded with time, duration and gate.<span class="zh">每次外出(廁所／小食部)均記錄時間、時長與閘口。</span></li>
+    <li>Phones kept in numbered slots — one phone, one slot, one record.<span class="zh">手機存放於編號格位——一機一格一記錄。</span></li>
+    <li>Absences over the threshold are flagged automatically.<span class="zh">超過時限之外出自動標記,便於跟進。</span></li>
+  </ul>
+</div>
+
+<div class="slide">
+  <div class="kicker">ARCHITECTURE 架構</div>
+  <h2>One database, every device live<span class="zh">單一資料庫,所有裝置即時同步</span></h2>
+  <div class="grid">
+    <div class="box"><b>gate.html — Gate terminal 閘口</b><p>Opens without password; camera scanning, purposes, phone slots, traffic signals.<span class="zh">開啟免密碼;鏡頭掃碼、外出目的、手機格、放行信號。</span></p></div>
+    <div class="box"><b>admin.html — Administration 管理</b><p>Students, competition/helper lists, records, Excel export, scenario &amp; threshold.<span class="zh">學生名單、參賽/工作人員名單、記錄、Excel 匯出、場景與時限。</span></p></div>
+    <div class="box"><b>enquiry.html — Teacher enquiry 教師查詢</b><p>Search any student; currently-outside list; today's trip board.<span class="zh">搜尋學生;正在外面名單;當日外出總覽。</span></p></div>
+    <div class="box"><b>GitHub Pages + Firebase</b><p>Static hosting with Realtime Database; staff-password protected; HTTPS.<span class="zh">靜態託管加即時資料庫;職員密碼保護;全程 HTTPS。</span></p></div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="kicker">EXIT 外出</div>
+  <h2>Exit flow in four steps<span class="zh">外出流程四步</span></h2>
+  <div class="steps">
+    <li>Student scans the QR code on the student card.<span class="zh">學生掃描學生證上之 QR 碼。</span></li>
+    <li>Prefect taps the purpose: Toilet / Food / Competition / Helper / Other.<span class="zh">風紀點選目的:廁所／小食部／參賽／工作人員／其他。</span></li>
+    <li>System checks lists &amp; houses, then shows a traffic signal.<span class="zh">系統核對名單與社別,然後顯示放行信號。</span></li>
+    <li>Phone goes into the displayed slot (not required for Competition / Helper).<span class="zh">手機放入顯示之格位(參賽／工作人員無需交出手機)。</span></li>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="kicker">RETURN 返回</div>
+  <h2>Return flow<span class="zh">返回流程</span></h2>
+  <div class="steps">
+    <li>Student scans again at the gate (Competition / Helper: any gate).<span class="zh">學生再次掃碼(參賽／工作人員可於任何閘口返回)。</span></li>
+    <li>Screen shows time outside and the slot number for phone collection.<span class="zh">畫面顯示在外時間與取回手機之格位編號。</span></li>
+    <li>Over the threshold? Yellow caution + record flagged.<span class="zh">超過時限?顯示黃色注意信號並於記錄標記。</span></li>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="kicker">SIGNALS 信號</div>
+  <h2>Read the light, act at once<span class="zh">看清信號,即時行動</span></h2>
+  <div class="sig"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#2fd37f"/><path d="M50 20 L76 48 H62 V80 H38 V48 H24 Z" fill="#fff"/></svg><div><b>PASS 放行</b><p>Procedure complete — admit the student.<span class="zh">手續完成,可讓學生通過。</span></p></div></div>
+  <div class="sig"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#ff5d55"/><path d="M34 34 L66 66 M66 34 L34 66" stroke="#fff" stroke-width="13" stroke-linecap="round" fill="none"/></svg><div><b>STOP 禁止通過</b><p>Wrong gate · slots full · already out · not found · not on list.<span class="zh">錯閘口・格位已滿・重複外出・查無此人・不在名單。</span></p></div></div>
+  <div class="sig"><svg viewBox="0 0 100 100"><path d="M50 7 L97 89 H3 Z" fill="#ffb224" stroke="#ffb224" stroke-width="7" stroke-linejoin="round"/><rect x="44.5" y="33" width="11" height="31" rx="5" fill="#141414"/><circle cx="50" cy="75" r="6.5" fill="#141414"/></svg><div><b>CAUTION 注意</b><p>Overlong return · previously overlong · no exit record · phone at another gate.<span class="zh">返回超時・曾超時・無外出記錄・手機於其他閘口。</span></p></div></div>
+</div>
+
+<div class="slide">
+  <div class="kicker">RULES 規則</div>
+  <h2>Purpose rules at a glance<span class="zh">外出目的規則一覽</span></h2>
+  <table>
+    <tr><th>Purpose 目的</th><th>List 名單</th><th>Phone 手機格</th><th>Limit 時限</th><th>House 社別</th></tr>
+    <tr><td>Toilet 廁所 / Food 小食部 / Other 其他</td><td>—</td><td>Assigned 分配</td><td>Yes 適用</td><td>Yes 適用</td></tr>
+    <tr><td>Competition 參賽</td><td>Required 必需</td><td>None 無</td><td>None 無限時</td><td>Exempt 豁免</td></tr>
+    <tr><td>Student Helper 工作人員</td><td>Required 必需</td><td>None 無</td><td>None 無限時</td><td>Exempt 豁免</td></tr>
+  </table>
+</div>
+
+<div class="slide">
+  <div class="kicker">CUSTODY 保管</div>
+  <h2>Phone slots &amp; channels<span class="zh">手機格與通道</span></h2>
+  <div class="grid">
+    <div class="box"><b>12 slots per gate 每閘 12 格</b><p>Full = exits blocked. Tap a slot for occupant details; Manual Return (password) releases it.<span class="zh">滿格即暫停外出;點選格位可查占用人資料;「手動返回」(需密碼)釋放格位。</span></p></div>
+    <div class="box"><b>Two channel types 兩種通道</b><p>Normal: all purposes + slots. Special: Competition/Helper only, no slots, no limit.<span class="zh">普通:所有目的加手機格。專用:僅參賽/工作人員,無手機格、無限時。</span></p></div>
+    <div class="box"><b>Two houses per gate 每閘兩社</b><p>Other houses get STOP — except Competition/Helper, exempt everywhere.<span class="zh">其他社顯示禁止——參賽/工作人員於任何閘口豁免。</span></p></div>
+    <div class="box"><b>Overlong ≥ threshold 超時</b><p>Flagged on return; next exit shows a caution badge; slots flash red.<span class="zh">返回時標記;下次外出顯示注意標記;格位紅色閃爍。</span></p></div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="kicker">BACK OFFICE 後勤</div>
+  <h2>Admin &amp; enquiry highlights<span class="zh">管理與查詢重點</span></h2>
+  <ul>
+    <li>Excel import for students; one-click upload for competition &amp; helper lists.<span class="zh">學生以 Excel 匯入;參賽與工作人員名單一鍵上載。</span></li>
+    <li>Records by date range; Excel export with purpose, slot, gates, duration, flags.<span class="zh">按日期範圍檢視記錄;Excel 匯出含目的、格位、閘口、時長與標記。</span></li>
+    <li>Per-student summary: trips, purpose breakdown, total time, overlong count.<span class="zh">按學生統計:外出次數、目的分佈、總時長、超時次數。</span></li>
+    <li>Teachers: live status, elapsed time and trip board from any phone.<span class="zh">教師可於任何手機查看即時狀態、在外時間與外出總覽。</span></li>
+  </ul>
+</div>
+
+<div class="slide">
+  <div class="kicker">WRAP-UP 總結</div>
+  <h1>Safe, counted, accounted.<span class="zh">安全、有數、有據。</span></h1>
+  <div class="sub">Questions? Full procedures in <b>manual.html</b> (web) and the printed user manual.<span class="zh">如有疑問,完整程序見 manual.html(網頁版)及打印版使用手冊。</span></div>
+</div>
+
+</div>
+<div class="counter"><span id="cur">1</span> / <span id="tot">10</span></div>
+<div class="nav"><button id="prev" title="Previous">←</button><button id="next" title="Next">→</button><button id="fs" title="Fullscreen">⛶</button></div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+document.getElementById('tot').textContent=slides.length;
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('on',k===i));document.getElementById('cur').textContent=i+1;}
+document.getElementById('next').onclick=()=>show(i+1);
+document.getElementById('prev').onclick=()=>show(i-1);
+document.getElementById('fs').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();};
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight',' ','PageDown','Enter'].includes(e.key)){e.preventDefault();show(i+1);}
+  else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();show(i-1);}
+  else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+});
+let tx=null;document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;});
+document.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>60)show(i+(dx<0?1:-1));tx=null;});
+show(0);
+</script>
+</body>
+</html>
