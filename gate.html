@@ -54,7 +54,6 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 #reader__dashboard,#reader__filescan_input{display:none!important}
 .camerr{min-height:1.2em;font-size:12.5px;color:var(--red);text-align:center;line-height:1.6}
 .camerr .ghostbtn{margin-left:8px}
-/* 手機格 */
 .slots-wrap{margin-top:8px}
 .slots-head{display:flex;justify-content:space-between;align-items:center;font:800 clamp(12px,1.9vh,16px) 'IBM Plex Mono';letter-spacing:.14em;color:var(--dim);margin-bottom:8px}
 .slots-head .mono{color:var(--amber);font-size:clamp(14px,2.2vh,18px)}
@@ -68,7 +67,6 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .slotbig b{font-family:'Archivo';font-weight:900;font-size:clamp(64px,14vh,120px);line-height:1;color:var(--amber);text-shadow:0 0 44px rgba(255,178,36,.55);animation:houseIn .45s cubic-bezier(.2,1.4,.4,1)}
 .slotbig span{font:700 clamp(11px,1.7vh,14px) 'IBM Plex Mono';letter-spacing:.26em;color:var(--dim);text-align:center}
 .slotbig.green b{color:var(--green);text-shadow:0 0 44px rgba(47,211,127,.55)}
-/* 放行信號 */
 .sigwrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0 auto}
 .signal{width:clamp(120px,26vh,210px);aspect-ratio:1;animation:pop .45s cubic-bezier(.2,1.5,.4,1)}
 .signal svg{width:100%;height:100%;display:block}
@@ -79,7 +77,6 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .siglabel{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(18px,3.2vh,28px);letter-spacing:.12em;text-align:center}
 .siglabel.go{color:var(--green)}.siglabel.stop{color:var(--red)}.siglabel.caution{color:var(--amber)}
 .sigsub{font-size:clamp(12px,1.9vh,15px);color:var(--dim);text-align:center;font-weight:600;max-width:560px}
-/* 候選名單 */
 .cands{display:grid;gap:8px;max-height:46vh;overflow:auto;width:100%}
 .cand{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.03);cursor:pointer;font-size:15px;color:var(--text);text-align:left}
 .cand:active,.cand:hover{background:rgba(255,178,36,.12);border-color:var(--amber)}
@@ -122,9 +119,9 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .pbtn b{font-family:'Archivo';font-size:18px;letter-spacing:.06em}
 .pbtn span{font-size:12px;color:var(--faint)}
 .pbtn:active{transform:scale(.97)}
-.pbtn.t:hover{border-color:var(--blue);background:rgba(75,139,255,.12)}
+.pbtn.t:hover,.pbtn.c:hover{border-color:var(--blue);background:rgba(75,139,255,.12)}
 .pbtn.f:hover{border-color:var(--amber);background:rgba(255,178,36,.12)}
-.pbtn.o:hover{border-color:var(--green);background:rgba(47,211,127,.1)}
+.pbtn.h:hover,.pbtn.o:hover{border-color:var(--green);background:rgba(47,211,127,.12)}
 .foot-hint{font-size:12px;color:var(--faint);text-align:center;letter-spacing:.12em}
 .minitable{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
 .minitable th{font:600 10px 'IBM Plex Mono';letter-spacing:.12em;color:var(--faint);text-align:left;padding:6px;border-bottom:1px solid var(--line2)}
@@ -155,8 +152,8 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .xbtn{background:none;border:0;color:var(--faint);font-size:18px;cursor:pointer}
 .xbtn:hover{color:var(--text)}
 .overlay{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(4,8,16,.7);backdrop-filter:blur(6px);padding:20px}
-#setOv{z-index:80}
 .overlay.open{display:flex}
+#setOv{z-index:80}
 .pad{width:min(390px,94vw);border-radius:24px;padding:24px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(23,37,66,.95),rgba(10,19,36,.95));box-shadow:var(--shadow);animation:up .25s ease}
 .pad.wide{width:min(560px,94vw);max-height:88vh;overflow:auto}
 #padOv .pad{max-height:88vh;overflow:auto}
@@ -202,13 +199,14 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
     <label class="hsel"><input type="checkbox" name="gh" value="M">M</label>
     <label class="hsel"><input type="checkbox" name="gh" value="C">C</label>
   </div>
-  <p class="dim" style="font-size:11.5px;margin-top:8px">其他社學生喺本閘掃碼會被拒絕。留空＝不限社 Leave empty = all Houses</p>
+  <p class="dim" style="font-size:11.5px;margin-top:8px">其他社學生喺本閘掃碼會被拒絕（參賽／工作人員返回豁免）。留空＝不限社</p>
   <label style="margin-top:18px">Mode 模式</label>
   <label class="mode"><input type="radio" name="gmode" value="auto"><div><b>AUTO 自動（建議）</b><span>Scan = out; scan again = return 掃碼自動判斷外出／返回</span></div></label>
   <label class="mode"><input type="radio" name="gmode" value="out"><div><b>OUT Only 只登記外出</b><span>This device only registers exits 本裝置只處理離開</span></div></label>
   <label class="mode"><input type="radio" name="gmode" value="in"><div><b>IN Only 只登記返回</b><span>This device only registers returns 本裝置只處理返回</span></div></label>
-  <label class="mode" style="margin-top:16px"><input type="checkbox" id="gSound"><div><b>Sound 聲音提示</b><span>Beep on scan 掃描嗶聲</span></div></label>
-  <div class="note">Phone slots 手機格：本閘 12 格，滿格禁止外出；㩒占用格可睇佔用人資料。<br>Overlong threshold 超時時限：<b><span id="thNote">15</span> min</b>（於 Admin 設定）<br>Event scenario 活動場景由 Admin 統一設定。</div>
+  <label class="mode" style="margin-top:14px"><input type="checkbox" id="gSound"><div><b>Sound 聲音提示</b><span>Beep on scan 掃描嗶聲</span></div></label>
+  <label class="mode" style="margin-top:14px"><input type="checkbox" id="gSlots"><div><b>Phone Slots Open 開放手機存放格</b><span>關閉後一般外出唔再分配格位；參賽／工作人員本來唔用格</span></div></label>
+  <div class="note">Phone slots 手機格：本閘 12 格，滿格禁止外出；㩒占用格可睇佔用人資料。<br>Overlong threshold 超時時限：<b><span id="thNote">15</span> min</b>（於 Admin 設定；參賽／工作人員無限時）<br>Event scenario 活動場景由 Admin 統一設定。</div>
   <div class="drawer-btns"><button class="btn primary" id="saveCfg">Save 儲存</button><button class="btn ghost" data-signout>Sign Out 登出</button></div>
 </aside>
 
@@ -254,10 +252,11 @@ const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
-let threshold=15, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
+let threshold=15, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
 const $=id=>document.getElementById(id), board=$('board');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
+const NO_LIMIT=p=>p==='competition'||p==='helper';
 
 function initGate(){
   if(booted)return; booted=true;
@@ -269,11 +268,14 @@ function initGate(){
   db.ref('students').on('value',s=>{students=s.val()||{};});
   db.ref('live').on('value',s=>{liveMap=s.val()||{};const n=Object.keys(liveMap).length;$('nowOut').textContent=n;const pb=$('pillOutB');if(pb)pb.textContent=n;});
   db.ref('counters').on('value',s=>{countersMap=s.val()||{};});
+  db.ref('participantList').on('value',s=>{compList=s.val()||{};});
+  db.ref('helperList').on('value',s=>{helperList=s.val()||{};});
   db.ref('.info/connected').on('value',s=>{const on=!!s.val();$('conn').className='conn '+(on?'on':'off');$('connTx').textContent=on?'LIVE 連線':'OFFLINE 離線';});
   watchThreshold(v=>{threshold=v;$('thNote').textContent=v;const p=$('pillThB');if(p)p.textContent=v+' min';refreshSlots();});
   watchScenario(v=>{scenario=v;applyHeader();if(state==='ready')toReady();});
 
   /* ---- 手機格 ---- */
+  function slotsOpen(){ return !(gateCfg&&gateCfg.slotsOpen===false); }
   function subscribeSlots(){
     if(slotsRef)slotsRef.off();
     slotsRef=db.ref('slots/'+gateKey());
@@ -293,7 +295,7 @@ function initGate(){
       const over=o&&o.outAt&&(Date.now()-o.outAt)>=lim;
       c+=`<div class="slot${o?' occ':''}${over?' over':''}" data-slot="${i}">${i}</div>`;}
     g.innerHTML=c;
-    const f=$('slotFree');if(f)f.textContent=freeCount()+'/12 FREE';
+    const f=$('slotFree');if(f)f.textContent=slotsOpen()?freeCount()+'/12 FREE':'CLOSED';
     const ov=$('slotOver');if(ov){const n=overCount();
       if(n>0){ov.style.display='inline';ov.textContent=`⚠ ${n} OVER`;}else ov.style.display='none';}
   }
@@ -335,7 +337,7 @@ function initGate(){
           <div class="row"><span class="k">Device<i>登記裝置</i></span><span class="v mono small">${esc((live&&live.gate)||cfg.name)}</span></div>
         </div>
       </div>
-      ${outAt&&(Date.now()-outAt)>=threshold*60000?`<div class="alert" style="margin-top:12px">⏱ CURRENTLY OVERLONG 現時已超時 ≥ ${threshold} MIN</div>`:''}
+      ${outAt&&!NO_LIMIT(live?live.purpose:null)&&(Date.now()-outAt)>=threshold*60000?`<div class="alert" style="margin-top:12px">⏱ CURRENTLY OVERLONG 現時已超時 ≥ ${threshold} MIN</div>`:''}
       ${st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:''}
       <h4 style="font-family:'Archivo';font-size:13px;letter-spacing:.08em;margin:14px 0 4px;color:var(--dim)">TODAY'S TRIPS 今日記錄</h4>
       <div id="sdTrips" class="dim" style="font-size:12px">Loading…</div>`;
@@ -368,18 +370,18 @@ function initGate(){
   };
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('slotOv').classList.contains('open'))closeSlotDetail(); });
 
-  /* ---- 閘口社分配 ---- */
+  /* ---- 閘口社分配／手機格開關 ---- */
   function subscribeGateCfg(){
     if(gateCfgRef)gateCfgRef.off();
     gateCfgRef=db.ref('config/gates/'+gateKey());
-    gateCfgRef.on('value',s=>{gateCfg=s.val()||{};refreshHousePill();});
+    gateCfgRef.on('value',s=>{gateCfg=s.val()||{};refreshHousePill();refreshSlots();});
   }
   function gateHouses(){ return gateCfg&&gateCfg.houses ? String(gateCfg.houses).split(',').map(x=>x.trim().toUpperCase()).filter(Boolean) : []; }
   function houseLabel(){ const hs=gateHouses(); return hs.length?hs.join(' '):'ALL 全社'; }
   function refreshHousePill(){ const p=$('pillHouse'); if(p)p.textContent=houseLabel(); }
   function houseAllowed(st){ const hs=gateHouses(); if(!hs.length)return true; return hs.includes(String(st.house||'').toUpperCase()); }
 
-  /* ---- QR scanner（單實例＋三段後備）---- */
+  /* ---- QR scanner ---- */
   function startScanner(){
     if(state!=='ready'||!document.getElementById('reader'))return;
     if(!window.Html5Qrcode){const c=$('camErr');if(c)c.innerHTML='Scanner library not loaded 掃描庫未載入';return;}
@@ -400,7 +402,7 @@ function initGate(){
     else{try{q.clear()}catch(e){}}
   }
 
-  /* ---- 密碼鎖（設定／敏感操作共用）---- */
+  /* ---- 密碼鎖 ---- */
   let pwCallback=null;
   function askPassword(msg,onOk){
     pwCallback=onOk;
@@ -429,6 +431,7 @@ function initGate(){
     $('gName').value=cfg.name;
     document.querySelector(`input[name=gmode][value=${cfg.mode}]`).checked=true;
     $('gSound').checked=!cfg.muted;
+    $('gSlots').checked=slotsOpen();
     const hs=gateHouses();
     document.querySelectorAll('input[name=gh]').forEach(i=>{i.checked=hs.includes(i.value);});
     $('drawer').classList.add('open');
@@ -441,10 +444,10 @@ function initGate(){
     cfg.muted=!$('gSound').checked; window.MUTED=cfg.muted;
     localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
     const hs=[...document.querySelectorAll('input[name=gh]:checked')].map(i=>i.value).join(',');
-    db.ref('config/gates/'+gateKey()).update({houses:hs});
+    db.ref('config/gates/'+gateKey()).update({houses:hs,slotsOpen:$('gSlots').checked});
     applyHeader(); $('drawer').classList.remove('open');
     if(gateKey()!==oldKey){subscribeSlots();subscribeGateCfg();}
-    refreshHousePill();
+    refreshHousePill();refreshSlots();
     toReady();
   };
   function applyHeader(){
@@ -454,7 +457,7 @@ function initGate(){
     $('scBadge').textContent=`${sc.zh} ${sc.en.toUpperCase()}`;
   }
 
-  /* ---- manual pad（5 欄純按鈕輸入）---- */
+  /* ---- manual pad ---- */
   let padBuf='';
   const PAD_KEYS=['1','2','3','A','D','4','5','6','B','E','7','8','9','C','CLR','0','⌫'];
   PAD_KEYS.forEach(k=>{
@@ -501,13 +504,15 @@ function initGate(){
     return out.sort(byClsNo).slice(0,12);
   }
   function proceed(st){
-    if(!houseAllowed(st)){
+    const live=liveMap[st.card];
+    const isOut=!!live;
+    const exempt=isOut&&NO_LIMIT(live.purpose);   // 參賽／工作人員：任何閘口可返回
+    if(!exempt&&!houseAllowed(st)){
       const hs=gateHouses();
       showWarn(st,'WRONG GATE',`此閘口只限 ${hs.join(' / ')} 社使用 — 請往正確閘口 This gate serves House ${hs.join('/')} only`,null);
       sound('warn');return;
     }
-    const isOut=!!liveMap[st.card];
-    if(cfg.mode==='out'){ isOut?showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',liveMap[st.card]):showPurpose(st); return; }
+    if(cfg.mode==='out'){ isOut?showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',live):showPurpose(st); return; }
     if(cfg.mode==='in'){ isOut?doIn(st):showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null); return; }
     isOut?doIn(st):showPurpose(st);
   }
@@ -528,24 +533,34 @@ function initGate(){
   function doOut(st,purpose){
     const card=st.card, now=Date.now();
     const recKey=db.ref('records').push().key;
-    assignSlot(card,st.sid,recKey,now).then(slot=>{
-      if(!slot){showWarn(st,'SLOTS FULL','本閘 12 個手機格已滿 — 不能外出',null);sound('warn');return;}
+    const needSlot=!NO_LIMIT(purpose)&&slotsOpen();
+    const finish=slot=>{
       db.ref('live/'+card).transaction(cur=>{
         if(cur)return;
-        return {recordId:recKey,outAt:now,gate:cfg.name,purpose,slot,slotGate:cfg.name};
+        return {recordId:recKey,outAt:now,gate:cfg.name,purpose,slot:slot||null,slotGate:slot?cfg.name:null};
       }).then(res=>{
-        if(!res.committed){db.ref(`slots/${gateKey()}/${slot}`).set(null);showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',liveMap[card]||{outAt:now});return;}
+        if(!res.committed){
+          if(slot)db.ref(`slots/${gateKey()}/${slot}`).set(null);
+          showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',liveMap[card]||{outAt:now});return;
+        }
         db.ref('records/'+recKey).set({card,sid:st.sid,cls:st.cls,no:st.no,house:st.house,scenario,
-          code:pendingCode,purpose,slot,slotGate:cfg.name,gateOut:cfg.name,outAt:now,gateIn:null,inAt:null,durationSec:null,overlong:false});
-        db.ref('counters/'+card+'/outCount').transaction(v=>(v||0)+1).then(r=>showOut(st,r.snapshot.val()||1,!!st.overlongFlag,purpose,slot));
+          code:pendingCode,purpose,slot:slot||null,slotGate:slot?cfg.name:null,gateOut:cfg.name,outAt:now,gateIn:null,inAt:null,durationSec:null,overlong:false});
+        db.ref('counters/'+card+'/outCount').transaction(v=>(v||0)+1).then(r=>showOut(st,r.snapshot.val()||1,!!st.overlongFlag,purpose,slot||null));
       });
-    });
+    };
+    if(needSlot){
+      assignSlot(card,st.sid,recKey,now).then(slot=>{
+        if(!slot){showWarn(st,'SLOTS FULL','本閘 12 個手機格已滿 — 不能外出',null);sound('warn');return;}
+        finish(slot);
+      });
+    } else finish(null);
   }
   function doIn(st){
     const card=st.card; let captured=null;
     db.ref('live/'+card).transaction(cur=>{ if(!cur)return; captured=cur; return null; }).then(res=>{
       if(!res.committed||!captured){showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null);return;}
-      const now=Date.now(), durMs=Math.max(0,now-captured.outAt), over=durMs>=threshold*60000;
+      const now=Date.now(), durMs=Math.max(0,now-captured.outAt);
+      const over=!NO_LIMIT(captured.purpose)&&durMs>=threshold*60000;
       const upd={};
       upd['records/'+captured.recordId+'/inAt']=now;
       upd['records/'+captured.recordId+'/gateIn']=cfg.name;
@@ -577,7 +592,8 @@ function initGate(){
     <div class="row"><span class="k">Class Number<i>學號</i></span><span class="v">${esc(st.no||'—')}</span></div>
     <div class="row"><span class="k">Scanned<i>掃描值</i></span><span class="v mono small">${esc(st.card)}</span></div>`;}
   function flagBadge(st){return st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:'';}
-  function slotsStrip(){return `<div class="slots-wrap"><div class="slots-head"><span>PHONE SLOTS 手機格 · ${esc(cfg.name)}（㩒格睇資料）</span><span><span class="mono" id="slotOver" style="color:var(--red);margin-right:10px;display:none"></span><span class="mono" id="slotFree">${freeCount()}/12 FREE</span></span></div><div class="slots" id="slotsGrid"></div></div>`;}
+  function slotsStrip(){const open=slotsOpen();
+    return `<div class="slots-wrap"><div class="slots-head"><span>PHONE SLOTS 手機格 · ${esc(cfg.name)}${open?'（㩒格睇資料）':' · <span style="color:var(--red)">CLOSED 暫停開放</span>'}</span><span><span class="mono" id="slotOver" style="color:var(--red);margin-right:10px;display:none"></span><span class="mono" id="slotFree">${open?freeCount()+'/12 FREE':'CLOSED'}</span></span></div><div class="slots" id="slotsGrid"></div></div>`;}
   function schedule(ms){clearTimeout(resetT);resetT=setTimeout(toReady,ms);}
   function toReady(){state='ready';pendingSt=null;clearTimeout(resetT);renderReady();}
   function renderReady(){
@@ -614,6 +630,8 @@ function initGate(){
       <div class="purp">
         <button class="pbtn t" data-purpose="toilet">🚻<b>TOILET</b><span>廁所</span></button>
         <button class="pbtn f" data-purpose="food">🍱<b>FOOD</b><span>小食部</span></button>
+        <button class="pbtn c" data-purpose="competition">🏅<b>COMPETITION</b><span>參賽</span></button>
+        <button class="pbtn h" data-purpose="helper">🦺<b>HELPER</b><span>工作人員</span></button>
         <button class="pbtn o" data-purpose="other">📌<b>OTHER</b><span>其他</span></button>
       </div>
       ${slotsStrip()}
@@ -622,21 +640,29 @@ function initGate(){
   }
   function showOut(st,count,wasFlag,purpose,slot){
     state='out';pendingSt=null;const sc=scenarioMeta(scenario),pm=purposeMeta(purpose);
+    const noLimit=NO_LIMIT(purpose);
+    const midHtml=slot
+      ?`<div class="slotbig"><b>#${slot}</b><span>PHONE SLOT 手機格 · PUT PHONE IN 請放入手機</span></div>`
+      :(noLimit
+        ?`<div class="okline" style="text-align:center;font-size:clamp(14px,2.2vh,18px)">📵 無需交手機 · ⏱ 無限時 NO PHONE · NO TIME LIMIT</div>`
+        :`<div class="okline" style="text-align:center;font-size:clamp(14px,2.2vh,18px)">📵 手機格暫停開放 — 請自行保管手機 SLOTS CLOSED</div>`);
     board.innerHTML=`
       <div class="micro">GOING ${sc.out.en} ${sc.out.zh} · RECORDED 已記錄</div>
       ${signal(wasFlag?'caution':'go', wasFlag?'⚠ 曾外出時間過長 PREVIOUSLY OVERLONG — 請留意返回時間':'手續完成 · 請放行 PROCEED')}
-      <div class="slotbig"><b>#${slot}</b><span>PHONE SLOT 手機格 · PUT PHONE IN 請放入手機</span></div>
+      ${midHtml}
       <div class="grid2">${houseBlock(st)}<div class="info">${rows(st)}</div></div>
-      <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span><span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
+      <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span>${noLimit?'<span class="pill">♾️ NO LIMIT 無限時</span>':''}<span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
     sound(wasFlag?'warn':'out');schedule(wasFlag?11000:9000);
   }
   function showIn(st,durMs,over,purpose,phone){
     state='in';pendingSt=null;const sc=scenarioMeta(scenario),pm=purposeMeta(purpose);
+    const noLimit=NO_LIMIT(purpose);
     const otherPhone=phone&&!phone.own;
     const sig=(over||otherPhone)?'caution':'go';
     const sub=over?`⏱ 外出時間過長 TIME EXCEEDED ≥ ${threshold} MIN — 已標記`
       :otherPhone?`📱 手機存放於其他閘 PHONE AT ${esc(phone.gate)} #${phone.slot}`
+      :noLimit?`♾️ 無限時記錄 NO TIME LIMIT · ${pm.icon} ${pm.zh}`
       :'準時返回 ON TIME · 請放行 PROCEED';
     const phoneHtml=phone&&phone.own?`<div class="slotbig green"><b>#${phone.slot}</b><span>COLLECT PHONE 取回手機</span></div>`:'';
     board.innerHTML=`
@@ -679,7 +705,12 @@ function initGate(){
     const cd=e.target.closest('[data-cand]');
     if(cd){const st=students[cd.dataset.cand];if(st)proceed(st);return;}
     const p=e.target.closest('[data-purpose]');
-    if(p&&pendingSt){doOut(pendingSt,p.dataset.purpose);return;}
+    if(p&&pendingSt){
+      const pu=p.dataset.purpose;
+      if(pu==='competition'&&!compList[pendingSt.card]){showWarn(pendingSt,'NOT ON LIST','參賽者名單無此學生 — 不能以參賽原因外出 Not in competition list',null);sound('warn');return;}
+      if(pu==='helper'&&!helperList[pendingSt.card]){showWarn(pendingSt,'NOT ON LIST','工作人員名單無此學生 — 不能以工作人員原因外出 Not in helper list',null);sound('warn');return;}
+      doOut(pendingSt,pu);return;
+    }
     const b=e.target.closest('[data-act]');
     if(b){const a=b.dataset.act;
       if(a==='manual')openPad();
@@ -693,13 +724,21 @@ function initGate(){
 const KE=(typeof KIOSK_EMAIL!=='undefined')?KIOSK_EMAIL:'';
 const KP=(typeof KIOSK_PASSWORD!=='undefined')?KIOSK_PASSWORD:'';
 function showAuthFail(){
-  board.innerHTML=`<div class="center"><div class="nf">AUTH / NETWORK ERROR<span>無法自動登入閘口帳號 — 檢查網絡或 config.js 嘅 KIOSK_EMAIL / KIOSK_PASSWORD</span></div><button class="ghostbtn" onclick="location.reload()">Retry 重試</button></div>`;
+  board.innerHTML=`<div class="center"><div class="nf">AUTH / NETWORK ERROR<span>無法自動登入閘口帳號 — 檢查網絡或 config.js 嘅 KIOSK_EMAIL / KIOSK_PASSWORD</span></div><button class="ghostbtn" onclick="localStorage.removeItem('gate.authfail');location.reload()">Retry 重試</button></div>`;
 }
 function silentLogin(){
   if(!KE||!KP){showAuthFail();return;}
-  auth.signInWithEmailAndPassword(KE,KP).catch(()=>showAuthFail());
+  const last=parseInt(localStorage.getItem('gate.authfail')||'0',10);
+  if(Date.now()-last<10*60000){showAuthFail();return;}
+  auth.signInWithEmailAndPassword(KE,KP).catch(()=>{
+    localStorage.setItem('gate.authfail',String(Date.now()));
+    showAuthFail();
+  });
 }
-auth.onAuthStateChanged(u=>{ if(u)initGate(); else silentLogin(); });
+auth.onAuthStateChanged(u=>{
+  if(u){ localStorage.removeItem('gate.authfail'); initGate(); }
+  else silentLogin();
+});
 </script>
 </body>
 </html>
