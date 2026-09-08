@@ -512,18 +512,23 @@ function initGate(){
     out=Object.values(students).filter(s=>String(s.sid||'').includes(q)||String(s.card||'').toUpperCase().includes(q));
     return out.sort(byClsNo).slice(0,12);
   }
+  function wrongGate(st){
+    const hs=gateHouses();
+    showWarn(st,'WRONG GATE',`此閘口只限 ${hs.join(' / ')} 社使用 — 請往正確閘口 This gate serves House ${hs.join('/')} only`,null);
+    sound('warn');
+  }
   function proceed(st){
     const live=liveMap[st.card];
     const isOut=!!live;
-    const exempt=isOut&&NO_LIMIT(live.purpose);   // 參賽／工作人員：任何閘口可返回
-    if(!exempt&&!houseAllowed(st)){
-      const hs=gateHouses();
-      showWarn(st,'WRONG GATE',`此閘口只限 ${hs.join(' / ')} 社使用 — 請往正確閘口 This gate serves House ${hs.join('/')} only`,null);
-      sound('warn');return;
+    if(isOut){
+      // 返回：參賽／工作人員豁免社別＋任何閘口；其他目的照舊
+      if(!NO_LIMIT(live.purpose)&&!houseAllowed(st)){ wrongGate(st); return; }
+      if(cfg.mode==='out'){ showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',live); return; }
+      doIn(st); return;
     }
-    if(cfg.mode==='out'){ isOut?showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',live):showPurpose(st); return; }
-    if(cfg.mode==='in'){ isOut?doIn(st):showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null); return; }
-    isOut?doIn(st):showPurpose(st);
+    // 外出：社別檢查延後到選擇目的時（參賽／工作人員豁免）
+    if(cfg.mode==='in'){ showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null); return; }
+    showPurpose(st);
   }
   function handleScan(raw,manual){
     raw=String(raw||'').trim(); if(!raw)return;
@@ -540,6 +545,7 @@ function initGate(){
   }
 
   function doOut(st,purpose){
+    if(!NO_LIMIT(purpose)&&!houseAllowed(st)){ wrongGate(st); return; }
     const card=st.card, now=Date.now();
     const recKey=db.ref('records').push().key;
     const needSlot=!NO_LIMIT(purpose)&&channelType()==='normal';
@@ -718,6 +724,7 @@ function initGate(){
       const pu=p.dataset.purpose;
       if(pu==='competition'&&!compList[pendingSt.card]){showWarn(pendingSt,'NOT ON LIST','參賽者名單無此學生 — 不能以參賽原因外出 Not in competition list',null);sound('warn');return;}
       if(pu==='helper'&&!helperList[pendingSt.card]){showWarn(pendingSt,'NOT ON LIST','工作人員名單無此學生 — 不能以工作人員原因外出 Not in helper list',null);sound('warn');return;}
+      if(!NO_LIMIT(pu)&&!houseAllowed(pendingSt)){ wrongGate(pendingSt); return; }
       doOut(pendingSt,pu);return;
     }
     const b=e.target.closest('[data-act]');
