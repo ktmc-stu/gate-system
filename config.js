@@ -9,5 +9,9 @@ const FIREBASE_CONFIG = {
   appId: "1:693237112593:web:caa8867e73186e3a5cf6b0"
 };
 
-// ⚠️ 請確保呢個電郵同你喺 Firebase -> Authentication -> 使用者 入面建立嘅職員帳號完全一致
-const STAFF_EMAIL = "gate@ktmc.edu.hk";
+/* 職員帳號：index / admin / enquiry 進入密碼＋gate 內設定鎖／手動返回驗證 */
+const STAFF_EMAIL = "你而家用緊嘅職員電郵";
+
+/* 新增：gate 專用自動登入帳號（Firebase Auth → Users → Add user 建立） */
+const KIOSK_EMAIL = "kiosk@ktmc.edu.hk";
+const KIOSK_PASSWORD = "設一個kiosk專用密碼";
