@@ -26,6 +26,8 @@ function watchScenario(cb){ db.ref('config/scenario').on('value',s=>cb(s.val()==
 const PURPOSES={
   toilet:{en:'Toilet',zh:'廁所',icon:'🚻'},
   food:  {en:'Food',  zh:'小食部',icon:'🍱'},
+  competition:{en:'Competition',zh:'參賽',icon:'🏅'},
+  helper:{en:'Student Helper',zh:'工作人員',icon:'🦺'},
   other: {en:'Other', zh:'其他',icon:'📌'}
 };
 function purposeMeta(p){return PURPOSES[p]||{en:'—',zh:'—',icon:'·'};}
