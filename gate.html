@@ -259,7 +259,7 @@ const $=id=>document.getElementById(id), board=$('board');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
 
-requireAuth(function init(){
+function initGate(){
   if(booted)return; booted=true;
   bindSignOut();
   applyHeader(); subscribeSlots(); subscribeGateCfg(); toReady();
@@ -687,7 +687,19 @@ requireAuth(function init(){
       return;}
     if(state!=='ready'&&state!=='choice'&&state!=='cand')toReady();
   });
-});
+}
+
+/* ---- 靜默登入：進入 gate 毋須密碼 ---- */
+const KE=(typeof KIOSK_EMAIL!=='undefined')?KIOSK_EMAIL:'';
+const KP=(typeof KIOSK_PASSWORD!=='undefined')?KIOSK_PASSWORD:'';
+function showAuthFail(){
+  board.innerHTML=`<div class="center"><div class="nf">AUTH / NETWORK ERROR<span>無法自動登入閘口帳號 — 檢查網絡或 config.js 嘅 KIOSK_EMAIL / KIOSK_PASSWORD</span></div><button class="ghostbtn" onclick="location.reload()">Retry 重試</button></div>`;
+}
+function silentLogin(){
+  if(!KE||!KP){showAuthFail();return;}
+  auth.signInWithEmailAndPassword(KE,KP).catch(()=>showAuthFail());
+}
+auth.onAuthStateChanged(u=>{ if(u)initGate(); else silentLogin(); });
 </script>
 </body>
 </html>
