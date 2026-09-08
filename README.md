@@ -1,191 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>User Manual 使用手冊 · Gate Pass System</title>
-<link rel="icon" href="logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-:root{--panel:rgba(17,29,54,.86);--panel2:rgba(10,19,36,.9);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.28);
- --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff}
-*{margin:0;padding:0;box-sizing:border-box}
-html{color-scheme:dark}
-body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
- background:radial-gradient(1100px 520px at 92% -10%,rgba(75,139,255,.14),transparent 60%),radial-gradient(900px 520px at -8% 110%,rgba(255,178,36,.1),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
-.mono{font-family:'IBM Plex Mono',monospace}
-.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--line);background:rgba(8,14,26,.8);backdrop-filter:blur(12px)}
-.topbar .t{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:18px;letter-spacing:.06em}
-.topbar .t b{color:var(--amber)}
-.topbar a{color:var(--dim);text-decoration:none;font-size:13px;font-weight:600}
-.topbar a:hover{color:var(--amber)}
-.doc{max-width:940px;margin:0 auto;padding:40px 22px 90px}
-h1{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(30px,5vw,46px);letter-spacing:.03em}
-h1 .zh{display:block;font-size:.42em;color:var(--dim);font-weight:700;letter-spacing:.2em;margin-top:8px}
-.lede{margin:14px 0 8px;font-size:15.5px;line-height:1.8}
-h2{font-family:'Archivo','Noto Sans TC';font-size:24px;margin:48px 0 4px;padding-left:14px;border-left:4px solid var(--amber)}
-h2 .zh{display:block;font-size:14px;color:var(--dim);font-weight:500;margin-top:4px}
-h3{font-family:'Archivo','Noto Sans TC';font-size:16.5px;margin:26px 0 4px;color:var(--amber)}
-h3 .zh{color:var(--dim);font-weight:500;font-size:13px;margin-left:8px}
-p{margin:9px 0;line-height:1.8;font-size:15px}
-p .zh,li .zh,td .zh{display:block;color:var(--dim);font-size:13.5px;margin-top:3px;line-height:1.7}
-ul,ol{margin:8px 0 8px 22px;line-height:1.8;font-size:15px}
-li{margin:5px 0}
-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
-th{font:600 10.5px 'IBM Plex Mono';letter-spacing:.12em;color:var(--faint);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line2);text-transform:uppercase}
-td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-tbody tr:nth-child(even) td{background:rgba(255,255,255,.02)}
-.toc{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin:26px 0}
-.toc b{font-family:'Archivo';font-size:14px;letter-spacing:.1em}
-.toc a{color:var(--dim);text-decoration:none;display:block;padding:5px 0;font-size:14px}
-.toc a:hover{color:var(--amber)}
-.toc a .zh{display:inline;color:var(--faint);margin-left:8px;font-size:12.5px}
-.sig{display:flex;gap:16px;align-items:center;margin:12px 0;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02)}
-.sig svg{width:58px;height:58px;flex:none}
-.sig .lb{font-family:'Archivo';font-weight:800;font-size:16px}
-.sig .lb .zh{display:block;font-size:13px;color:var(--dim);font-weight:500}
-.sig p{margin:4px 0 0;font-size:13.5px;color:var(--dim)}
-.note{border:1px solid rgba(255,178,36,.4);background:rgba(255,178,36,.07);border-radius:12px;padding:13px 17px;margin:14px 0;font-size:14px;line-height:1.75}
-code{font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.35);padding:2px 7px;border-radius:6px;font-size:13px}
-footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;line-height:1.8}
-</style>
-</head>
-<body>
-<div class="topbar">
-  <div class="t">G<b>A</b>TE · USER MANUAL</div>
-  <a href="index.html">← Back to Index 返回入口</a>
-</div>
+# Gate Pass System 陸運會／水運會 封閉區進出記錄系統
 
-<main class="doc">
-<h1>User Manual<span class="zh">使 用 手 冊</span></h1>
-<p class="lede">Gate Pass System for Sports Day &amp; Swimming Gala — closed-area entry/exit recording with QR scanning, phone-slot custody and live enquiries.<span class="zh">適用於陸運會及水運會之封閉區進出記錄系統,具備 QR 掃描、手機格保管及即時查詢功能。</span></p>
+## 設定步驟
+1. **Firebase Console**（console.firebase.google.com）→ Add Project
+2. **Authentication → Sign-in method**：開啟 Email/Password，新增一個職員帳號
+   （例如 `gate@school.edu.hk`），密碼即全系統通用密碼。建議關閉自行註冊。
+3. **Realtime Database → Create Database**
+4. **Rules 分頁**：貼上 `rules.json` → Publish
+5. **Project Settings → Your apps → Web app**：複製設定貼入 `config.js`，修改 `STAFF_EMAIL`
+6. 全部檔案上傳 GitHub repo → Settings → Pages → Deploy from branch (main)
+7. 等 1–2 分鐘，到 `https://<user>.github.io/<repo>/`
 
-<div class="toc">
-  <b>CONTENTS 目錄</b>
-  <a href="#s1">1. System Overview<span class="zh">系統概述</span></a>
-  <a href="#s2">2. Accounts &amp; Access<span class="zh">帳號與進入方式</span></a>
-  <a href="#s3">3. Administration — Before the Event<span class="zh">管理頁 — 活動前準備</span></a>
-  <a href="#s4">4. Gate Operation<span class="zh">閘口操作</span></a>
-  <a href="#s5">5. Teacher Enquiry<span class="zh">教師查詢</span></a>
-  <a href="#s6">6. Administration — Records &amp; Export<span class="zh">管理頁 — 記錄與匯出</span></a>
-  <a href="#s7">7. Troubleshooting<span class="zh">常見問題處理</span></a>
-  <a href="#s8">8. Data &amp; Privacy<span class="zh">資料與私隱</span></a>
-</div>
+## 活動當日流程
+1. 開場前：`admin.html` → Settings → 揀場景（Sports Day 陸運會／Swimming Gala 水運會）→ Save，
+   再按「開始活動」（清除殘留外出狀態，全部學生視為在內）。多日活動每日早上按一次。
+2. 閘口裝置開 `gate.html`（登入一次後長期有效）：
+   - 出口裝置設「OUT Only 只登記外出」，入口裝置設「IN Only 只登記返回」；只有一部機用「雙模式」
+   - 場景名稱由 Admin 統一派發，所有裝置即時同步
+   - 拍卡機（USB 鍵盤模式）插任何閘口裝置即可；iPad 需 USB 轉接器，建議開 Guided Access
+3. 老師用 `enquiry.html` 查詢邊個喺外面、去咗幾耐。
+4. 收場後：`admin.html` → Records → 揀日期 → 匯出記錄（每行有「活動」欄）／匯出統計。
 
-<h2 id="s1">1. System Overview<span class="zh">系統概述</span></h2>
-<p>The system is hosted on GitHub Pages and uses Firebase Realtime Database as the single source of truth. Every device (gate tablets, admin PC, teacher phones) reads and writes the same live data.<span class="zh">系統託管於 GitHub Pages,並以 Firebase 即時資料庫為唯一資料來源。所有裝置(閘口平板、管理電腦、教師手機)均讀寫同一份即時資料。</span></p>
-<table>
-  <tr><th>Page 頁面</th><th>Purpose 用途</th><th>Access 進入方式</th></tr>
-  <tr><td class="mono">index.html</td><td>Entry portal<span class="zh">入口頁</span></td><td>Staff password<span class="zh">職員密碼</span></td></tr>
-  <tr><td class="mono">gate.html</td><td>Gate terminal: scanning, purposes, phone slots<span class="zh">閘口终端:掃描、外出目的、手機格</span></td><td>Open freely; settings require staff password<span class="zh">開啟無需密碼;設定需職員密碼</span></td></tr>
-  <tr><td class="mono">admin.html</td><td>Students, lists, records, exports, settings<span class="zh">學生、名單、記錄、匯出、設定</span></td><td>Staff password<span class="zh">職員密碼</span></td></tr>
-  <tr><td class="mono">enquiry.html</td><td>Teacher enquiry &amp; trip board<span class="zh">教師查詢與外出總覽</span></td><td>Staff password<span class="zh">職員密碼</span></td></tr>
-  <tr><td class="mono">manual.html</td><td>This manual<span class="zh">本手冊</span></td><td>Open<span class="zh">無需密碼</span></td></tr>
-</table>
-
-<h2 id="s2">2. Accounts &amp; Access<span class="zh">帳號與進入方式</span></h2>
-<ul>
-  <li>One shared <b>staff account</b> (e-mail + password) unlocks the index page, Admin, Enquiry and the gate settings lock.<span class="zh">系統設有一個共用<b>職員帳號</b>(電郵與密碼),用於進入入口頁、管理頁、查詢頁,以及解鎖閘口設定。</span></li>
-  <li>A separate <b>kiosk account</b> signs gate devices in silently; no password is requested when a gate page is opened.<span class="zh">另設<b>閘口專用帳號</b>,閘口裝置開啟時自動登入,無需輸入密碼。</span></li>
-  <li>Passwords are managed in Firebase Console → Authentication. Change them after the event if desired.<span class="zh">密碼於 Firebase 控制台之 Authentication 管理;如有需要,請於活動結束後更換。</span></li>
-</ul>
-
-<h2 id="s3">3. Administration — Before the Event<span class="zh">管理頁 — 活動前準備</span></h2>
-<h3>3.1 Import Students<span class="zh">匯入學生名單</span></h3>
-<p>Students tab → drop an <code>.xlsx</code> or <code>.csv</code> file. Columns: <b>Student ID Card Number, Student ID, Class, Class Number, House</b>. Choose Merge (update) or Replace All. The card number must equal the content of the QR code printed on the student card.<span class="zh">於「Students 學生」分頁拖放 Excel 或 CSV 檔案,欄位為<b>學生證卡號、學生編號、班別、學號、社</b>;可選「合併更新」或「全部取代」。卡號須與學生證上 QR 碼之內容一致。</span></p>
-<h3>3.2 Competition &amp; Helper Lists<span class="zh">參賽者與工作人員名單</span></h3>
-<p>Upload the competition list and the student-helper list. Each upload replaces the whole list; any column containing a Student ID or Card Number is recognised automatically. The current list is displayed under each card.<span class="zh">上載參賽者名單與工作人員名單;每次上載均取代整份名單,檔案中任何包含學生編號或卡號之欄位皆會自動識別,名單內容顯示於卡片下方。</span></p>
-<h3>3.3 Scenario &amp; Threshold<span class="zh">活動場景與超時時限</span></h3>
-<p>Settings → Event Scenario: <b>Sports Day</b> (Inside / Outside Stand) or <b>Swimming Gala</b> (Inside / Outside Venue). The overlong threshold (default 15 minutes) flags returns that exceed it.<span class="zh">於「Settings 設定」選擇活動場景:<b>陸運會</b>(看台內/看台外)或<b>水運會</b>(場館內/場館外);超時時限預設為 15 分鐘,超過時限之返回將被標記。</span></p>
-<h3>3.4 Start Event Day<span class="zh">開始活動</span></h3>
-<p>Press <b>Start Event Day</b> each morning. It clears all "outside" states and all phone-slot occupancy so the day begins clean.<span class="zh">請於每日活動開始前按<b>「開始活動」</b>,系統會清除所有外出狀態與手機格占用,使當日由乾淨狀態開始。</span></p>
-
-<h2 id="s4">4. Gate Operation<span class="zh">閘口操作</span></h2>
-<h3>4.1 Screen Layout<span class="zh">畫面佈局</span></h3>
-<p>Header: gate name, scenario badge, channel badge, connection status and clock. The camera preview sits at the top; below it are the phone-slot strip and status pills (houses served, currently outside, time limit).<span class="zh">頁首顯示閘口名稱、場景徽章、通道徽章、連線狀態及時鐘。鏡頭預覽位於畫面上方,其下為手機格條與狀態標籤(服務社、正在外面人數、時限)。</span></p>
-<h3>4.2 Exit Flow<span class="zh">外出流程</span></h3>
-<ol>
-  <li>Student scans the QR code on the student card (or use Manual Entry).<span class="zh">學生掃描學生證上之 QR 碼(或使用手動輸入)。</span></li>
-  <li>The prefect taps the purpose: Toilet, Food, Competition, Student Helper or Other.<span class="zh">風紀點選外出目的:廁所、小食部、參賽、工作人員或其他。</span></li>
-  <li>Competition and Helper require the student to be on the uploaded list; otherwise the scan is rejected.<span class="zh">參賽及工作人員必須於已上載之名單內,否則系統拒絕是次登記。</span></li>
-  <li>Normal purposes receive a phone-slot number: place the phone in that slot. Competition and Helper keep their phones and have no time limit.<span class="zh">一般目的會獲分配手機格編號,請將手機放入該格;參賽及工作人員無需交出手機,且不設時限。</span></li>
-</ol>
-<h3>4.3 Return Flow<span class="zh">返回流程</span></h3>
-<ol>
-  <li>Student scans again at any gate serving them (Competition/Helper may return at <b>any</b> gate).<span class="zh">學生再次掃碼返回(參賽及工作人員可於<b>任何</b>閘口返回)。</span></li>
-  <li>The screen shows the time outside; collect the phone from the displayed slot.<span class="zh">畫面顯示在外時間;請按顯示之格位取回手機。</span></li>
-  <li>Returns exceeding the threshold raise a yellow caution and are flagged in the records.<span class="zh">超過時限之返回會顯示黃色注意信號,並於記錄中標記。</span></li>
-</ol>
-<h3>4.4 Traffic Signals<span class="zh">放行信號</span></h3>
-<div class="sig"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#2fd37f"/><path d="M50 20 L76 48 H62 V80 H38 V48 H24 Z" fill="#fff"/></svg>
-  <div><div class="lb">PASS<span class="zh">放行</span></div><p>Procedure complete; admit the student.<span class="zh">手續完成,可讓學生通過。</span></p></div></div>
-<div class="sig"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#ff5d55"/><path d="M34 34 L66 66 M66 34 L34 66" stroke="#fff" stroke-width="13" stroke-linecap="round" fill="none"/></svg>
-  <div><div class="lb">STOP<span class="zh">禁止通過</span></div><p>Wrong gate, slots full, already out, not found, or not on the required list. Do not admit; follow the on-screen reason.<span class="zh">錯閘口、手機格已滿、重複外出、查無此人或不在所需名單內。不得通過,請依畫面所示原因處理。</span></p></div></div>
-<div class="sig"><svg viewBox="0 0 100 100"><path d="M50 7 L97 89 H3 Z" fill="#ffb224" stroke="#ffb224" stroke-width="7" stroke-linejoin="round"/><rect x="44.5" y="33" width="11" height="31" rx="5" fill="#141414"/><circle cx="50" cy="75" r="6.5" fill="#141414"/></svg>
-  <div><div class="lb">CAUTION<span class="zh">注意</span></div><p>Admit but take note: overlong return, previously overlong student, return without an exit record, or phone stored at another gate.<span class="zh">可通過但須留意:返回超時、曾超時之學生、無外出記錄之返回,或手機存放於其他閘口。</span></p></div></div>
-<h3>4.5 Purpose Rules<span class="zh">外出目的規則</span></h3>
-<table>
-  <tr><th>Purpose 目的</th><th>List check 名單核對</th><th>Phone slot 手機格</th><th>Time limit 時限</th><th>House restriction 社別限制</th></tr>
-  <tr><td>Toilet 廁所</td><td>—</td><td>Assigned 分配</td><td>Applies 適用</td><td>Applies 適用</td></tr>
-  <tr><td>Food 小食部</td><td>—</td><td>Assigned 分配</td><td>Applies 適用</td><td>Applies 適用</td></tr>
-  <tr><td>Competition 參賽</td><td>Required 必需</td><td>None 無</td><td>None 無限時</td><td>Exempt 豁免</td></tr>
-  <tr><td>Student Helper 工作人員</td><td>Required 必需</td><td>None 無</td><td>None 無限時</td><td>Exempt 豁免</td></tr>
-  <tr><td>Other 其他</td><td>—</td><td>Assigned 分配</td><td>Applies 適用</td><td>Applies 適用</td></tr>
-</table>
-<h3>4.6 Phone Slots<span class="zh">手機存放格</span></h3>
-<ul>
-  <li>Each gate owns 12 slots. When all 12 are occupied, further exits at that gate are blocked.<span class="zh">每閘設有 12 個手機格;格位全滿時,該閘暫停辦理外出。</span></li>
-  <li>Tap an occupied slot to view the occupant: student ID, class, purpose, exit time, live elapsed time, trip count, registering device and today's trips.<span class="zh">點選已占用之格位可查閱占用人資料:學生編號、班別、目的、離開時間、即時在外時間、外出次數、登記裝置及當日記錄。</span></li>
-  <li><b>Manual Return</b> (staff password) releases a slot and writes a normal return record.<span class="zh"><b>「手動返回」</b>(需職員密碼)可釋放格位,並寫入正常返回記錄。</span></li>
-  <li>Slots exceeding the threshold flash red and the header shows "⚠ n OVER".<span class="zh">超時格位以紅色閃爍,標題列顯示「⚠ n OVER」。</span></li>
-</ul>
-<h3>4.7 Manual Entry<span class="zh">手動輸入</span></h3>
-<p>The keypad provides digits 1–9, letters A–E, CLR and backspace. Accepted inputs: card number, student ID, class + number (e.g. <code>3B12</code>), or class only (lists the whole class). Multiple matches produce a candidate list to tap.<span class="zh">手動鍵盤提供數字 1–9、字母 A–E、CLR 及退格鍵。可輸入卡號、學生編號、班別加學號(如 <code>3B12</code>)或僅班別(列出全班);若有多個符合結果,將顯示候選名單供點選。</span></p>
-<h3>4.8 Channel Types<span class="zh">通道類型</span></h3>
-<table>
-  <tr><th>Channel 通道</th><th>Purposes 目的</th><th>Phone slots 手機格</th><th>Time limit 時限</th></tr>
-  <tr><td>Normal 普通</td><td>All five 全部五種</td><td>Yes 有</td><td>Applies 適用</td></tr>
-  <tr><td>Competition / Helper only 參賽者、工作人員專用</td><td>Competition &amp; Helper only 僅兩種</td><td>None 無</td><td>None 無限時</td></tr>
-</table>
-<h3>4.9 Gate Settings (password protected)<span class="zh">閘口設定(需密碼)</span></h3>
-<p>Tap ⚙ and enter the staff password. Settings per gate: gate name (defines slot identity), houses served (two houses per gate; Competition/Helper exempt), mode (Auto / Out-only / In-only), channel type and sound.<span class="zh">按 ⚙ 並輸入職員密碼。每閘可設定:閘口名稱(決定手機格身份)、服務社(每閘兩社;參賽及工作人員豁免)、模式(自動/只登記外出/只登記返回)、通道類型及聲音提示。</span></p>
-
-<h2 id="s5">5. Teacher Enquiry<span class="zh">教師查詢</span></h2>
-<ul>
-  <li>Search by student ID, card number, class + number, or class.<span class="zh">可以學生編號、卡號、班別加學號或班別搜尋。</span></li>
-  <li>The detail card shows current status (inside / outside with live elapsed time), purpose, slot, trip count and recent records.<span class="zh">詳情卡顯示當前狀態(在看台內/外出中並附即時在外時間)、目的、手機格、外出次數及最近記錄。</span></li>
-  <li><b>Currently Outside</b> lists every student outside now; <b>Trip Board</b> summarises today's trips and returned list.<span class="zh"><b>「正在外面」</b>列出所有外出中之學生;<b>「外出總覽」</b>顯示當日外出統計與已返回記錄。</span></li>
-</ul>
-
-<h2 id="s6">6. Administration — Records &amp; Export<span class="zh">管理頁 — 記錄與匯出</span></h2>
-<ul>
-  <li>Records tab: choose a date range or use Today / Last 7 Days / All; the table lists every trip in range.<span class="zh">「Records 記錄」分頁:選擇日期範圍或使用「今天/近7日/全部」快速按鈕;表格列出範圍內所有進出記錄。</span></li>
-  <li><b>Export Excel</b> includes event, purpose, scanned value, phone slot, exit/return gates and times, duration and overlong flag.<span class="zh"><b>「匯出記錄」</b>之 Excel 包含活動、目的、掃描值、手機格、出/入閘口與時間、在外時長及超時標記。</span></li>
-  <li><b>Summary</b> exports per-student trip counts, purpose breakdown, total time outside and overlong counts.<span class="zh"><b>「匯出統計」</b>按學生列出外出次數、各目的次數、總在外時間及超時次數。</span></li>
-  <li>Settings shows live phone-slot occupancy for every gate. Danger-zone clears require a second confirm press.<span class="zh">「Settings 設定」即時顯示各閘手機格占用;危險區域之清除功能須按兩次確認。</span></li>
-</ul>
-
-<h2 id="s7">7. Troubleshooting<span class="zh">常見問題處理</span></h2>
-<table>
-  <tr><th>Symptom 現象</th><th>Action 處理方法</th></tr>
-  <tr><td>Camera unavailable<span class="zh">相機不可用</span></td><td>Allow camera permission (iPhone: Settings → Safari → Camera); open the page in Safari or the system browser, not inside messaging apps; tap Retry.<span class="zh">請允許瀏覽器使用相機(iPhone:設定→Safari→相機);請使用 Safari 或系統瀏覽器,勿於通訊軟件內開啟;可按 Retry 重試。</span></td></tr>
-  <tr><td>Login temporarily blocked (<code>auth/too-many-requests</code>)<span class="zh">登入被暫時封鎖</span></td><td>Wait 30–60 minutes without retrying, then attempt once; verify the account and password in Firebase Console.<span class="zh">請停止重試並等候 30 至 60 分鐘,然後只嘗試一次;並於 Firebase 控制台核對帳號與密碼。</span></td></tr>
-  <tr><td>STOP — WRONG GATE<span class="zh">禁止 — 錯閘口</span></td><td>The student's house is not served by this gate; direct them to the correct gate. Competition and Helper purposes are exempt.<span class="zh">該學生之社別非本閘服務範圍,請引導至正確閘口;參賽及工作人員不受此限。</span></td></tr>
-  <tr><td>STOP — SLOTS FULL<span class="zh">禁止 — 手機格已滿</span></td><td>No free slot at this gate; use the other gate serving the same houses, or free slots via Manual Return.<span class="zh">本閘手機格已滿;請使用服務同社之另一閘口,或以「手動返回」釋放格位。</span></td></tr>
-  <tr><td>STOP — NOT ON LIST<span class="zh">禁止 — 不在名單</span></td><td>The student is absent from the competition/helper list; choose another purpose or verify with the responsible teacher.<span class="zh">該學生不在參賽者或工作人員名單內;請改選其他目的或向負責教師核實。</span></td></tr>
-  <tr><td>Today's records seem missing<span class="zh">今日記錄疑似缺少</span></td><td>Check the system clock of each gate device; use the All range to locate the records.<span class="zh">請檢查各閘口裝置之系統時鐘;可以使用「All 全部」範圍查找有關記錄。</span></td></tr>
-  <tr><td>Password lock reappears<span class="zh">密碼鎖再次出現</span></td><td>The session was cleared (e.g. private browsing); re-enter the staff password.<span class="zh">工作階段已被清除(例如使用無痕模式);請重新輸入職員密碼。</span></td></tr>
-</table>
-
-<h2 id="s8">8. Data &amp; Privacy<span class="zh">資料與私隱</span></h2>
-<ul>
-  <li>Only card number, student ID, class, class number and house are stored; no student names are kept.<span class="zh">系統只儲存卡號、學生編號、班別、學號及社,不儲存學生姓名。</span></li>
-  <li>All database reads and writes require an authenticated staff or kiosk account.<span class="zh">資料庫之所有讀寫均須通過職員或閘口帳號驗證。</span></li>
-  <li>Exported files contain student identifiers; store them securely and delete them after use.<span class="zh">匯出檔案包含學生識別資料,請妥善保管,並於使用後刪除。</span></li>
-</ul>
-
-<footer>Gate Pass System · User Manual v1.0 · Sports Day &amp; Swimming Gala<span class="zh">進出記錄系統 · 使用手冊 v1.0 · 陸運會及水運會適用</span></footer>
-</main>
-</body>
-</html>
+## 安全須知
+- 未登入嘅人完全讀寫唔到資料庫（規則 `auth != null`）
+- 系統只存卡號／學號／班別／學號／社，唔存姓名
+- 定期喺 Firebase Console 更換通用密碼
