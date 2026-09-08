@@ -10,8 +10,8 @@ const FIREBASE_CONFIG = {
 };
 
 /* 職員帳號：index / admin / enquiry 進入密碼＋gate 內設定鎖／手動返回驗證 */
-const STAFF_EMAIL = "你而家用緊嘅職員電郵";
+const STAFF_EMAIL = "gate@ktmc.edu.hk";
 
 /* 新增：gate 專用自動登入帳號（Firebase Auth → Users → Add user 建立） */
 const KIOSK_EMAIL = "kiosk@ktmc.edu.hk";
-const KIOSK_PASSWORD = "設一個kiosk專用密碼";
+const KIOSK_PASSWORD = "sportsday2627";
