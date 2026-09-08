@@ -245,7 +245,10 @@ requireAuth(function init(){
     $('stOut').textContent=Object.keys(live).length;
     $('stFlag').textContent=arr.filter(s=>s.overlongFlag).length;
   }
-  function loadToday(){db.ref('records').orderByChild('outAt').startAt(todayStart).once('value').then(s=>$('stToday').textContent=s.numChildren());}
+  function loadToday(){const f=todayStart,t=todayStart+86400000-1;
+    db.ref('records').once('value').then(s=>{let n=0;
+      s.forEach(c=>{const r=c.val();if(!r)return;const v=recTime(r);if(isFinite(v)&&v>=f&&v<=t)n++;});
+      $('stToday').textContent=n;});}
 
   /* tabs */
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
@@ -401,9 +404,14 @@ requireAuth(function init(){
     if(f>t){const x=f;f=t;t=x;}
     return[f,t];
   }
+  function recTime(r){let v=Number(r.outAt);if(!isFinite(v))v=Date.parse(String(r.outAt||''));return isFinite(v)?v:NaN;}
   function fetchRecords(){const[f,t]=range();
-    return db.ref('records').orderByChild('outAt').startAt(f).endAt(t).once('value').then(s=>{
-      const rows=[];s.forEach(c=>rows.push(c.val()));rows.sort((a,b)=>(b.outAt||0)-(a.outAt||0));return rows;});}
+    return db.ref('records').once('value').then(s=>{
+      const rows=[];s.forEach(c=>{const r=c.val();if(!r)return;
+        const v=recTime(r);
+        if(isFinite(v)&&v>=f&&v<=t)rows.push(r);});
+      rows.sort((a,b)=>(recTime(b)||0)-(recTime(a)||0));
+      return rows;});}
   function renderRecTable(rows){
     $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>目的</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+
       rows.slice(0,300).map(r=>{const m=houseMeta(r.house);return `<tr>
