@@ -220,7 +220,8 @@ requireAuth(function init(){
   const d=new Date();d.setHours(0,0,0,0);todayStart=d.getTime();
   $('dFrom').value=$('dTo').value=fmtDate(Date.now());
 
-  db.ref('students').on('value',s=>{students=s.val()||{};updateStats();renderStudents();});
+  db.ref('students').on('value',s=>{students=s.val()||{};updateStats();renderStudents();
+    renderListPreview('compList',compMap);renderListPreview('helperList',helperMap);});
   db.ref('live').on('value',s=>{live=s.val()||{};updateStats();});
   watchThreshold(v=>$('thIn').value=v);
   watchScenario(v=>{const el=document.querySelector(`input[name=scen][value=${v}]`);if(el)el.checked=true;});
@@ -354,8 +355,17 @@ requireAuth(function init(){
       });};
     $(clearBtn).onclick=()=>{if(confirm(`清空${label}？`))db.ref(path).set(null).then(()=>toast(`${label}已清空 Cleared`));};
   }
-  db.ref('participantList').on('value',s=>{$('compCount').textContent=Object.keys(s.val()||{}).length+' people 人';});
-  db.ref('helperList').on('value',s=>{$('helperCount').textContent=Object.keys(s.val()||{}).length+' people 人';});
+  let compMap={},helperMap={};
+  function renderListPreview(elId,map){
+    const el=$(elId);if(!el)return;
+    const cards=Object.keys(map||{});
+    if(!cards.length){el.innerHTML='<span class="dim">（空 Empty）</span>';return;}
+    const arr=cards.map(c=>students[c]||Object.assign({card:c},map[c])).sort(byClsNo);
+    el.innerHTML=`<table><tr><th>House</th><th>Student ID</th><th>Class</th><th>No.</th></tr>`+
+      arr.map(s=>`<tr><td><span class="hchip" style="--hc:${houseMeta(s.house).color}">${esc(s.house||'?')}</span></td><td class="mono">${esc(s.sid||s.card||'—')}</td><td>${esc(s.cls||'—')}</td><td>${esc(s.no||'—')}</td></tr>`).join('')+`</table>`;
+  }
+  db.ref('participantList').on('value',s=>{compMap=s.val()||{};$('compCount').textContent=Object.keys(compMap).length+' people 人';renderListPreview('compList',compMap);});
+  db.ref('helperList').on('value',s=>{helperMap=s.val()||{};$('helperCount').textContent=Object.keys(helperMap).length+' people 人';renderListPreview('helperList',helperMap);});
   wireList('btnCompUp','compFile','btnCompClear','participantList','參賽者名單 ');
   wireList('btnHelperUp','helperFile','btnHelperClear','helperList','工作人員名單 ');
  
