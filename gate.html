@@ -474,14 +474,20 @@ function initGate(){
     updPad();});
   function updPad(){const v=$('padVal');if(v)v.innerHTML=padBuf?esc(padBuf).replace(/ /g,'&nbsp;'):'&nbsp;';}
   function openPad(){padBuf='';updPad();stopScanner();$('padOv').classList.add('open');}
-  function closePad(){$('padOv').classList.remove('open');if(state==='ready')startScanner();}
-  $('padClose').onclick=closePad;
-  $('padGo').onclick=()=>{const q=padBuf.trim();closePad();if(q)handleScan(q,true);};
+  function closePad(){$('padOv').classList.remove('open');}
+  $('padClose').onclick=()=>{closePad();if(state==='ready')startScanner();};
+  $('padGo').onclick=()=>{
+    const q=padBuf.trim();
+    padBuf='';updPad();
+    closePad();          // 即時關閉輸入框
+    stopScanner();       // 先停鏡頭，確保判斷畫面順利顯示
+    if(q)handleScan(q,true); else toReady();
+  };
   document.addEventListener('keydown',e=>{ if(!$('padOv').classList.contains('open'))return;
     if(/^[0-9a-zA-Z]$/.test(e.key)&&padBuf.length<24){padBuf+=e.key.toUpperCase();updPad();}
     else if(e.key==='Backspace'){padBuf=padBuf.slice(0,-1);updPad();e.preventDefault();}
     else if(e.key==='Enter'){$('padGo').click();}
-    else if(e.key==='Escape')closePad();});
+    else if(e.key==='Escape'){closePad();if(state==='ready')startScanner();}});
 
   /* ---- 搜尋 ---- */
   function findStudent(q){
