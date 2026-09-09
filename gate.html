@@ -580,8 +580,21 @@ function initGate(){
     } else finish(null);
   }
   function doIn(st){
-    const card=st.card; let captured=null;
-    db.ref('live/'+card).transaction(cur=>{ if(!cur)return; captured=cur; return null; }).then(res=>{
+    const card=st.card; let captured=null, wrongGateReturn=false;
+    db.ref('live/'+card).transaction(cur=>{ 
+      if(!cur)return; 
+      captured=cur; 
+      // 如果學生有手機格，且手機格喺其他閘，就唔清除 live（視為無效操作）
+      if(cur.slot && (cur.slotGate||cfg.name) !== cfg.name){
+        wrongGateReturn=true;
+        return cur; // 保留 live 狀態，唔寫入返回記錄
+      }
+      return null; 
+    }).then(res=>{
+      if(wrongGateReturn){
+        showWrongGateReturn(st, captured);
+        return;
+      }
       if(!res.committed||!captured){showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null);return;}
       const now=Date.now(), durMs=Math.max(0,now-captured.outAt);
       const over=!NO_LIMIT(captured.purpose)&&durMs>=threshold*60000;
@@ -593,11 +606,26 @@ function initGate(){
       if(over)upd['students/'+card+'/overlongFlag']=true;
       let phone=null;
       if(captured.slot){
-        if((captured.slotGate||cfg.name)===cfg.name){ upd[`slots/${gateKey()}/${captured.slot}`]=null; phone={slot:captured.slot,own:true}; }
-        else phone={slot:captured.slot,own:false,gate:captured.slotGate};
+        upd[`slots/${gateKey()}/${captured.slot}`]=null; 
+        phone={slot:captured.slot,own:true};
       }
       db.ref().update(upd).then(()=>showIn(st,durMs,over,captured.purpose,phone));
     });
+  }
+
+  /* ---- 跨閘返回＝無效：STOP 且不寫入記錄 ---- */
+  function showWrongGateReturn(st, live){
+    state='warn';pendingSt=null;
+    const otherGate = live.slotGate || cfg.name;
+    board.innerHTML=`
+      <div class="micro">ATTENTION · 請注意</div>
+      ${signal('stop')}
+      <div class="warn-title" style="text-align:center">WRONG GATE FOR RETURN<span>請前往 <b>${esc(otherGate)}</b> 取回手機 Please return to ${esc(otherGate)} to collect phone</span></div>
+      <div class="grid2">${houseBlock(st)}<div class="info">${rows(st)}
+        <span class="pill mono" style="margin-top:10px">📱 PHONE AT ${esc(otherGate)} SLOT #${live.slot}</span>
+        </div></div>
+      <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
+    sound('err');schedule(10000);
   }
 
   /* ---- 畫面 ---- */
@@ -667,17 +695,18 @@ function initGate(){
   function showOut(st,count,wasFlag,purpose,slot){
     state='out';pendingSt=null;const sc=scenarioMeta(scenario),pm=purposeMeta(purpose);
     const noLimit=NO_LIMIT(purpose);
+    const flag = noLimit ? false : wasFlag; // 參賽／工作人員 忽略 wasFlag
     const midHtml=slot
       ?`<div class="slotbig"><b>#${slot}</b><span>PHONE SLOT 手機格 · PUT PHONE IN 請放入手機</span></div>`
       :`<div class="okline" style="text-align:center;font-size:clamp(14px,2.2vh,18px)">📵 無需交手機 · ⏱ 無限時 NO PHONE · NO TIME LIMIT</div>`;
     board.innerHTML=`
       <div class="micro">GOING ${sc.out.en} ${sc.out.zh} · RECORDED 已記錄</div>
-      ${signal(wasFlag?'caution':'go', wasFlag?'⚠ 曾外出時間過長 PREVIOUSLY OVERLONG — 請留意返回時間':'手續完成 · 請放行 PROCEED')}
+      ${signal(flag?'caution':'go', flag?'⚠ 曾外出時間過長 PREVIOUSLY OVERLONG — 請留意返回時間':'手續完成 · 請放行 PROCEED')}
       ${midHtml}
       <div class="grid2">${houseBlock(st)}<div class="info">${rows(st)}</div></div>
       <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span>${noLimit?'<span class="pill">♾️ NO LIMIT 無限時</span>':''}<span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
-    sound(wasFlag?'warn':'out');schedule(wasFlag?11000:9000);
+    sound(flag?'warn':'out');schedule(flag?11000:9000);
   }
   function showIn(st,durMs,over,purpose,phone){
     state='in';pendingSt=null;const sc=scenarioMeta(scenario),pm=purposeMeta(purpose);
