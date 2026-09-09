@@ -260,7 +260,6 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 const vAuth = firebase.initializeApp(FIREBASE_CONFIG, 'verify').auth();
 
 const CFG_KEY='gate.cfg.v1';
-const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
