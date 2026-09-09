@@ -1,7 +1,7 @@
 /* shared.js — 所有頁面共用 */
 firebase.initializeApp(FIREBASE_CONFIG);
-const db   = firebase.database();
-const auth = firebase.auth();
+let db   = firebase.database();
+let auth = firebase.auth();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 const HOUSE_META = {
@@ -111,7 +111,10 @@ function showLock(){
 function requireAuth(onReady){
   let booted=false;
   auth.onAuthStateChanged(u=>{
-    if(u){booted=true;document.getElementById('lock')?.remove();onReady(u);}
+    if(u){
+      // Sessions must stay separate: reject kiosk login on staff pages
+      if(typeof KIOSK_EMAIL!=='undefined' && u.email && u.email.toLowerCase()===String(KIOSK_EMAIL).toLowerCase()){ auth.signOut(); return; }
+      booted=true;document.getElementById('lock')?.remove();onReady(u);}
     else{ booted ? location.reload() : showLock(); }
   });
 }
