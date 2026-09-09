@@ -122,7 +122,7 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
         <span class="dim" id="compCount">0 people 人</span>
       </div>
       <input type="file" id="compFile" accept=".xlsx,.xls,.csv" hidden>
-      <p class="dim" style="font-size:12.5px">Excel/CSV 任何欄位含學生編號或卡號即自動識別；上載＝取代整份名單 Upload replaces whole list</p>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用卡號或學生編號；上載＝取代整份名單 Only Class + Class No needed (e.g. 3B and 12, or 3B12)</p>
       <div id="compList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
     <div class="card">
@@ -133,7 +133,7 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
         <span class="dim" id="helperCount">0 people 人</span>
       </div>
       <input type="file" id="helperFile" accept=".xlsx,.xls,.csv" hidden>
-      <p class="dim" style="font-size:12.5px">Excel/CSV 任何欄位含學生編號或卡號即自動識別；上載＝取代整份名單 Upload replaces whole list</p>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用卡號或學生編號；上載＝取代整份名單 Only Class + Class No needed (e.g. 3B and 12, or 3B12)</p>
       <div id="helperList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
     <div class="card">
@@ -331,15 +331,35 @@ requireAuth(function init(){
     const wb=XLSX.read(data,{type:'array'});
     const arr=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
     const out={};let issues=0;
+    const clsRe=/^\d{1,2}[A-Za-z]$/, noRe=/^\d{1,2}$/, comboRe=/^(\d{1,2}[A-Za-z])[\s\-]?(\d{1,2})$/;
+
     for(let r=0;r<arr.length;r++){
-      const row=arr[r];if(!row)continue;
+      const row=arr[r];if(!row||!row.some(c=>c!==null&&c!==undefined&&c!==''))continue;
       const joined=String(row.join(' ')).toLowerCase();
-      if(joined.includes('student')||joined.includes('card')||joined.includes('學生')||joined.includes('卡號'))continue;
+      if(joined.includes('student')||joined.includes('card')||joined.includes('class')||joined.includes('no')||joined.includes('學生')||joined.includes('卡號')||joined.includes('班')||joined.includes('學號'))continue;
       let hit=null;
+      // 1) 直接配對卡號或學生編號
       for(let c=0;c<row.length&&!hit;c++){
-        const v=clean(row[c]);if(!v)continue;
-        const up=v.toUpperCase();
+        const v=clean(row[c]);if(!v)continue;const up=v.toUpperCase();
         hit=students[v]||students[up]||Object.values(students).find(s=>String(s.sid||'').toUpperCase()===up);
+      }
+      // 2) 配對連體字如 3B12 / 3B-12
+      if(!hit){for(let c=0;c<row.length&&!hit;c++){
+        const v=clean(row[c]);if(!v)continue;const m=v.match(comboRe);
+        if(m){const cls=m[1].toUpperCase(),no=String(parseInt(m[2],10));
+          hit=Object.values(students).find(s=>String(s.cls||'').toUpperCase()===cls&&String(parseInt(s.no,10)||s.no)===no);}
+      }}
+      // 3) 同一行入面分別搵班別同學號（如 "3B" 同 "12" 兩欄）
+      if(!hit){
+        let foundCls=null,foundNo=null;
+        for(let c=0;c<row.length;c++){
+          const v=clean(row[c]);if(!v)continue;
+          if(!foundCls&&clsRe.test(v))foundCls=v.toUpperCase();
+          else if(!foundNo&&noRe.test(v))foundNo=String(parseInt(v,10));
+        }
+        if(foundCls&&foundNo){
+          hit=Object.values(students).find(s=>String(s.cls||'').toUpperCase()===foundCls&&String(parseInt(s.no,10)||s.no)===foundNo);
+        }
       }
       if(hit)out[hit.card]={sid:hit.sid,cls:hit.cls,no:hit.no};
       else if(joined.trim())issues++;
