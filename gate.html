@@ -250,6 +250,16 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 <script src="config.js"></script>
 <script src="shared.js"></script>
 <script>
+ /* ==== Separate sessions ====
+   Gate runs on its own Firebase app instance ('kiosk'), so its login never
+   unlocks index/admin/enquiry, and their logins never unlock the gate. ==== */
+const kApp = firebase.initializeApp(FIREBASE_CONFIG, 'kiosk');
+auth = kApp.auth();
+db   = kApp.database();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+const vAuth = firebase.initializeApp(FIREBASE_CONFIG, 'verify').auth();
+
+const CFG_KEY='gate.cfg.v1';
 const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
@@ -418,8 +428,8 @@ function initGate(){
   function tryUnlock(){
     const pwd=$('setPwd').value;
     $('setErr').textContent='';
-    auth.signInWithEmailAndPassword(STAFF_EMAIL,pwd)
-      .then(()=>{ $('setOv').classList.remove('open');
+    vAuth.signInWithEmailAndPassword(STAFF_EMAIL,pwd)
+      .then(()=>{ vAuth.signOut(); $('setOv').classList.remove('open');
         if(pwCallback){const cb=pwCallback;pwCallback=null;cb();}
         else openDrawer(); })
       .catch(err=>{
