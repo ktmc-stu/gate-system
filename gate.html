@@ -372,11 +372,12 @@ function initGate(){
   $('sdClose').onclick=closeSlotDetail;
   $('sdCancel').onclick=closeSlotDetail;
   $('sdIn').onclick=()=>{
-    const card=sdCard; if(!card)return;
+    const card=sdCard, slotNo=sdSlot; if(!card||!slotNo)return;
     closeSlotDetail();
     askPassword('輸入職員密碼以執行「手動返回」 Enter staff password for Manual Return', ()=>{
-      const st=students[card];
-      if(st)doIn(st);
+      if(liveMap[card]){ const st=students[card]; if(st){doIn(st);return;} }
+      // 孤兒格：學生已在看台內（無外出記錄）→ 只釋放格位
+      db.ref(`slots/${gateKey()}/${slotNo}`).set(null).then(()=>toReady());
     });
   };
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('slotOv').classList.contains('open'))closeSlotDetail(); });
@@ -573,6 +574,7 @@ function initGate(){
       });
     };
     if(needSlot){
+      for(let i=1;i<=12;i++){const o=slotsMap[i];if(o&&o.card===card)db.ref(`slots/${gateKey()}/${i}`).set(null);}
       assignSlot(card,st.sid,recKey,now).then(slot=>{
         if(!slot){showWarn(st,'SLOTS FULL','本閘 12 個手機格已滿 — 不能外出',null);sound('warn');return;}
         finish(slot);
@@ -605,9 +607,11 @@ function initGate(){
       upd['records/'+captured.recordId+'/overlong']=over;
       if(over)upd['students/'+card+'/overlongFlag']=true;
       let phone=null;
-      if(captured.slot){
-        upd[`slots/${gateKey()}/${captured.slot}`]=null; 
-        phone={slot:captured.slot,own:true};
+      let slotNo=captured.slot||null;
+      if(!slotNo){for(let i=1;i<=12;i++){const o=slotsMap[i];if(o&&o.card===card){slotNo=i;break;}}}
+      if(slotNo){
+        upd[`slots/${gateKey()}/${slotNo}`]=null;
+        phone={slot:slotNo,own:true};
       }
       db.ref().update(upd).then(()=>showIn(st,durMs,over,captured.purpose,phone));
     });
