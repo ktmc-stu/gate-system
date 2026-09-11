@@ -124,6 +124,7 @@ requireAuth(function(){
   db.ref('counters').on('value',s=>{counters=s.val()||{};if(curSid)renderDetail(curSid);});
   db.ref('config/normalLimit').on('value',s=>{normalLimit=parseInt(s.val(),10)||0;if(curSid)renderDetail(curSid);});
   $('q').addEventListener('input',()=>doSearch($('q').value));
+   bindKeypadInput($('q'),{title:'Search<span>搜尋</span>'});
 
   function doSearch(q){
     q=String(q||'').trim().toUpperCase();
