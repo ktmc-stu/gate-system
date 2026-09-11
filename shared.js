@@ -65,13 +65,15 @@ document.addEventListener('click',e=>{
     <p class="kbx-err" id="kbErr"></p>
     <button class="kbx-go" id="kbGo">CONFIRM 確定</button></div>`;
   document.body.appendChild(ov);
-  let buf='',mask=false,mode='L',upper=true,done=null,max=64;
+  let buf='',mask=false,mode='L',upper=true,done=null,max=64,numOnly=false;
   const L=[['A','B','C','D','E','F','G'],['H','I','J','K','L','M','N'],['O','P','Q','R','S','T','U'],['V','W','X','Y','Z','SHIFT','BK'],['123:2','CLR:2','SP:3']];
   const D=[['1','2','3','4','5','6','7'],['8','9','0','-','_','.',','],['@','#','!','?','SP','\'','"'],['ABC:2','BK:2','CLR:3']];
+  const N=[['1','2','3'],['4','5','6'],['7','8','9'],['CLR','0','BK']];
   function disp(){document.getElementById('kbVal').textContent=buf?(mask?'•'.repeat(buf.length):buf):'\u00a0';}
   function render(){
     const wrap=document.getElementById('kbKeys');wrap.innerHTML='';
-    (mode==='L'?L:D).forEach(row=>row.forEach(tok=>{
+    wrap.style.gridTemplateColumns=(mode==='N')?'repeat(3,1fr)':'repeat(7,1fr)';
+    (mode==='N'?N:(mode==='L'?L:D)).forEach(row=>row.forEach(tok=>{
       let span=1,key=String(tok);
       const m=key.match(/^(.*):([23])$/);if(m){key=m[1];span=+m[2];}
       let label=key;
@@ -108,13 +110,13 @@ document.addEventListener('click',e=>{
     if(e.key==='Enter'){e.preventDefault();document.getElementById('kbGo').click();return;}
     if(e.key==='Escape'){ov.classList.remove('open');done=null;return;}
     if(e.key==='Backspace'){buf=buf.slice(0,-1);disp();e.preventDefault();return;}
-    if(e.key.length===1&&buf.length<max){buf+=e.key;disp();e.preventDefault();}
+    if(e.key.length===1&&buf.length<max&&(!numOnly||/[0-9]/.test(e.key))){buf+=e.key;disp();e.preventDefault();}
   });
   window.KeyPad={
     open(o){
-      buf=o.initial||'';mask=!!o.mask;done=o.onDone||null;max=o.max||64;
+      buf=o.initial||'';mask=!!o.mask;done=o.onDone||null;max=o.max||64;numOnly=!!o.numeric;
       const t=document.getElementById('kbTitle');if(t&&o.title)t.innerHTML=o.title;
-      mode='L';upper=true;render();disp();
+      mode=numOnly?'N':'L';upper=true;render();disp();
       document.getElementById('kbErr').textContent='';
       ov.classList.add('open');
     },
@@ -126,7 +128,7 @@ document.addEventListener('click',e=>{
     el.setAttribute('readonly','readonly');
     el.style.cursor='pointer';
     el.addEventListener('click',()=>{
-      KeyPad.open({title:o.title||'Input<span>輸入</span>',initial:el.value,max:o.max,mask:!!o.mask,onDone:v=>{
+      KeyPad.open({title:o.title||'Input<span>輸入</span>',initial:el.value,max:o.max,mask:!!o.mask,numeric:!!o.numeric,onDone:v=>{
         const val=o.format?o.format(v):v;
         el.value=val;
         el.dispatchEvent(new Event('input',{bubbles:true}));
