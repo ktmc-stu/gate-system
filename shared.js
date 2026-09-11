@@ -65,7 +65,7 @@ document.addEventListener('click',e=>{
     <p class="kbx-err" id="kbErr"></p>
     <button class="kbx-go" id="kbGo">CONFIRM 確定</button></div>`;
   document.body.appendChild(ov);
-  let buf='',mask=false,mode='L',upper=true,done=null,max=64,numOnly=false;
+  let buf='',mask=false,mode='L',upper=false,done=null,max=64,numOnly=false;
   const L=[['A','B','C','D','E','F','G'],['H','I','J','K','L','M','N'],['O','P','Q','R','S','T','U'],['V','W','X','Y','Z','SHIFT','BK'],['123:2','CLR:2','SP:3']];
   const D=[['1','2','3','4','5','6','7'],['8','9','0','-','_','.',','],['@','#','!','?','SP','\'','"'],['ABC:2','BK:2','CLR:3']];
   const N=[['1','2','3'],['4','5','6'],['7','8','9'],['CLR','0','BK']];
@@ -77,7 +77,7 @@ document.addEventListener('click',e=>{
       let span=1,key=String(tok);
       const m=key.match(/^(.*):([23])$/);if(m){key=m[1];span=+m[2];}
       let label=key;
-      if(key==='SHIFT')label=upper?'⇧':'';
+      if(key==='SHIFT')label=upper?'⇧':'⇩';
       else if(key==='BK')label='⌫';
       else if(key==='SP')label='␣';
       else if(mode==='L'&&/^[A-Z]$/.test(key)){label=upper?key:key.toLowerCase();key=label;}
@@ -116,7 +116,7 @@ document.addEventListener('click',e=>{
     open(o){
       buf=o.initial||'';mask=!!o.mask;done=o.onDone||null;max=o.max||64;numOnly=!!o.numeric;
       const t=document.getElementById('kbTitle');if(t&&o.title)t.innerHTML=o.title;
-      mode=numOnly?'N':'L';upper=true;render();disp();
+      mode=numOnly?'N':'L';upper=false;render();disp();
       document.getElementById('kbErr').textContent='';
       ov.classList.add('open');
     },
