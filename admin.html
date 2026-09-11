@@ -247,8 +247,8 @@ requireAuth(function init(){
    /* ---- 所有輸入綁定螢幕鍵盤（廢除系統鍵盤）---- */
   function normDate(v){const d=String(v).replace(/[^0-9]/g,'');return d.length===8?d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6):v;}
   bindKeypadInput($('sFilter'),{title:'Search<span>搜尋</span>'});
-  bindKeypadInput($('thIn'),{title:'Threshold (min)<span>超時時限</span>',max:3});
-  bindKeypadInput($('limIn'),{title:'Daily Limit<span>每日上限</span>',max:3});
+  bindKeypadInput($('thIn'),{title:'Threshold (min)<span>超時時限</span>',max:3,numeric:true});
+  bindKeypadInput($('limIn'),{title:'Daily Limit<span>每日上限</span>',max:3,numeric:true});
   db.ref('slots').on('value',s=>{
     const all=s.val()||{},gates=Object.keys(all),el=$('slotsOverview');
     if(el)el.innerHTML=gates.length?gates.map(g=>{
