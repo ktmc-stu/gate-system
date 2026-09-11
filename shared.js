@@ -125,4 +125,19 @@ function bindSignOut(){}
 document.addEventListener('click',e=>{
   if(e.target.closest('[data-signout]')){ auth.signOut().then(()=>location.reload()); }
 });
+/* iOS standalone (Home Screen shortcut) resume bug: keyboard may die on 2nd+ launch.
+   Fix: clear half-focused state when app becomes visible; on tap of ANY input,
+   force blur→focus inside the tap gesture to re-trigger the keyboard. */
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&document.activeElement&&document.activeElement.blur)document.activeElement.blur();});
+window.addEventListener('pageshow',()=>{if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();});
+document.addEventListener('touchend',e=>{
+  const t=e.target;
+  const el=(t&&t.closest)?t.closest('input,textarea'):null;
+  if(!el)return;
+  const ty=(el.type||'text').toLowerCase();
+  if(['checkbox','radio','file','button','submit','range','color'].includes(ty))return; // don't break toggles/pickers
+  e.preventDefault();
+  el.blur();el.focus();
+  try{el.scrollIntoView({block:'center'});}catch(_){}
+},{passive:false,capture:true});
 function watchThreshold(cb){db.ref('config/overlongMin').on('value',s=>{const v=s.val();cb(v&&v>0?v:15);});}
