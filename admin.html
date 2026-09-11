@@ -162,8 +162,8 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
     <div class="card">
       <h3>Entry / Exit Records<span>進出記錄</span></h3>
       <div class="toolbar">
-        <label class="dim">From 由 <input type="date" id="dFrom"></label>
-        <label class="dim">To 至 <input type="date" id="dTo"></label>
+        <label class="dim">From 由 <input type="text" id="dFrom" placeholder="YYYY-MM-DD" style="width:150px"></label>
+        <label class="dim">To 至 <input type="text" id="dTo" placeholder="YYYY-MM-DD" style="width:150px"></label>
         <button class="btn ghost" id="btnLoad">Load 載入</button>
         <button class="btn ghost" id="qToday">Today 今天</button>
         <button class="btn ghost" id="q7">Last 7 Days 近7日</button>
@@ -242,6 +242,13 @@ requireAuth(function init(){
   watchScenario(v=>{const el=document.querySelector(`input[name=scen][value=${v}]`);if(el)el.checked=true;});
   $('btnScen').onclick=()=>db.ref('config/scenario').set(document.querySelector('input[name=scen]:checked').value).then(()=>toast('Scenario saved 已儲存場景'));
   $('btnLim').onclick=()=>{const v=parseInt($('limIn').value,10);db.ref('config/normalLimit').set(isFinite(v)&&v>=0?v:0).then(()=>toast('Limit saved 已儲存上限'));};
+   /* ---- 所有輸入綁定螢幕鍵盤（廢除系統鍵盤）---- */
+  function normDate(v){const d=String(v).replace(/[^0-9]/g,'');return d.length===8?d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6):v;}
+  bindKeypadInput($('sFilter'),{title:'Search<span>搜尋</span>'});
+  bindKeypadInput($('thIn'),{title:'Threshold (min)<span>超時時限</span>',max:3});
+  bindKeypadInput($('limIn'),{title:'Daily Limit<span>每日上限</span>',max:3});
+  bindKeypadInput($('dFrom'),{title:'From<span>開始日期</span>',max:8,format:normDate});
+  bindKeypadInput($('dTo'),{title:'To<span>結束日期</span>',max:8,format:normDate});
   db.ref('slots').on('value',s=>{
     const all=s.val()||{},gates=Object.keys(all),el=$('slotsOverview');
     if(el)el.innerHTML=gates.length?gates.map(g=>{
