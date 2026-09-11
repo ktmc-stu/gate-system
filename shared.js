@@ -28,15 +28,34 @@ function scenarioMeta(s){return SCENARIOS[s]||SCENARIOS.track;}
 function watchThreshold(cb){db.ref('config/overlongMin').on('value',s=>cb(parseInt(s.val(),10)||15));}
 function watchScenario(cb){db.ref('config/scenario').on('value',s=>cb(s.val()||'track'));}
 /* ---- 音效（WebAudio 嗶聲）---- */
-let AC=null;
+let AC=null, audioUnlocked=false;
 function ac(){
   if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
-  if(AC&&AC.state==='suspended'){ AC.resume(); }
   return AC;
 }
+/* iOS（尤其主畫面捷徑／standalone）必須喺用戶手勢內 resume + 播放一段靜音 buffer 先至開到聲音路由 */
+function primeAudio(){
+  const c=ac(); if(!c)return;
+  if(c.state==='suspended'){ c.resume().catch(()=>{}); }
+  if(!audioUnlocked && c.state==='running'){
+    try{
+      const b=c.createBuffer(1,1,22050);
+      const s=c.createBufferSource(); s.buffer=b; s.connect(c.destination); s.start(0);
+      audioUnlocked=true;
+    }catch(e){}
+  }
+}
+function unlockAudio(){
+  const c=ac(); if(!c)return;
+  if(c.state==='suspended'){ c.resume().then(primeAudio).catch(primeAudio); }
+  else primeAudio();
+}
+['pointerdown','touchend','click','keydown'].forEach(ev=>
+  document.addEventListener(ev,unlockAudio,{passive:true}));
 function tone(f,d,type,g){
   if(window.MUTED)return;
   const c=ac(); if(!c)return;
+  if(c.state==='suspended'){ c.resume().catch(()=>{}); }
   d=d||0.12; type=type||'sine'; g=(g===undefined)?0.18:g;
   const o=c.createOscillator(), v=c.createGain();
   o.type=type; o.frequency.value=f;
@@ -48,18 +67,13 @@ function tone(f,d,type,g){
 }
 function sound(kind){
   if(window.MUTED)return;
-  ac();
+  primeAudio();
   if(kind==='out'){ tone(660,.1); setTimeout(()=>tone(880,.14),110); }
   else if(kind==='in'){ tone(880,.1); setTimeout(()=>tone(660,.14),110); }
   else if(kind==='warn'){ tone(520,.16,'square',.14); setTimeout(()=>tone(520,.16,'square',.14),200); }
   else if(kind==='err'){ tone(300,.2,'sawtooth',.16); setTimeout(()=>tone(220,.26,'sawtooth',.16),180); }
   else tone(700,.08);
 }
-/* 瀏覽器要求用戶手勢先至准開聲：任何點擊／按鍵自動解鎖 AudioContext */
-function unlockAudio(){ const c=ac(); if(c&&c.state==='suspended')c.resume(); }
-document.addEventListener('pointerdown',unlockAudio,{passive:true});
-document.addEventListener('keydown',unlockAudio,{passive:true});
-
 /* ---- 登出：事件委託 ---- */
 function bindSignOut(){}
 document.addEventListener('click',e=>{
