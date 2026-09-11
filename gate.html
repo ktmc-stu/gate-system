@@ -495,7 +495,7 @@ function initGate(){
 
   /* ---- 自訂鍵盤（gate 零系統鍵盤依賴）---- */
   let pwCallback=null, kbBuf='', kbMask=false, kbDone=null;
-  let kbMode='L', kbUpper=true;
+  let kbMode='L', kbUpper=false;
   const KB_L=[['A','B','C','D','E','F','G'],['H','I','J','K','L','M','N'],['O','P','Q','R','S','T','U'],['V','W','X','Y','Z','SHIFT','BK'],['123:2','CLR:2','SP:3']];
   const KB_D=[['1','2','3','4','5','6','7'],['8','9','0','-','_','.',','],['@','#','!','?','SP','\'','"'],['ABC:2','BK:2','CLR:3']];
   function renderKb(){
@@ -544,7 +544,7 @@ function initGate(){
   function kbRender(){const v=$('setVal');if(v)v.textContent=kbBuf?(kbMask?'•'.repeat(kbBuf.length):kbBuf):'\u00a0';}
   function openKeypad(o){
     kbBuf=o.initial||'';kbMask=!!o.mask;kbDone=o.onDone||null;
-    kbMode='L';kbUpper=true;renderKb();
+    kbMode='L';kbUpper=false;renderKb();
     const m=$('setMsg');if(m&&o.msg)m.innerHTML=o.msg;
     const t=$('setTitle');if(t)t.innerHTML=o.title||'Input<span>輸入</span>';
     $('setErr').textContent='';kbRender();
