@@ -425,8 +425,17 @@ function initGate(){
     pwCallback=onOk;
     const m=$('setMsg'); if(m&&msg)m.textContent=msg;
     $('setPwd').value='';$('setErr').textContent='';
-    $('setOv').classList.add('open');setTimeout(()=>$('setPwd').focus(),60);
+    $('setOv').classList.add('open');
+    const inp=$('setPwd');
+    inp.focus();   // 同步 focus：仍處於用戶手勢內，獨立模式都會彈鍵盤
+    setTimeout(()=>{try{inp.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}},250);
   }
+  // 獨立模式補鑊：若「已聚焦但冇鍵盤」，㩒輸入框時 blur 再 focus 重新觸發
+  ['setPwd','gName'].forEach(id=>{
+    const el=$(id);if(!el)return;
+    el.addEventListener('click',()=>{if(document.activeElement===el){el.blur();el.focus();}});
+    el.addEventListener('focus',()=>{setTimeout(()=>{try{el.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}},250);});
+  });
   $('btnSet').onclick=()=>{ askPassword('輸入職員密碼以解鎖設定 Enter staff password to unlock settings', null); };
   $('setClose').onclick=()=>{ $('setOv').classList.remove('open'); pwCallback=null; };
   function tryUnlock(){
