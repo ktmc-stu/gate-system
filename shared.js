@@ -106,7 +106,9 @@ function showLock(){
         el.querySelector('#lockErr').textContent = msg || ('錯誤：'+code);
       });
   });
-  setTimeout(()=>el.querySelector('#lockPwd').focus(),60);
+  const li=el.querySelector('#lockPwd');
+  li.focus();
+  li.addEventListener('click',()=>{ if(document.activeElement===li){ li.blur(); li.focus(); } });
 }
 function requireAuth(onReady){
   let booted=false;
