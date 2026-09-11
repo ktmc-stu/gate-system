@@ -1,36 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="apple-touch-icon" href="ios-logo.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="KTMC Gate">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Gate · 閘口</title>
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="ios-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#081120;--panel:rgba(17,29,54,.86);--panel2:rgba(10,19,36,.9);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.28);
- --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--amber-d:#ff8a3d;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;--shadow:0 20px 60px rgba(2,8,20,.55)}
+:root{--bg:#081120;--panel:rgba(17,29,54,.88);--panel2:rgba(10,19,36,.92);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.3);
+ --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--amber-d:#ff8a3d;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;
+ --shadow:0 24px 70px rgba(2,8,20,.6);--grad:linear-gradient(135deg,#ffc95e,#ff8a3d)}
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
 html{color-scheme:dark}
 body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;
- background:radial-gradient(1200px 600px at 85% -10%,rgba(75,139,255,.18),transparent 60%),radial-gradient(1000px 600px at -10% 110%,rgba(255,178,36,.14),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
+ background:radial-gradient(1300px 640px at 85% -12%,rgba(75,139,255,.2),transparent 62%),radial-gradient(1000px 620px at -10% 112%,rgba(255,178,36,.16),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
  background-image:linear-gradient(rgba(160,190,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(160,190,255,.05) 1px,transparent 1px);
  background-size:44px 44px;mask-image:radial-gradient(ellipse 90% 70% at 50% 35%,#000 20%,transparent 75%)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}
+::-webkit-scrollbar-track{background:transparent}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
 ::selection{background:rgba(255,178,36,.35)}
-.top{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--line);background:rgba(8,14,26,.72);backdrop-filter:blur(14px)}
+.top{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 20px;
+ border-bottom:1px solid var(--line2);background:rgba(8,14,26,.8);backdrop-filter:blur(18px);box-shadow:0 10px 34px rgba(0,0,0,.35)}
 .gsign{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:22px;letter-spacing:.08em}
-.logo{width:38px;height:38px;object-fit:contain;border-radius:12px;flex:none}
+.logo{width:38px;height:38px;object-fit:contain;border-radius:12px;flex:none;filter:drop-shadow(0 4px 12px rgba(255,138,61,.35))}
 .gsign b{color:var(--amber);font-weight:800}
 .gsign .zh{font-size:12px;color:var(--faint);letter-spacing:.3em;font-weight:500}
 .led{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:led 2.2s infinite}
 @keyframes led{50%{opacity:.4}}
 .gmid{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.modebadge{font:600 11px 'IBM Plex Mono';letter-spacing:.12em;padding:7px 14px;border-radius:99px;color:var(--amber);border:1px solid rgba(255,178,36,.35);background:rgba(255,178,36,.1)}
+.modebadge{font:600 11px 'IBM Plex Mono';letter-spacing:.12em;padding:7px 14px;border-radius:99px;color:var(--amber);border:1px solid rgba(255,178,36,.35);background:rgba(255,178,36,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 .conn{display:flex;align-items:center;gap:7px;font:600 11px 'IBM Plex Mono';letter-spacing:.1em;color:var(--faint)}
 .conn i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
 .conn.on{color:var(--green)}.conn.on i{background:var(--green);box-shadow:0 0 10px var(--green)}
@@ -39,31 +45,34 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nowout{font:600 11px 'IBM Plex Mono';letter-spacing:.12em;color:var(--dim)}
 .nowout b{color:var(--amber);font-size:17px;margin-left:4px}
 .clock{font-family:'IBM Plex Mono';font-weight:600;font-size:20px;letter-spacing:.06em}
-.iconbtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--dim);font-size:17px;cursor:pointer;transition:.2s}
+.iconbtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--dim);font-size:17px;cursor:pointer;transition:.2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
 .iconbtn:hover{color:var(--amber);border-color:rgba(255,178,36,.5);transform:rotate(30deg)}
 main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:24px;position:relative;z-index:2}
 .board{width:min(1020px,96vw);position:relative;display:flex;flex-direction:column;gap:20px;
- padding:clamp(24px,4.5vw,50px);border-radius:26px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2));
- box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px)}
+ padding:clamp(24px,4.5vw,50px);border-radius:28px;border:1px solid var(--line2);background:linear-gradient(180deg,var(--panel),var(--panel2));
+ box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(16px)}
+.board::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;border-radius:2px;
+ background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.75}
 .board>*{position:relative;animation:up .4s cubic-bezier(.2,.8,.3,1) both}
 @keyframes up{from{opacity:0;transform:translateY(14px)}}
 .micro{font:600 11px 'IBM Plex Mono';letter-spacing:.3em;color:var(--faint)}
-.ready-word{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(44px,8vw,92px);line-height:1;text-shadow:0 0 40px rgba(255,178,36,.25)}
-.cursor{display:inline-block;width:.42em;height:.8em;background:linear-gradient(180deg,var(--amber),var(--amber-d));margin-left:.12em;border-radius:4px;animation:blink 1.1s steps(1) infinite}
+.ready-word{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(44px,8vw,92px);line-height:1;
+ background:linear-gradient(180deg,#ffffff,#ffd58a 78%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 30px rgba(255,178,36,.28))}
+.cursor{display:inline-block;width:.42em;height:.8em;background:var(--grad);margin-left:.12em;border-radius:4px;animation:blink 1.1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 .ready-sub{font-size:clamp(16px,2.2vw,22px);font-weight:600;color:var(--dim)}
 .ready-sub .zh{color:var(--faint);font-size:.82em;margin-left:10px}
-#reader{width:min(360px,82vw);margin:2px auto 0;border-radius:20px;overflow:hidden;border:1px solid var(--line2);background:#000;box-shadow:0 16px 44px rgba(0,0,0,.5)}
+#reader{width:min(360px,82vw);margin:2px auto 0;border-radius:22px;overflow:hidden;border:1px solid var(--line2);background:#000;box-shadow:0 18px 50px rgba(0,0,0,.55),0 0 0 4px rgba(255,255,255,.04)}
 #reader video{width:100%!important;height:auto!important;object-fit:cover}
 #reader__dashboard,#reader__filescan_input{display:none!important}
 .camerr{min-height:1.2em;font-size:12.5px;color:var(--red);text-align:center;line-height:1.6}
 .camerr .ghostbtn{margin-left:8px}
-.camoff{width:min(360px,82vw);margin:2px auto 0;border-radius:20px;border:2px dashed var(--line2);background:rgba(255,255,255,.03);
+.camoff{width:min(360px,82vw);margin:2px auto 0;border-radius:22px;border:2px dashed var(--line2);background:rgba(255,255,255,.03);
  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:34px 20px;text-align:center;
  font:800 clamp(14px,2.4vh,20px) 'IBM Plex Mono';letter-spacing:.14em;color:var(--dim)}
 .camoff span{font:500 12px 'Noto Sans TC';letter-spacing:.2em;color:var(--faint)}
-/* 姓名（當眼＋英文自動縮細）*/
-.stname{font-family:'Noto Sans TC','IBM Plex Sans',sans-serif;font-weight:900;line-height:1.15;margin:0 0 8px;color:var(--text);font-size:clamp(26px,4.6vw,42px);overflow-wrap:anywhere}
+.stname{font-family:'Noto Sans TC','IBM Plex Sans',sans-serif;font-weight:900;line-height:1.15;margin:0 0 8px;color:var(--text);
+ font-size:clamp(26px,4.6vw,42px);overflow-wrap:anywhere;text-shadow:0 3px 18px rgba(0,0,0,.35)}
 .stname.en{font-family:'Archivo','IBM Plex Sans',sans-serif;letter-spacing:.01em}
 .stname.sz-md{font-size:clamp(20px,3.4vw,30px)}
 .stname.sz-sm{font-size:clamp(15px,2.5vw,21px);font-weight:800}
@@ -72,10 +81,11 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .slots-head .mono{color:var(--amber);font-size:clamp(14px,2.2vh,18px)}
 .slots{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(6px,1vh,10px)}
 @media(max-width:560px){.slots{grid-template-columns:repeat(6,1fr)}}
-.slot{aspect-ratio:1;border-radius:12px;border:2px solid var(--line2);display:flex;align-items:center;justify-content:center;
- font:900 clamp(18px,3.4vh,30px) 'Archivo';color:var(--dim);background:rgba(255,255,255,.04);transition:.2s}
-.slot.occ{background:linear-gradient(180deg,#ffc95e,#ff9a2e);color:#2a1800;border-color:transparent;box-shadow:0 6px 18px rgba(255,150,40,.45);cursor:pointer}
-.slot.occ.over{background:linear-gradient(180deg,#ff9a8a,#ff5d55);color:#fff;box-shadow:0 6px 18px rgba(255,93,85,.5);animation:flash 1.4s infinite}
+.slot{aspect-ratio:1;border-radius:14px;border:2px solid var(--line2);display:flex;align-items:center;justify-content:center;
+ font:900 clamp(18px,3.4vh,30px) 'Archivo';color:var(--dim);background:rgba(255,255,255,.04);box-shadow:inset 0 2px 8px rgba(0,0,0,.35);transition:.2s}
+.slot.occ{background:linear-gradient(180deg,#ffc95e,#ff9a2e);color:#2a1800;border-color:transparent;cursor:pointer;
+ box-shadow:0 8px 22px rgba(255,150,40,.45),inset 0 2px 0 rgba(255,255,255,.4)}
+.slot.occ.over{background:linear-gradient(180deg,#ff9a8a,#ff5d55);color:#fff;box-shadow:0 8px 22px rgba(255,93,85,.5),inset 0 2px 0 rgba(255,255,255,.35);animation:flash 1.4s infinite}
 .slotbig{display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px auto}
 .slotbig b{font-family:'Archivo';font-weight:900;font-size:clamp(64px,14vh,120px);line-height:1;color:var(--amber);text-shadow:0 0 44px rgba(255,178,36,.55);animation:houseIn .45s cubic-bezier(.2,1.4,.4,1)}
 .slotbig span{font:700 clamp(11px,1.7vh,14px) 'IBM Plex Mono';letter-spacing:.26em;color:var(--dim);text-align:center}
@@ -83,30 +93,31 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .sigwrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0 auto}
 .signal{width:clamp(120px,26vh,210px);aspect-ratio:1;animation:pop .45s cubic-bezier(.2,1.5,.4,1)}
 .signal svg{width:100%;height:100%;display:block}
-.signal.go{filter:drop-shadow(0 0 42px rgba(47,211,127,.55))}
-.signal.stop{filter:drop-shadow(0 0 42px rgba(255,93,85,.55));animation:pop .45s cubic-bezier(.2,1.5,.4,1),flash 1.2s infinite .5s}
-.signal.caution{filter:drop-shadow(0 0 42px rgba(255,178,36,.5));animation:pop .45s cubic-bezier(.2,1.5,.4,1),flash 1.4s infinite .5s}
+.signal.go{filter:drop-shadow(0 0 46px rgba(47,211,127,.6))}
+.signal.stop{filter:drop-shadow(0 0 46px rgba(255,93,85,.6));animation:pop .45s cubic-bezier(.2,1.5,.4,1),flash 1.2s infinite .5s}
+.signal.caution{filter:drop-shadow(0 0 46px rgba(255,178,36,.55));animation:pop .45s cubic-bezier(.2,1.5,.4,1),flash 1.4s infinite .5s}
 @keyframes pop{from{transform:scale(.35);opacity:0}}
 .siglabel{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(18px,3.2vh,28px);letter-spacing:.12em;text-align:center}
 .siglabel.go{color:var(--green)}.siglabel.stop{color:var(--red)}.siglabel.caution{color:var(--amber)}
 .sigsub{font-size:clamp(12px,1.9vh,15px);color:var(--dim);text-align:center;font-weight:600;max-width:560px}
 .cands{display:grid;gap:8px;max-height:46vh;overflow:auto;width:100%}
-.cand{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.03);cursor:pointer;font-size:15px;color:var(--text);text-align:left;flex-wrap:wrap}
-.cand:active,.cand:hover{background:rgba(255,178,36,.12);border-color:var(--amber)}
+.cand{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.03);cursor:pointer;font-size:15px;color:var(--text);text-align:left;flex-wrap:wrap;transition:.15s}
+.cand:active,.cand:hover{background:rgba(255,178,36,.12);border-color:var(--amber);transform:translateY(-1px)}
 .cand .hc{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font:900 15px 'Archivo';color:#fff;flex:none}
 .cand .nm{font-weight:800}
 .cand .mono{font-weight:700}
 .cand .dim{font-size:12.5px}
 .ready-foot{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
-.pill{font:600 12px 'IBM Plex Mono';letter-spacing:.06em;color:var(--dim);border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:99px;padding:9px 15px}
+.pill{font:600 12px 'IBM Plex Mono';letter-spacing:.06em;color:var(--dim);border:1px solid var(--line2);border-radius:99px;padding:9px 15px;
+ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 .pill b{color:var(--text)}
 .pill.house b{color:var(--amber);font-family:'Archivo';font-size:13px}
 .ghostbtn{border:1px dashed var(--line2);background:none;color:var(--dim);border-radius:99px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
 .ghostbtn:hover{color:var(--amber);border-color:var(--amber);background:rgba(255,178,36,.08)}
 .grid2{display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,4vw,44px);align-items:center}
 @media(max-width:680px){.grid2{grid-template-columns:1fr;justify-items:center}.info{width:100%}}
-.house{width:clamp(140px,18vw,200px);aspect-ratio:1;border-radius:24px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
- box-shadow:0 18px 50px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.35),inset 0 -14px 30px rgba(0,0,0,.25);animation:houseIn .5s cubic-bezier(.2,1.4,.4,1)}
+.house{width:clamp(140px,18vw,200px);aspect-ratio:1;border-radius:26px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ box-shadow:0 20px 55px rgba(0,0,0,.55),inset 0 2px 0 rgba(255,255,255,.4),inset 0 -14px 30px rgba(0,0,0,.25);animation:houseIn .5s cubic-bezier(.2,1.4,.4,1)}
 .house::before{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 90% at 20% 0%,rgba(255,255,255,.35),transparent 45%)}
 @keyframes houseIn{from{transform:scale(.55) rotate(-6deg);opacity:0}}
 .house .hl{font-family:'Archivo';font-weight:900;font-size:clamp(72px,11vw,120px);line-height:1;text-shadow:0 4px 18px rgba(0,0,0,.3)}
@@ -129,20 +140,30 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .center{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
 .purp{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 @media(max-width:620px){.purp{grid-template-columns:1fr}}
-.pbtn{border:1px solid var(--line2);border-radius:18px;background:rgba(255,255,255,.04);padding:18px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:30px;transition:.15s;color:var(--text)}
+.pbtn{position:relative;border:1px solid var(--line2);border-top:3px solid var(--line2);border-radius:18px;padding:18px 10px;cursor:pointer;
+ display:flex;flex-direction:column;align-items:center;gap:6px;font-size:30px;transition:.18s;color:var(--text);
+ background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
 .pbtn b{font-family:'Archivo';font-size:18px;letter-spacing:.06em}
 .pbtn span{font-size:12px;color:var(--faint)}
 .pbtn:active{transform:scale(.97)}
-.pbtn.t:hover,.pbtn.c:hover{border-color:var(--blue);background:rgba(75,139,255,.12)}
-.pbtn.f:hover{border-color:var(--amber);background:rgba(255,178,36,.12)}
-.pbtn.h:hover,.pbtn.o:hover{border-color:var(--green);background:rgba(47,211,127,.12)}
+.pbtn.t{border-top-color:var(--blue)}.pbtn.t:hover{border-color:var(--blue);background:rgba(75,139,255,.12);transform:translateY(-2px)}
+.pbtn.f{border-top-color:var(--amber)}.pbtn.f:hover{border-color:var(--amber);background:rgba(255,178,36,.12);transform:translateY(-2px)}
+.pbtn.c{border-top-color:#a78bfa}.pbtn.c:hover{border-color:#a78bfa;background:rgba(167,139,250,.12);transform:translateY(-2px)}
+.pbtn.h{border-top-color:var(--green)}.pbtn.h:hover{border-color:var(--green);background:rgba(47,211,127,.12);transform:translateY(-2px)}
+.pbtn.o{border-top-color:#f472b6}.pbtn.o:hover{border-color:#f472b6;background:rgba(244,114,182,.12);transform:translateY(-2px)}
 .foot-hint{font-size:12px;color:var(--faint);text-align:center;letter-spacing:.12em}
 .minitable{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
 .minitable th{font:600 10px 'IBM Plex Mono';letter-spacing:.12em;color:var(--faint);text-align:left;padding:6px;border-bottom:1px solid var(--line2)}
 .minitable td{padding:6px;border-bottom:1px solid var(--line)}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(410px,94vw);z-index:60;padding:28px;overflow:auto;background:rgba(10,18,34,.92);
- backdrop-filter:blur(20px);border-left:1px solid var(--line);transform:translateX(105%);transition:transform .3s cubic-bezier(.3,1,.4,1)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{border:1px solid var(--line2);background:rgba(255,255,255,.04);color:var(--dim);border-radius:99px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer;transition:.15s}
+.chip.on{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.12)}
+#othTxt{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line2);background:rgba(0,0,0,.35);color:var(--text);font-size:16px;outline:none}
+#othTxt:focus{border-color:var(--amber);box-shadow:0 0 0 4px rgba(255,178,36,.15)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(410px,94vw);z-index:60;padding:28px;overflow:auto;background:rgba(10,18,34,.94);
+ backdrop-filter:blur(20px);border-left:1px solid var(--line2);transform:translateX(105%);transition:transform .3s cubic-bezier(.3,1,.4,1)}
 .drawer.open{transform:none;box-shadow:-40px 0 90px rgba(0,0,0,.6)}
+.drawer::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.7}
 .drawer h2{font-family:'Archivo';font-size:22px;font-weight:800}
 .drawer h2 span{font-size:.6em;color:var(--faint);font-weight:500;margin-left:8px}
 .drawer label{display:block;margin:18px 0 8px;font-size:13px;color:var(--dim);font-weight:600}
@@ -159,29 +180,31 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .note{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--faint);line-height:1.7}
 .drawer-btns{display:flex;gap:10px;margin-top:24px}
 .btn{border:0;border-radius:12px;padding:13px 20px;font-weight:800;font-size:14px;cursor:pointer;transition:.2s}
-.btn.primary{background:linear-gradient(180deg,#ffc95e,#ff9a2e);color:#2a1800;flex:1;box-shadow:0 10px 26px rgba(255,150,40,.3)}
+.btn.primary{background:var(--grad);color:#2a1800;flex:1;box-shadow:0 10px 26px rgba(255,150,40,.3)}
 .btn.green{background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f;box-shadow:0 10px 26px rgba(47,211,127,.25)}
 .btn.ghost{background:none;border:1px solid var(--line);color:var(--dim)}
 .btn.ghost:hover{color:var(--red);border-color:var(--red)}
 .xbtn{background:none;border:0;color:var(--faint);font-size:18px;cursor:pointer}
 .xbtn:hover{color:var(--text)}
-.overlay{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(4,8,16,.7);backdrop-filter:blur(6px);padding:20px}
+.overlay{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(4,8,16,.72);backdrop-filter:blur(6px);padding:20px}
 .overlay.open{display:flex}
 #setOv{z-index:80}
-.pad{width:min(390px,94vw);border-radius:24px;padding:24px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(23,37,66,.95),rgba(10,19,36,.95));box-shadow:var(--shadow);animation:up .25s ease}
+.pad{width:min(390px,94vw);border-radius:28px;padding:24px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(23,37,66,.96),rgba(10,19,36,.96));box-shadow:var(--shadow);animation:up .25s ease;position:relative}
+.pad::before{content:'';position:absolute;top:0;left:12%;right:12%;height:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.7;border-radius:2px}
 .pad.wide{width:min(560px,94vw);max-height:88vh;overflow:auto}
-#padOv .pad{max-height:88vh;overflow:auto}
+#padOv .pad,#othOv .pad{max-height:88vh;overflow:auto}
 .pad-head{display:flex;justify-content:space-between;align-items:center;font-family:'Archivo';font-weight:800;font-size:18px}
 .pad-head span{font-size:.65em;color:var(--faint);font-weight:500;margin-left:6px}
 .pad-disp{margin:16px 0 6px;min-height:56px;display:flex;align-items:center;padding:0 16px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid var(--line2);font-size:24px;letter-spacing:.12em}
 .pad-hint{font-size:12px;color:var(--faint);margin-bottom:14px;line-height:1.6}
 .pad-keys{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.pad-keys button{padding:16px 0;font-size:20px;font-weight:700;border-radius:14px;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);transition:.15s}
+.pad-keys button{padding:16px 0;font-size:20px;font-weight:700;border-radius:14px;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);transition:.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 .pad-keys button:active{background:var(--amber);color:#241500;border-color:var(--amber)}
 .pad-keys button.alpha{border-color:rgba(255,178,36,.45);color:var(--amber);background:rgba(255,178,36,.06)}
 .pad-keys button.w2{grid-column:span 2}
 @media(max-width:400px){.pad-keys button{padding:13px 0;font-size:17px}}
 .pad .go{width:100%;margin-top:14px;padding:16px;border:0;border-radius:14px;cursor:pointer;background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f;font-weight:900;font-size:16px;letter-spacing:.06em}
+.pad .go:active{transform:scale(.98)}
 .pad-err{min-height:1.2em;font-size:12.5px;color:var(--red);text-align:center;margin-top:8px}
 .sd-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
 </style>
@@ -204,8 +227,8 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <h2>Device Settings<span>裝置設定（已解鎖）</span></h2><button class="xbtn" id="drawerClose">✕</button>
   </div>
-  <label>Gate Name 閘口名稱（= Phone Slots identity 手機格身份；同名稱＝同一閘共享 12 格）</label>
-  <input type="text" id="gName" maxlength="24" placeholder="e.g. Gate A">
+  <label>Gate Name 閘口名稱（㩒欄位用鍵盤輸入；同名稱＝同一閘共享 12 格）</label>
+  <input type="text" id="gName" maxlength="24" placeholder="e.g. Gate A" readonly style="cursor:pointer">
   <label style="margin-top:20px">Houses Served 本閘服務社（每閘兩社・專屬不可共用）</label>
   <div class="houses">
     <label class="hsel"><input type="checkbox" name="gh" value="K">K</label>
@@ -222,15 +245,16 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
   <label style="margin-top:18px">Channel Type 通道類型</label>
   <label class="mode"><input type="radio" name="gchan" value="normal"><div><b>Normal 普通</b><span>All purposes + phone slots 所有目的＋手機格</span></div></label>
   <label class="mode"><input type="radio" name="gchan" value="special"><div><b>Competition / Helper Only 參賽者・工作人員專用</b><span>No phone slots · no time limit 無手機格・無限時</span></div></label>
-  <div class="note">普通通道：手機格 12 格，滿格禁止外出；㩒占用格可睇佔用人資料。<br>專用通道：只限參賽／工作人員目的，無手機格、無限時。<br>Overlong threshold 超時時限：<b><span id="thNote">15</span> min</b>（於 Admin 設定）<br>Event scenario 活動場景由 Admin 統一設定。</div>
+  <div class="note">普通通道：手機格 12 格，滿格禁止外出；㩒占用格可睇佔用人資料。<br>專用通道：只限參賽／工作人員目的，無手機格、無限時。<br>廁所／小食每日總次數上限於 Admin 設定；參賽／工作人員／其他不限。<br>Overlong threshold 超時時限於 Admin 設定。</div>
   <div class="drawer-btns"><button class="btn primary" id="saveCfg">Save 儲存</button></div>
 </aside>
 
 <div class="overlay" id="setOv">
   <div class="pad">
-    <div class="pad-head"><div>Settings Lock<span>需要密碼</span></div><button class="xbtn" id="setClose">✕</button></div>
+    <div class="pad-head"><div id="setTitle">Settings Lock<span>需要密碼</span></div><button class="xbtn" id="setClose">✕</button></div>
     <p class="dim" id="setMsg" style="font-size:12px;margin:8px 0">輸入職員密碼以解鎖設定 Enter staff password to unlock settings</p>
-    <input type="password" id="setPwd" placeholder="Staff password 職員密碼" autocomplete="current-password">
+    <div class="pad-disp mono" id="setVal">&nbsp;</div>
+    <div class="pad-keys" id="setKeys"></div>
     <p class="pad-err" id="setErr"></p>
     <button class="go" id="setGo">UNLOCK 解鎖</button>
   </div>
@@ -244,6 +268,16 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
       <button class="btn green" id="sdIn">Manual Return 手動返回（釋放格位）</button>
       <button class="btn ghost" id="sdCancel">Close 關閉</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="othOv">
+  <div class="pad wide">
+    <div class="pad-head"><div>Reason for OTHER<span>其他原因・必填</span></div><button class="xbtn" id="othClose">✕</button></div>
+    <div class="chips" id="othChips"></div>
+    <input type="text" id="othTxt" placeholder="或輸入原因 Or type a reason" maxlength="40">
+    <p class="pad-err" id="othErr"></p>
+    <button class="go" id="othGo">CONFIRM 確定</button>
   </div>
 </div>
 
@@ -275,11 +309,12 @@ const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false,cam:true};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
-let threshold=15, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
+let threshold=15, normalLimit=0, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, state='boot', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
 const $=id=>document.getElementById(id), board=$('board');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
 const NO_LIMIT=p=>p==='competition'||p==='helper';
+const NORMAL=p=>p==='toilet'||p==='food';
 
 function initGate(){
   if(booted)return; booted=true;
@@ -293,8 +328,9 @@ function initGate(){
   db.ref('counters').on('value',s=>{countersMap=s.val()||{};});
   db.ref('participantList').on('value',s=>{compList=s.val()||{};});
   db.ref('helperList').on('value',s=>{helperList=s.val()||{};});
+  db.ref('config/normalLimit').on('value',s=>{normalLimit=parseInt(s.val(),10)||0;});
   db.ref('.info/connected').on('value',s=>{const on=!!s.val();$('conn').className='conn '+(on?'on':'off');$('connTx').textContent=on?'LIVE 連線':'OFFLINE 離線';});
-  watchThreshold(v=>{threshold=v;$('thNote').textContent=v;const p=$('pillThB');if(p)p.textContent=v+' min';refreshSlots();});
+  watchThreshold(v=>{threshold=v;$('thNote')&&($('thNote').textContent=v);const p=$('pillThB');if(p)p.textContent=v+' min';refreshSlots();});
   watchScenario(v=>{scenario=v;applyHeader();if(state==='ready')toReady();});
 
   /* ---- 手機格 ---- */
@@ -334,6 +370,20 @@ function initGate(){
     });
   }
 
+  /* ---- 普通原因（廁所／小食）每日總次數 ---- */
+  function normalUsed(sid){
+    const d=fmtDate(Date.now());
+    const nt=countersMap[sid]&&countersMap[sid].normalToday;
+    return (nt&&nt.d===d)?(nt.n||0):0;
+  }
+  function bumpNormal(sid){
+    const d=fmtDate(Date.now());
+    db.ref('counters/'+sid+'/normalToday').transaction(cur=>{
+      if(!cur||cur.d!==d)return {d,n:1};
+      return {d,n:(cur.n||0)+1};
+    });
+  }
+
   /* ---- 格位詳情 ---- */
   let sdCard=null, sdSlot=null, sdTimer=null;
   function openSlotDetail(i){
@@ -352,7 +402,7 @@ function initGate(){
         <div class="info">${nameBlock(st)}
           <div class="row"><span class="k">Student ID<i>學生編號</i></span><span class="v mono">${esc(st.sid||'—')}</span></div>
           <div class="row"><span class="k">Class<i>班別</i></span><span class="v">${esc(st.cls||'—')} · No.${esc(st.no||'—')}</span></div>
-          <div class="row"><span class="k">Purpose<i>目的</i></span><span class="v">${pm.icon} ${pm.zh} ${pm.en}</span></div>
+          <div class="row"><span class="k">Purpose<i>目的</i></span><span class="v">${pm.icon} ${pm.zh} ${pm.en}${live&&live.reason?` · ${esc(live.reason)}`:''}</span></div>
           <div class="row"><span class="k">Out<i>出去時間</i></span><span class="v mono">${outAt?fmtClock(outAt):'—'}</span></div>
           <div class="row"><span class="k">Elapsed<i>已經出去</i></span><span class="v mono" id="sdElapsed" style="color:var(--amber)">${outAt?fmtDur(Date.now()-outAt):'—'}</span></div>
           <div class="row"><span class="k">Trips<i>外出次數</i></span><span class="v">#${cnt}</span></div>
@@ -376,7 +426,7 @@ function initGate(){
       rows.sort((a,b)=>b.outAt-a.outAt);
       const el=$('sdTrips');if(!el)return;
       el.innerHTML=rows.length?`<table class="minitable"><tr><th>Out 出</th><th>In 返</th><th>時長</th><th>目的</th><th></th></tr>`+
-        rows.slice(0,6).map(r=>`<tr><td class="mono">${fmtHM(r.outAt)}</td><td class="mono">${r.inAt?fmtHM(r.inAt):'未返'}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${r.purpose?purposeMeta(r.purpose).icon:''}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
+        rows.slice(0,6).map(r=>`<tr><td class="mono">${fmtHM(r.outAt)}</td><td class="mono">${r.inAt?fmtHM(r.inAt):'未返'}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${purposeMeta(r.purpose).icon}${r.reason?` ${esc(r.reason)}`:''}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
         :'<span class="dim">今日暫無其他記錄 No other trips today</span>';
     });
   }
@@ -439,37 +489,59 @@ function initGate(){
     if(state==='ready')toReady();
   };
 
-  /* ---- 密碼鎖 ---- */
-  let pwCallback=null;
+  /* ---- 自訂鍵盤（gate 零系統鍵盤依賴）---- */
+  let pwCallback=null, kbBuf='', kbMask=false, kbDone=null;
+  const KB_KEYS=['1','2','3','4','5','6','7','8','9','0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','CLR','⌫'];
+  (function buildKb(){
+    const wrap=$('setKeys');if(!wrap)return;
+    KB_KEYS.forEach(k=>{
+      const b=document.createElement('button');b.textContent=k;
+      b.dataset.k=k==='CLR'?'clr':k==='⌫'?'bk':k;
+      if(k==='CLR'||k==='⌫')b.classList.add('w2');
+      if(/^[A-Z]$/.test(k))b.classList.add('alpha');
+      wrap.appendChild(b);
+    });
+    wrap.addEventListener('click',e=>{
+      const b=e.target.closest('button');if(!b)return;const k=b.dataset.k;
+      if(k==='clr')kbBuf='';
+      else if(k==='bk')kbBuf=kbBuf.slice(0,-1);
+      else if(kbBuf.length<24)kbBuf+=k;
+      kbRender();
+    });
+  })();
+  function kbRender(){const v=$('setVal');if(v)v.textContent=kbBuf?(kbMask?'•'.repeat(kbBuf.length):kbBuf):'\u00a0';}
+  function openKeypad(o){
+    kbBuf=o.initial||'';kbMask=!!o.mask;kbDone=o.onDone||null;
+    const m=$('setMsg');if(m&&o.msg)m.innerHTML=o.msg;
+    const t=$('setTitle');if(t)t.innerHTML=o.title||'Input<span>輸入</span>';
+    $('setErr').textContent='';kbRender();
+    $('setOv').classList.add('open');
+  }
   function askPassword(msg,onOk){
     pwCallback=onOk;
-    const m=$('setMsg'); if(m&&msg)m.textContent=msg;
-    $('setPwd').value='';$('setErr').textContent='';
-    $('setOv').classList.add('open');
-    const inp=$('setPwd');
-    inp.focus();
-    setTimeout(()=>{try{inp.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}},250);
+    openKeypad({title:'Settings Lock<span>需要密碼</span>',msg:msg||'輸入職員密碼 Enter staff password',mask:true});
   }
-  ['setPwd','gName'].forEach(id=>{
-    const el=$(id);if(!el)return;
-    el.addEventListener('click',()=>{if(document.activeElement===el){el.blur();el.focus();}});
+  $('gName').addEventListener('click',()=>{
+    openKeypad({title:'Gate Name<span>閘口名稱</span>',msg:'輸入閘口名稱 Enter gate name',initial:cfg.name,mask:false,onDone:v=>{$('gName').value=v.trim()||'Gate A';}});
   });
   $('btnSet').onclick=()=>{ askPassword('輸入職員密碼以解鎖設定 Enter staff password to unlock settings', null); };
-  $('setClose').onclick=()=>{ $('setOv').classList.remove('open'); pwCallback=null; };
+  $('setClose').onclick=()=>{ $('setOv').classList.remove('open'); pwCallback=null; kbDone=null; };
   function tryUnlock(){
-    const pwd=$('setPwd').value;
+    const pwd=kbBuf;
     $('setErr').textContent='';
     vAuth.signInWithEmailAndPassword(STAFF_EMAIL,pwd)
       .then(()=>{ vAuth.signOut(); $('setOv').classList.remove('open');
         if(pwCallback){const cb=pwCallback;pwCallback=null;cb();}
         else openDrawer(); })
-      .catch(err=>{
+      .catch(err=>{ kbBuf='';kbRender();
         const code=(err&&err.code)||'';
         $('setErr').textContent = code==='auth/wrong-password'||code==='auth/invalid-credential' ? '密碼錯誤 Incorrect password' : '登入失敗 Login failed ['+code+']';
       });
   }
-  $('setGo').onclick=tryUnlock;
-  $('setPwd').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
+  $('setGo').onclick=()=>{
+    if(kbDone){const cb=kbDone;kbDone=null;$('setOv').classList.remove('open');cb(kbBuf);return;}
+    tryUnlock();
+  };
 
   function openDrawer(){
     $('gName').value=cfg.name;
@@ -533,7 +605,32 @@ function initGate(){
     else if(e.key==='Enter'){$('padGo').click();}
     else if(e.key==='Escape'){closePad();if(state==='ready')startScanner();}});
 
-  /* ---- 搜尋（key = 學生編號）---- */
+  /* ---- 其他原因 overlay ---- */
+  const OTH_REASONS=['見老師 Teacher','物資 Equipment','身體不適 Unwell','比賽相關 Competition','班務 Class duty'];
+  let othPick='', othSt=null;
+  (function buildChips(){
+    const w=$('othChips');if(!w)return;
+    OTH_REASONS.forEach(r=>{
+      const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=r;
+      b.onclick=()=>{othPick=(othPick===r?'':r);w.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x.textContent===othPick));};
+      w.appendChild(b);
+    });
+  })();
+  function openOther(st){
+    othSt=st;othPick='';$('othTxt').value='';$('othErr').textContent='';
+    $('othChips').querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+    stopScanner();
+    $('othOv').classList.add('open');
+  }
+  $('othClose').onclick=()=>{$('othOv').classList.remove('open');othSt=null;if(state==='ready')startScanner();else if(state==='choice')startScanner();};
+  $('othGo').onclick=()=>{
+    const reason=othPick||$('othTxt').value.trim();
+    if(!reason){$('othErr').textContent='請選擇或輸入原因 Please choose or type a reason';return;}
+    const st=othSt;$('othOv').classList.remove('open');othSt=null;
+    if(st)doOut(st,'other',reason);
+  };
+
+  /* ---- 搜尋 ---- */
   function findStudent(q){
     q=String(q||'').trim().toUpperCase(); if(!q)return null;
     if(students[q])return students[q];
@@ -583,7 +680,7 @@ function initGate(){
     proceed(st);
   }
 
-  function doOut(st,purpose){
+  function doOut(st,purpose,reason){
     if(!NO_LIMIT(purpose)&&!houseAllowed(st)){ wrongGate(st); return; }
     const sid=st.sid, now=Date.now();
     const recKey=db.ref('records').push().key;
@@ -591,15 +688,19 @@ function initGate(){
     const finish=slot=>{
       db.ref('live/'+sid).transaction(cur=>{
         if(cur)return;
-        return {recordId:recKey,outAt:now,gate:cfg.name,purpose,slot:slot||null,slotGate:slot?cfg.name:null};
+        return {recordId:recKey,outAt:now,gate:cfg.name,purpose,reason:reason||'',slot:slot||null,slotGate:slot?cfg.name:null};
       }).then(res=>{
         if(!res.committed){
           if(slot)db.ref(`slots/${gateKey()}/${slot}`).set(null);
           showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',liveMap[sid]||{outAt:now});return;
         }
         db.ref('records/'+recKey).set({sid,cls:st.cls,no:st.no,name:st.name||'',house:st.house,scenario,
-          code:pendingCode,purpose,slot:slot||null,slotGate:slot?cfg.name:null,gateOut:cfg.name,outAt:now,gateIn:null,inAt:null,durationSec:null,overlong:false});
-        db.ref('counters/'+sid+'/outCount').transaction(v=>(v||0)+1).then(r=>showOut(st,r.snapshot.val()||1,!!st.overlongFlag,purpose,slot||null));
+          code:pendingCode,purpose,reason:reason||'',slot:slot||null,slotGate:slot?cfg.name:null,gateOut:cfg.name,outAt:now,gateIn:null,inAt:null,durationSec:null,overlong:false});
+        if(NORMAL(purpose))bumpNormal(sid);
+        db.ref('counters/'+sid+'/outCount').transaction(v=>(v||0)+1).then(r=>{
+          lastReason=reason||'';
+          showOut(st,r.snapshot.val()||1,!!st.overlongFlag,purpose,slot||null);
+        });
       });
     };
     if(needSlot){
@@ -688,6 +789,7 @@ function initGate(){
   }
   function showPurpose(st){
     state='choice';pendingSt=st;clearTimeout(resetT);resetT=setTimeout(toReady,90000);
+    const used=normalUsed(st.sid);
     board.innerHTML=`
       <div class="micro">SELECT PURPOSE · 選擇外出目的</div>
       <div class="grid2">${houseBlock(st)}<div class="info">${nameBlock(st)}${rows(st)}${flagBadge(st)}</div></div>
@@ -698,8 +800,11 @@ function initGate(){
            <button class="pbtn f" data-purpose="food">🍱<b>FOOD</b><span>小食部</span></button>
            <button class="pbtn c" data-purpose="competition">🏅<b>COMPETITION</b><span>參賽</span></button>
            <button class="pbtn h" data-purpose="helper">🦺<b>HELPER</b><span>工作人員</span></button>
-           <button class="pbtn o" data-purpose="other">📌<b>OTHER</b><span>其他</span></button>`}</div>
+           <button class="pbtn o" data-purpose="other">📌<b>OTHER</b><span>其他・需原因</span></button>`}</div>
       ${channelType()==='normal'?slotsStrip():''}
+      <div class="ready-foot">
+        <span class="pill">🚻🍱 TODAY 今日普通外出 <b>${used}${normalLimit>0?'/'+normalLimit:'/∞'}</b></span>
+      </div>
       <button class="ghostbtn" data-act="cancel" style="justify-self:center">Cancel 取消</button>`;
     refreshSlots(); tone(880,.08);
   }
@@ -715,7 +820,7 @@ function initGate(){
       ${signal(flag?'caution':'go', flag?'⚠ 曾外出時間過長 PREVIOUSLY OVERLONG — 請留意返回時間':'手續完成 · 請放行 PROCEED')}
       ${midHtml}
       <div class="grid2">${houseBlock(st)}<div class="info">${nameBlock(st)}${rows(st)}</div></div>
-      <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span>${noLimit?'<span class="pill">♾️ NO LIMIT 無限時</span>':''}<span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
+      <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span>${purpose==='other'&&lastReason?`<span class="pill">📌 ${esc(lastReason)}</span>`:''}${noLimit?'<span class="pill">♾️ NO LIMIT 無限時</span>':''}<span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
     sound(flag?'warn':'out');schedule(flag?11000:9000);
   }
@@ -786,6 +891,9 @@ function initGate(){
       const pu=p.dataset.purpose;
       if(pu==='competition'&&!compList[pendingSt.sid]){showWarn(pendingSt,'NOT ON LIST','參賽者名單無此學生 — 不能以參賽原因外出 Not in competition list',null);sound('warn');return;}
       if(pu==='helper'&&!helperList[pendingSt.sid]){showWarn(pendingSt,'NOT ON LIST','工作人員名單無此學生 — 不能以工作人員原因外出 Not in helper list',null);sound('warn');return;}
+      if(NORMAL(pu)&&normalLimit>0&&normalUsed(pendingSt.sid)>=normalLimit){
+        showWarn(pendingSt,'LIMIT REACHED',`今日廁所／小食外出已達上限 (${normalUsed(pendingSt.sid)}/${normalLimit}) Daily toilet/food limit reached`,null);sound('warn');return;}
+      if(pu==='other'){ openOther(pendingSt); return; }
       if(!NO_LIMIT(pu)&&!houseAllowed(pendingSt)){ wrongGate(pendingSt); return; }
       doOut(pendingSt,pu);return;
     }
