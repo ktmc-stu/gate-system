@@ -58,6 +58,10 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 #reader__dashboard,#reader__filescan_input{display:none!important}
 .camerr{min-height:1.2em;font-size:12.5px;color:var(--red);text-align:center;line-height:1.6}
 .camerr .ghostbtn{margin-left:8px}
+ .camoff{width:min(360px,82vw);margin:2px auto 0;border-radius:20px;border:2px dashed var(--line2);background:rgba(255,255,255,.03);
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:34px 20px;text-align:center;
+ font:800 clamp(14px,2.4vh,20px) 'IBM Plex Mono';letter-spacing:.14em;color:var(--dim)}
+.camoff span{font:500 12px 'Noto Sans TC';letter-spacing:.2em;color:var(--faint)}
 .slots-wrap{margin-top:8px}
 .slots-head{display:flex;justify-content:space-between;align-items:center;font:800 clamp(12px,1.9vh,16px) 'IBM Plex Mono';letter-spacing:.14em;color:var(--dim);margin-bottom:8px}
 .slots-head .mono{color:var(--amber);font-size:clamp(14px,2.2vh,18px)}
@@ -185,7 +189,7 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
     <span class="modebadge" id="modeBadge">—</span>
     <span class="conn" id="conn"><i></i><span id="connTx">…</span></span>
   </div>
-  <div class="gright"><span class="nowout">NOW OUTSIDE 正在外面 <b id="nowOut">0</b></span><time class="clock mono" id="clock">--:--:--</time><button class="iconbtn" id="btnSet" title="Settings 設定（需密碼）">⚙</button></div>
+  <div class="gright"><span class="nowout">NOW OUTSIDE 正在外面 <b id="nowOut">0</b></span><time class="clock mono" id="clock">--:--:--</time><button class="iconbtn" id="btnCam" title="鏡頭開關">📷</button><button class="iconbtn" id="btnSet" title="Settings 設定（需密碼）">⚙</button></div>
 </header>
 
 <main><section class="board" id="board"></section></main>
@@ -264,7 +268,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 const vAuth = firebase.initializeApp(FIREBASE_CONFIG, 'verify').auth();
 
 const CFG_KEY='gate.cfg.v1';
-let cfg={name:'Gate A',mode:'auto',muted:false};
+let cfg={name:'Gate A',mode:'auto',muted:false,cam:true};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
 let threshold=15, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, state='boot', pendingSt=null, pendingCode='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
@@ -276,7 +280,7 @@ const NO_LIMIT=p=>p==='competition'||p==='helper';
 function initGate(){
   if(booted)return; booted=true;
   bindSignOut();
-  applyHeader(); subscribeSlots(); subscribeGateCfg(); toReady();
+  applyHeader(); refreshCamBtn(); subscribeSlots(); subscribeGateCfg(); toReady();
   setInterval(()=>{$('clock').textContent=fmtClock(Date.now())},500);
   setInterval(()=>refreshSlots(),20000);
 
@@ -400,6 +404,7 @@ function initGate(){
 
   /* ---- QR scanner ---- */
   function startScanner(){
+    if(!cfg.cam)return;
     if(state!=='ready'||!document.getElementById('reader'))return;
     if(!window.Html5Qrcode){const c=$('camErr');if(c)c.innerHTML='Scanner library not loaded 掃描庫未載入';return;}
     stopScanner();
@@ -436,7 +441,20 @@ function initGate(){
     el.addEventListener('click',()=>{if(document.activeElement===el){el.blur();el.focus();}});
     el.addEventListener('focus',()=>{setTimeout(()=>{try{el.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}},250);});
   });
-  $('btnSet').onclick=()=>{ askPassword('輸入職員密碼以解鎖設定 Enter staff password to unlock settings', null); };
+  function refreshCamBtn(){
+    const b=$('btnCam');if(!b)return;
+    b.textContent=cfg.cam?'📷':'';
+    b.style.opacity=cfg.cam?'1':'.5';
+    b.title=cfg.cam?'鏡頭：開啟中（㩒關閉省電）':'鏡頭：已關閉（㩒開啟）';
+  }
+  $('btnCam').onclick=()=>{
+    cfg.cam=!cfg.cam;
+    localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
+    refreshCamBtn();
+    if(!cfg.cam)stopScanner();
+    if(state==='ready')toReady();
+  };
+ $('btnSet').onclick=()=>{ askPassword('輸入職員密碼以解鎖設定 Enter staff password to unlock settings', null); };
   $('setClose').onclick=()=>{ $('setOv').classList.remove('open'); pwCallback=null; };
   function tryUnlock(){
     const pwd=$('setPwd').value;
@@ -671,8 +689,8 @@ function initGate(){
       <div class="micro">EVENT PASS TERMINAL · ${sc.en.toUpperCase()} ${sc.zh} · DEVICE ${esc(cfg.name)}</div>
       <div class="ready-word">SCAN<span class="cursor"></span></div>
       <div class="ready-sub">Scan student QR code<span class="zh">請掃描學生證 QR 碼</span></div>
-      <div id="reader"></div>
-      <div class="camerr" id="camErr"></div>
+      ${cfg.cam?`<div id="reader"></div><div class="camerr" id="camErr"></div>`
+        :`<div class="camoff">📴 CAMERA OFF · 省電模式<span>鏡頭已關閉・節省電量</span><button class="ghostbtn" data-act="camon">開啟鏡頭</button></div>`}
       ${channelType()==='normal'?slotsStrip():''}
       <div class="ready-foot">
         <span class="pill house">HOUSE 社 <b id="pillHouse">${houseLabel()}</b></span>
@@ -786,6 +804,7 @@ function initGate(){
     if(b){const a=b.dataset.act;
       if(a==='manual')openPad();
       else if(a==='cancel')toReady();
+      else if(a==='camon'){cfg.cam=true;localStorage.setItem(CFG_KEY,JSON.stringify(cfg));refreshCamBtn();toReady();}
       return;}
     if(state!=='ready'&&state!=='choice'&&state!=='cand')toReady();
   });
