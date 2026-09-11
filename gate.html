@@ -140,7 +140,7 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .drawer h2{font-family:'Archivo';font-size:22px;font-weight:800}
 .drawer h2 span{font-size:.6em;color:var(--faint);font-weight:500;margin-left:8px}
 .drawer label{display:block;margin:18px 0 8px;font-size:13px;color:var(--dim);font-weight:600}
-.drawer input[type=text],.drawer input[type=password]{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line2);background:rgba(255,255,255,.05);color:var(--text);font-size:15px;outline:none;transition:.2s}
+.drawer input[type=text],.drawer input[type=password]{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line2);background:rgba(255,255,255,.05);color:var(--text);font-size:16px;outline:none;transition:.2s}
 .drawer input:focus{border-color:var(--amber);box-shadow:0 0 0 4px rgba(255,178,36,.15)}
 .mode{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px;cursor:pointer;transition:.2s;background:rgba(255,255,255,.02)}
 .mode:has(input:checked){border-color:rgba(255,178,36,.6);background:rgba(255,178,36,.08)}
@@ -470,6 +470,18 @@ function initGate(){
   }
   $('setGo').onclick=tryUnlock;
   $('setPwd').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
+   /* iOS 獨立模式恢復 bug：第二次啟動後鍵盤可能失靈。
+     對策：App 恢復顯示時清走半聚焦；tap 輸入框時喺手勢內強制 blur→focus 重新觸發鍵盤。 */
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&document.activeElement&&document.activeElement.blur)document.activeElement.blur();});
+  window.addEventListener('pageshow',()=>{if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();});
+  ['setPwd','gName'].forEach(id=>{
+    const el=$(id);if(!el)return;
+    el.addEventListener('touchend',e=>{
+      e.preventDefault();
+      el.blur();el.focus();
+      try{el.scrollIntoView({block:'center'});}catch(_){}
+    },{passive:false});
+  });
 
   function openDrawer(){
     $('gName').value=cfg.name;
