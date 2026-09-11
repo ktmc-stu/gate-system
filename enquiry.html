@@ -104,6 +104,7 @@ table.mini tbody tr:hover td{background:rgba(47,211,127,.06)}
 let students={},live={},recs=[],counters={},normalLimit=0,booted=false,curSid=null,todayStart=0;
 const $=id=>document.getElementById(id);
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
+ function recTime(r){let v=Number(r.outAt);if(!isFinite(v))v=Date.parse(String(r.outAt||''));return isFinite(v)?v:NaN;}
 function nameBlock(st){
   const n=String((st&&st.name)||'').trim(); if(!n)return '';
   const isEn=/^[A-Za-z][A-Za-z\s.\-']*$/.test(n);
@@ -120,7 +121,9 @@ requireAuth(function(){
   const d=new Date();d.setHours(0,0,0,0);todayStart=d.getTime();
   db.ref('students').on('value',s=>{students=s.val()||{};renderOutside();renderBoard();if(curSid)renderDetail(curSid);});
   db.ref('live').on('value',s=>{live=s.val()||{};renderOutside();renderBoard();if(curSid)renderDetail(curSid);});
-  db.ref('records').on('value',s=>{recs=[];s.forEach(c=>recs.push(c.val()));renderBoard();if(curSid)renderDetail(curSid);});
+  db.ref('records').on('value',s=>{recs=[];s.forEach(c=>{const r=c.val();if(!r)return;
+    const v=recTime(r);r.outAt=isFinite(v)?v:0;recs.push(r);});
+    renderBoard();if(curSid)renderDetail(curSid);});
   db.ref('counters').on('value',s=>{counters=s.val()||{};if(curSid)renderDetail(curSid);});
   db.ref('config/normalLimit').on('value',s=>{normalLimit=parseInt(s.val(),10)||0;if(curSid)renderDetail(curSid);});
   $('q').addEventListener('input',()=>doSearch($('q').value));
