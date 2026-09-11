@@ -4,10 +4,11 @@
 <link rel="apple-touch-icon" href="admin-logo.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="GATE">
+<meta name="apple-mobile-web-app-title" content="Gate Admin">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Admin · 管理</title>
+<link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -42,7 +43,6 @@ main{max-width:1220px;margin:0 auto;padding:28px 20px}
 .tile{position:relative;overflow:hidden;border-radius:18px;border:1px solid var(--line);padding:20px 22px;background:linear-gradient(180deg,var(--panel),var(--panel2));animation:up .45s ease both}
 .tile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--green)}
 .tile.a::before{background:var(--amber)}.tile.b::before{background:var(--blue)}.tile.r::before{background:var(--red)}
-.tile:nth-child(2){animation-delay:.05s}.tile:nth-child(3){animation-delay:.1s}.tile:nth-child(4){animation-delay:.15s}
 @keyframes up{from{opacity:0;transform:translateY(12px)}}
 .tnum{font-family:'Archivo';font-weight:900;font-size:40px;line-height:1.15;display:block}
 .tile.a .tnum{color:var(--amber)}.tile.b .tnum{color:var(--blue)}.tile.r .tnum{color:var(--red)}
@@ -56,7 +56,6 @@ section.pane.on{display:block}
 .drop{border:2px dashed var(--line2);border-radius:18px;padding:34px 20px;text-align:center;color:var(--dim);cursor:pointer;transition:.2s;margin-top:16px}
 .drop::before{content:'⬆';display:block;font-size:26px;color:var(--faint);margin-bottom:8px;transition:.2s}
 .drop:hover,.drop.over{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.06)}
-.drop:hover::before,.drop.over::before{color:var(--amber);transform:translateY(-3px)}
 .drop b{display:block;font-size:16px;color:var(--text);margin-bottom:4px}
 .radios{display:flex;gap:18px;margin-top:14px;font-size:13.5px;color:var(--dim);flex-wrap:wrap}
 .radios label{display:flex;gap:7px;align-items:center;cursor:pointer}.radios input{accent-color:var(--amber)}
@@ -65,7 +64,7 @@ section.pane.on{display:block}
 .toolbar input:focus{border-color:var(--amber);box-shadow:0 0 0 4px rgba(255,178,36,.12)}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{font:600 10.5px 'IBM Plex Mono';letter-spacing:.14em;color:var(--faint);text-align:left;padding:10px;border-bottom:1px solid var(--line2);text-transform:uppercase;white-space:nowrap}
-td{padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 tbody tr{transition:.12s}
 tbody tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 tbody tr:hover td{background:rgba(255,178,36,.05)}
@@ -101,7 +100,6 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
     <div class="tile r"><span class="tnum" id="stFlag">0</span><span class="tlab">OVERLONG FLAGS 超時標記</span></div>
   </div>
 
-  <!-- Students 學生 -->
   <section class="pane on" id="pane-stu">
     <div class="card">
       <h3>Import Students<span>匯入學生名單（Excel / CSV）</span></h3>
@@ -109,7 +107,7 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
         <label><input type="radio" name="impMode" value="merge" checked> Merge / Update 合併更新</label>
         <label><input type="radio" name="impMode" value="replace"> Replace All 全部取代（危險）</label>
       </div>
-      <div class="drop" id="drop"><b>Click or drop file here 點擊或拖放檔案</b>.xlsx / .csv — Columns 欄目：Student ID Card Number · Student ID · Class · Class Number · House</div>
+      <div class="drop" id="drop"><b>Click or drop file here 點擊或拖放檔案</b>.xlsx / .csv — Columns 欄目：Student ID 學生編號 · Class 班別 · Class Num 學號 · Name 姓名 · House 社</div>
       <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
       <div id="previewWrap" style="display:none">
         <div class="toolbar"><span id="pvInfo" class="dim"></span>
@@ -118,7 +116,7 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
         <div style="overflow-x:auto"><table id="pvTable"></table></div>
       </div>
     </div>
-       <div class="card">
+    <div class="card">
       <h3>Competition List<span>參賽者名單（核對・無限時・免交手機）</span></h3>
       <div class="toolbar">
         <button class="btn ghost" id="btnCompUp">Upload 上載</button>
@@ -126,7 +124,7 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
         <span class="dim" id="compCount">0 people 人</span>
       </div>
       <input type="file" id="compFile" accept=".xlsx,.xls,.csv" hidden>
-      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用卡號或學生編號；上載＝取代整份名單 Only Class + Class No needed (e.g. 3B and 12, or 3B12)</p>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
       <div id="compList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
     <div class="card">
@@ -137,13 +135,13 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
         <span class="dim" id="helperCount">0 people 人</span>
       </div>
       <input type="file" id="helperFile" accept=".xlsx,.xls,.csv" hidden>
-      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用卡號或學生編號；上載＝取代整份名單 Only Class + Class No needed (e.g. 3B and 12, or 3B12)</p>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
       <div id="helperList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
     <div class="card">
       <h3>Student List<span>學生名單</span></h3>
       <div class="toolbar">
-        <input type="text" id="sFilter" placeholder="Search 搜尋（卡號 / 學號 / 班別）" style="min-width:260px">
+        <input type="text" id="sFilter" placeholder="Search 搜尋（學生編號 / 姓名 / 班別）" style="min-width:260px">
         <button class="btn ghost" id="btnTemplate">Template 下載範本</button>
         <button class="btn ghost" id="btnExpStu">Export Students 匯出名單</button>
       </div>
@@ -152,7 +150,6 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
     </div>
   </section>
 
-  <!-- Records 記錄 -->
   <section class="pane" id="pane-rec">
     <div class="card">
       <h3>Entry / Exit Records<span>進出記錄</span></h3>
@@ -171,7 +168,6 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
     </div>
   </section>
 
-  <!-- Settings 設定 -->
   <section class="pane" id="pane-set">
     <div class="card">
       <h3>Event Scenario<span>活動場景</span></h3>
@@ -214,7 +210,7 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
 <script src="config.js"></script>
 <script src="shared.js"></script>
 <script>
-let students={},live={},todayStart=0,pendList=null,booted=false;
+let students={},live={},todayStart=0,pendList=null,booted=false,compMap={},helperMap={};
 const $=id=>document.getElementById(id);
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
@@ -234,7 +230,7 @@ requireAuth(function init(){
     const all=s.val()||{},gates=Object.keys(all),el=$('slotsOverview');
     if(el)el.innerHTML=gates.length?gates.map(g=>{
       const occ=Object.values(all[g]||{}).filter(Boolean);
-      return `<div><b class="mono">${esc(g)}</b> — ${occ.length}/12 占用：${occ.map(o=>esc(o.sid||o.card)).join(', ')||'（全空）'}</div>`;
+      return `<div><b class="mono">${esc(g)}</b> — ${occ.length}/12 占用：${occ.map(o=>{const st=students[o.sid];return esc(st?st.name||st.sid:o.sid);}).join(', ')||'（全空）'}</div>`;
     }).join(''):'（無占用 No occupancy）';
   });
   $('btnStartDay').onclick=()=>{
@@ -249,19 +245,15 @@ requireAuth(function init(){
     $('stOut').textContent=Object.keys(live).length;
     $('stFlag').textContent=arr.filter(s=>s.overlongFlag).length;
   }
-  function loadToday(){const f=todayStart,t=todayStart+86400000-1;
-    db.ref('records').once('value').then(s=>{let n=0;
-      s.forEach(c=>{const r=c.val();if(!r)return;const v=recTime(r);if(isFinite(v)&&v>=f&&v<=t)n++;});
-      $('stToday').textContent=n;});}
+  function loadToday(){db.ref('records').orderByChild('outAt').startAt(todayStart).once('value').then(s=>$('stToday').textContent=s.numChildren());}
 
-  /* tabs */
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
     document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+t.dataset.tab));
     if(t.dataset.tab==='rec')loadRecords();
   });
 
-  /* ---------- 匯入 ---------- */
+  /* ---------- 匯入（新格式：Student ID / Class / Class Num / Name / House）---------- */
   const clean=v=>String(v??'').trim().replace(/\.0$/,'');
   const norm=h=>String(h).toLowerCase().replace(/[\s.\-_()（）:：]/g,'');
   function colIdx(hdrs,preds,skip){return hdrs.findIndex((h,i)=>!skip.includes(i)&&preds.some(p=>norm(h).includes(p)));}
@@ -271,23 +263,22 @@ requireAuth(function init(){
     let hi=-1,cols=null;
     for(let r=0;r<Math.min(5,arr.length);r++){
       const hdr=arr[r].map(norm),sk=[];
-      const iC=colIdx(hdr,['card','卡'],sk);
-      if(iC<0)continue; sk.push(iC);
-      const iS=colIdx(hdr,['studentid','學生編號'],sk);sk.push(iS);
+      const iS=colIdx(hdr,['studentid','學生編號'],sk); if(iS<0)continue; sk.push(iS);
       const iCl=colIdx(hdr,['class','班'],sk);sk.push(iCl);
-      const iN=colIdx(hdr,['classnumber','學號','no'],sk);sk.push(iN);
+      const iN=colIdx(hdr,['classnum','學號','no'],sk);sk.push(iN);
+      const iNm=colIdx(hdr,['name','姓名'],sk);sk.push(iNm);
       const iH=colIdx(hdr,['house','社'],sk);
-      cols=[iC,iS,iCl,iN,iH];hi=r;break;
+      cols=[iS,iCl,iN,iNm,iH];hi=r;break;
     }
     if(hi<0){hi=0;cols=[0,1,2,3,4];}
     const seen=new Set(),list=[],issues=[];
     for(let r=hi+1;r<arr.length;r++){
       const row=arr[r]||[];
-      const card=clean(row[cols[0]]),sid=clean(row[cols[1]]),cls=clean(row[cols[2]]),no=clean(row[cols[3]]),house=clean(row[cols[4]]).toUpperCase();
-      if(!card&&!sid)continue;
-      if(!card){issues.push(`Row ${r+1}: missing card 缺卡號`);continue;}
-      if(seen.has(card))issues.push(`Row ${r+1}: duplicate card 卡號重複（以最後為準）`);
-      seen.add(card);list.push({card,sid,cls,no,house});
+      const sid=clean(row[cols[0]]),cls=clean(row[cols[1]]),no=clean(row[cols[2]]),name=clean(row[cols[3]]),house=clean(row[cols[4]]).toUpperCase();
+      if(!sid&&!name)continue;
+      if(!sid){issues.push(`Row ${r+1}: missing Student ID 缺學生編號`);continue;}
+      if(seen.has(sid))issues.push(`Row ${r+1}: duplicate 重複（以最後為準）`);
+      seen.add(sid);list.push({sid,cls,no,name,house});
     }
     return {list,issues};
   }
@@ -300,17 +291,17 @@ requireAuth(function init(){
     const {list,issues}=parseSheet(await f.arrayBuffer());
     pendList=list;
     $('pvInfo').textContent=`Ready to import 準備匯入 ${list.length} students${issues.length?` · ${issues.length} warnings 警告`:''}`;
-    const head='<tr><th>Card 卡號</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th></tr>';
-    $('pvTable').innerHTML=head+list.slice(0,8).map(s=>`<tr><td class="mono">${esc(s.card)}</td><td>${esc(s.sid)}</td><td>${esc(s.cls)}</td><td>${esc(s.no)}</td><td>${esc(s.house)}</td></tr>`).join('');
+    const head='<tr><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th></tr>';
+    $('pvTable').innerHTML=head+list.slice(0,8).map(s=>`<tr><td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name)}</b></td><td>${esc(s.cls)}</td><td>${esc(s.no)}</td><td>${esc(s.house)}</td></tr>`).join('');
     $('previewWrap').style.display='block';
   }
   $('btnPvCancel').onclick=()=>{pendList=null;$('previewWrap').style.display='none';};
   $('btnImport').onclick=()=>{
     if(!pendList)return;
     const replace=document.querySelector('input[name=impMode]:checked').value==='replace';
-    const inList=new Set(pendList.map(s=>s.card)),upd={};
-    pendList.forEach(s=>{const ex=students[s.card];
-      upd['students/'+s.card]={card:s.card,sid:s.sid,cls:s.cls,no:s.no,house:s.house,overlongFlag:ex?!!ex.overlongFlag:false};});
+    const inList=new Set(pendList.map(s=>s.sid)),upd={};
+    pendList.forEach(s=>{const ex=students[s.sid];
+      upd['students/'+s.sid]={sid:s.sid,cls:s.cls,no:s.no,name:s.name,house:s.house,overlongFlag:ex?!!ex.overlongFlag:false};});
     if(replace)Object.keys(students).forEach(c=>{if(!inList.has(c))upd['students/'+c]=null;});
     db.ref().update(upd).then(()=>{
       toast(`Imported ${pendList.length} students 已匯入`);
@@ -319,41 +310,37 @@ requireAuth(function init(){
   };
   $('btnTemplate').onclick=()=>{
     const ws=XLSX.utils.aoa_to_sheet([
-      ['Student ID Card Number','Student ID','Class','Class Number','House'],
-      ['A123456','25001','1A','01','K'],['B234567','25002','1B','02','T']]);
+      ['Student ID 學生編號','Class 班別','Class Num 學號','Name 姓名','House 社'],
+      ['25001','1A','01','陳大文','K'],['25002','1B','02','Chan Tai Man','T']]);
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Students');
     XLSX.writeFile(wb,'student_import_template.xlsx');
   };
   $('btnExpStu').onclick=()=>{
-    const data=Object.values(students).sort(byClsNo).map(s=>({'Card 卡號':s.card,'Student ID 學生編號':s.sid,'Class 班別':s.cls,'Class Number 學號':s.no,'House 社':s.house,'Overlong 超時標記':s.overlongFlag?'YES':''}));
+    const data=Object.values(students).sort(byClsNo).map(s=>({'Student ID 學生編號':s.sid,'Name 姓名':s.name||'','Class 班別':s.cls,'Class Num 學號':s.no,'House 社':s.house,'Overlong 超時標記':s.overlongFlag?'YES':''}));
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Students');
     XLSX.writeFile(wb,`students_${fmtDate(Date.now())}.xlsx`);
   };
 
-   /* ---------- 參賽／工作人員名單 ---------- */
+  /* ---------- 參賽／工作人員名單 ---------- */
   function parseListFile(data){
     const wb=XLSX.read(data,{type:'array'});
     const arr=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
     const out={};let issues=0;
     const clsRe=/^\d{1,2}[A-Za-z]$/, noRe=/^\d{1,2}$/, comboRe=/^(\d{1,2}[A-Za-z])[\s\-]?(\d{1,2})$/;
-
     for(let r=0;r<arr.length;r++){
       const row=arr[r];if(!row||!row.some(c=>c!==null&&c!==undefined&&c!==''))continue;
       const joined=String(row.join(' ')).toLowerCase();
-      if(joined.includes('student')||joined.includes('card')||joined.includes('class')||joined.includes('no')||joined.includes('學生')||joined.includes('卡號')||joined.includes('班')||joined.includes('學號'))continue;
+      if(joined.includes('student')||joined.includes('class')||joined.includes('no')||joined.includes('學生')||joined.includes('班')||joined.includes('學號'))continue;
       let hit=null;
-      // 1) 直接配對卡號或學生編號
       for(let c=0;c<row.length&&!hit;c++){
         const v=clean(row[c]);if(!v)continue;const up=v.toUpperCase();
-        hit=students[v]||students[up]||Object.values(students).find(s=>String(s.sid||'').toUpperCase()===up);
+        hit=students[up]||Object.values(students).find(s=>String(s.sid||'').toUpperCase()===up);
       }
-      // 2) 配對連體字如 3B12 / 3B-12
       if(!hit){for(let c=0;c<row.length&&!hit;c++){
         const v=clean(row[c]);if(!v)continue;const m=v.match(comboRe);
         if(m){const cls=m[1].toUpperCase(),no=String(parseInt(m[2],10));
           hit=Object.values(students).find(s=>String(s.cls||'').toUpperCase()===cls&&String(parseInt(s.no,10)||s.no)===no);}
       }}
-      // 3) 同一行入面分別搵班別同學號（如 "3B" 同 "12" 兩欄）
       if(!hit){
         let foundCls=null,foundNo=null;
         for(let c=0;c<row.length;c++){
@@ -365,10 +352,18 @@ requireAuth(function init(){
           hit=Object.values(students).find(s=>String(s.cls||'').toUpperCase()===foundCls&&String(parseInt(s.no,10)||s.no)===foundNo);
         }
       }
-      if(hit)out[hit.card]={sid:hit.sid,cls:hit.cls,no:hit.no};
+      if(hit)out[hit.sid]={sid:hit.sid,cls:hit.cls,no:hit.no,name:hit.name||''};
       else if(joined.trim())issues++;
     }
     return {out,issues};
+  }
+  function renderListPreview(elId,map){
+    const el=$(elId);if(!el)return;
+    const keys=Object.keys(map||{});
+    if(!keys.length){el.innerHTML='<span class="dim">（空 Empty）</span>';return;}
+    const arr=keys.map(k=>students[k]||Object.assign({sid:k},map[k])).sort(byClsNo);
+    el.innerHTML=`<table><tr><th>House</th><th>Name 姓名</th><th>Student ID</th><th>Class</th><th>No.</th></tr>`+
+      arr.map(s=>{const sid=s.sid||'';return `<tr><td><span class="hchip" style="--hc:${houseMeta(s.house).color}">${esc(s.house||'?')}</span></td><td><b>${esc(s.name||'—')}</b></td><td class="mono">${esc(sid)}</td><td>${esc(s.cls||'—')}</td><td>${esc(s.no||'—')}</td></tr>`;}).join('')+`</table>`;
   }
   function wireList(upBtn,fileBtn,clearBtn,path,label){
     $(upBtn).onclick=()=>$(fileBtn).click();
@@ -382,32 +377,23 @@ requireAuth(function init(){
       });};
     $(clearBtn).onclick=()=>{if(confirm(`清空${label}？`))db.ref(path).set(null).then(()=>toast(`${label}已清空 Cleared`));};
   }
-  let compMap={},helperMap={};
-  function renderListPreview(elId,map){
-    const el=$(elId);if(!el)return;
-    const cards=Object.keys(map||{});
-    if(!cards.length){el.innerHTML='<span class="dim">（空 Empty）</span>';return;}
-    const arr=cards.map(c=>students[c]||Object.assign({card:c},map[c])).sort(byClsNo);
-    el.innerHTML=`<table><tr><th>House</th><th>Student ID</th><th>Class</th><th>No.</th></tr>`+
-      arr.map(s=>`<tr><td><span class="hchip" style="--hc:${houseMeta(s.house).color}">${esc(s.house||'?')}</span></td><td class="mono">${esc(s.sid||s.card||'—')}</td><td>${esc(s.cls||'—')}</td><td>${esc(s.no||'—')}</td></tr>`).join('')+`</table>`;
-  }
   db.ref('participantList').on('value',s=>{compMap=s.val()||{};$('compCount').textContent=Object.keys(compMap).length+' people 人';renderListPreview('compList',compMap);});
   db.ref('helperList').on('value',s=>{helperMap=s.val()||{};$('helperCount').textContent=Object.keys(helperMap).length+' people 人';renderListPreview('helperList',helperMap);});
   wireList('btnCompUp','compFile','btnCompClear','participantList','參賽者名單 ');
   wireList('btnHelperUp','helperFile','btnHelperClear','helperList','工作人員名單 ');
- 
+
   /* ---------- 學生表 ---------- */
   const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
   function renderStudents(){
     const q=$('sFilter').value.trim().toUpperCase();
-    const list=Object.values(students).filter(s=>!q||[s.card,s.sid,s.cls,s.no].some(v=>String(v||'').toUpperCase().includes(q))).sort(byClsNo);
+    const list=Object.values(students).filter(s=>!q||[s.sid,s.cls,s.no,s.name].some(v=>String(v||'').toUpperCase().includes(q))).sort(byClsNo);
     const show=list;
-    $('stuTable').innerHTML='<tr><th>Card 卡號</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>Flag 標記</th><th></th></tr>'+
+    $('stuTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th>Flag 標記</th><th></th></tr>'+
       show.map(s=>{const m=houseMeta(s.house);return `<tr>
-        <td class="mono">${esc(s.card)}</td><td>${esc(s.sid)}</td><td>${esc(s.cls)}</td><td>${esc(s.no)}</td>
+        <td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name||'—')}</b></td><td>${esc(s.cls)}</td><td>${esc(s.no)}</td>
         <td><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span></td>
         <td>${s.overlongFlag?`<span class="flagchip">⚠ OVERLONG 超時</span>`:'<span class="dim">—</span>'}</td>
-        <td style="white-space:nowrap">${s.overlongFlag?`<button class="op" data-flag="${esc(s.card)}">Reset 重設</button>`:''}<button class="op del" data-del="${esc(s.card)}">Delete 刪除</button></td></tr>`;}).join('');
+        <td style="white-space:nowrap">${s.overlongFlag?`<button class="op" data-flag="${esc(s.sid)}">Reset 重設</button>`:''}<button class="op del" data-del="${esc(s.sid)}">Delete 刪除</button></td></tr>`;}).join('');
     $('stuCount').textContent=`Showing ${show.length} of ${list.length} 顯示 ${show.length} / ${list.length}`;
   }
   $('sFilter').oninput=renderStudents;
@@ -415,7 +401,7 @@ requireAuth(function init(){
     const f=e.target.closest('[data-flag]'),dd=e.target.closest('[data-del]');
     if(f)db.ref('students/'+f.dataset.flag+'/overlongFlag').set(false).then(()=>toast('Flag cleared 已重設標記'));
     if(dd){const c=dd.dataset.del,s=students[c];
-      if(confirm(`Delete ${s?.sid||c} (${s?.cls||''}) ? 確定刪除？`)){
+      if(confirm(`Delete ${s?.name||s?.sid||c} (${s?.cls||''}) ? 確定刪除？`)){
         const upd={};upd['students/'+c]=null;upd['live/'+c]=null;db.ref().update(upd);}}
   });
 
@@ -428,18 +414,13 @@ requireAuth(function init(){
     if(f>t){const x=f;f=t;t=x;}
     return[f,t];
   }
-  function recTime(r){let v=Number(r.outAt);if(!isFinite(v))v=Date.parse(String(r.outAt||''));return isFinite(v)?v:NaN;}
   function fetchRecords(){const[f,t]=range();
-    return db.ref('records').once('value').then(s=>{
-      const rows=[];s.forEach(c=>{const r=c.val();if(!r)return;
-        const v=recTime(r);
-        if(isFinite(v)&&v>=f&&v<=t)rows.push(r);});
-      rows.sort((a,b)=>(recTime(b)||0)-(recTime(a)||0));
-      return rows;});}
+    return db.ref('records').orderByChild('outAt').startAt(f).endAt(t).once('value').then(s=>{
+      const rows=[];s.forEach(c=>rows.push(c.val()));rows.sort((a,b)=>(b.outAt||0)-(a.outAt||0));return rows;});}
   function renderRecTable(rows){
-    $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Class</th><th>No.</th><th>House</th><th>目的</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+
+    $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th>目的</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+
       rows.slice(0,300).map(r=>{const m=houseMeta(r.house);return `<tr>
-        <td class="mono">${fmtDate(r.outAt)}</td><td>${esc(r.sid)}</td><td>${esc(r.cls)}</td><td>${esc(r.no)}</td>
+        <td class="mono">${fmtDate(r.outAt)}</td><td class="mono">${esc(r.sid)}</td><td><b>${esc(r.name||'—')}</b></td><td>${esc(r.cls)}</td><td>${esc(r.no)}</td>
         <td><span class="hchip" style="--hc:${m.color}">${esc(r.house||'?')}</span></td>
         <td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td>
         <td class="mono">${fmtHM(r.outAt)} <span class="dim">${esc(r.gateOut||'')}</span></td>
@@ -466,14 +447,14 @@ requireAuth(function init(){
     fetchRecords().then(rows=>{
       rows.sort((a,b)=>(a.outAt||0)-(b.outAt||0));
       const data=rows.map(r=>{const sm=scenarioMeta(r.scenario),pm=purposeMeta(r.purpose);return {
-        'Event 活動':`${sm.zh} ${sm.en}`,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Class 班別':r.cls,'Class Number 學號':r.no,'House 社':r.house,
-        'Purpose 目的':r.purpose?`${pm.zh} ${pm.en}`:'','Card 卡號':r.card,'Scanned Value 掃描值':r.code||r.card,
+        'Event 活動':`${sm.zh} ${sm.en}`,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Name 姓名':r.name||'','Class 班別':r.cls,'Class Num 學號':r.no,'House 社':r.house,
+        'Purpose 目的':r.purpose?`${pm.zh} ${pm.en}`:'',
         'Phone Slot 手機格':r.slot?`${r.slotGate||''} #${r.slot}`:'',
         'Gate Out 離開閘口':r.gateOut||'','Out Time 離開時間':r.outAt?fmtClock(r.outAt):'','Gate In 返回閘口':r.gateIn||'',
         'In Time 返回時間':r.inAt?fmtClock(r.inAt):'STILL OUTSIDE 仍未返回','Duration 在外時間':r.durationSec!=null?fmtDur(r.durationSec*1000):'',
         'Overlong 超時':r.overlong?'YES 是':''};});
       const ws=XLSX.utils.json_to_sheet(data);
-      ws['!cols']=[{wch:22},{wch:11},{wch:12},{wch:8},{wch:8},{wch:6},{wch:12},{wch:12},{wch:14},{wch:12},{wch:14},{wch:10},{wch:14},{wch:10},{wch:12},{wch:10}];
+      ws['!cols']=[{wch:22},{wch:11},{wch:12},{wch:14},{wch:8},{wch:8},{wch:6},{wch:12},{wch:12},{wch:14},{wch:10},{wch:14},{wch:10},{wch:12},{wch:10}];
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');
       XLSX.writeFile(wb,`gate-records_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
     }).finally(()=>{btn.disabled=false;btn.textContent='Export Excel 匯出記錄';});
@@ -481,10 +462,10 @@ requireAuth(function init(){
   $('btnExpSum').onclick=()=>{
     fetchRecords().then(rows=>{
       const map={};
-      rows.forEach(r=>{const k=r.sid||r.card;const e=map[k]||(map[k]={sid:r.sid,cls:r.cls,no:r.no,house:r.house,n:0,sec:0,over:0,t:0,f:0,o:0,c:0,h:0});
+      rows.forEach(r=>{const k=r.sid;const e=map[k]||(map[k]={sid:r.sid,name:r.name||'',cls:r.cls,no:r.no,house:r.house,n:0,sec:0,over:0,t:0,f:0,o:0,c:0,h:0});
         e.n++;e.sec+=r.durationSec||0;if(r.overlong)e.over++;
         if(r.purpose==='toilet')e.t++;else if(r.purpose==='food')e.f++;else if(r.purpose==='competition')e.c++;else if(r.purpose==='helper')e.h++;else e.o++;});
-      const data=Object.values(map).sort((a,b)=>b.n-a.n).map(e=>({'Student ID 學生編號':e.sid,'Class 班別':e.cls,'No. 學號':e.no,'House 社':e.house,
+      const data=Object.values(map).sort((a,b)=>b.n-a.n).map(e=>({'Student ID 學生編號':e.sid,'Name 姓名':e.name,'Class 班別':e.cls,'No. 學號':e.no,'House 社':e.house,
         'Total Exits 外出次數':e.n,'Toilet 廁所':e.t,'Food 小食':e.f,'Competition 參賽':e.c,'Student Helper 工作人員':e.h,'Other 其他':e.o,'Total Time Outside 總在外時間':fmtDur(e.sec*1000),'Overlong 超時次數':e.over}));
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Summary');
       XLSX.writeFile(wb,`gate-summary_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
