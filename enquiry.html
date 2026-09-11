@@ -1,61 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="apple-touch-icon" href="enquiry-logo.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Gate Enquiry">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Enquiry · 老師查詢</title>
 <link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="enquiry-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--panel:rgba(17,29,54,.86);--panel2:rgba(10,19,36,.9);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.28);
- --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff}
+:root{--panel:rgba(17,29,54,.88);--panel2:rgba(10,19,36,.92);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.3);
+ --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--amber-d:#ff8a3d;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;
+ --shadow:0 24px 70px rgba(2,8,20,.6);--grad:linear-gradient(135deg,#ffc95e,#ff8a3d)}
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
 html{color-scheme:dark}
 body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
- background:radial-gradient(1100px 520px at 92% -10%,rgba(75,139,255,.16),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
+ background:radial-gradient(1300px 640px at 92% -12%,rgba(75,139,255,.2),transparent 62%),radial-gradient(1000px 620px at -8% 112%,rgba(255,178,36,.15),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}
+::-webkit-scrollbar-track{background:transparent}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
-.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 22px;border-bottom:1px solid var(--line);background:rgba(8,14,26,.72);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
+::selection{background:rgba(255,178,36,.35)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 22px;border-bottom:1px solid var(--line2);
+ background:rgba(8,14,26,.82);backdrop-filter:blur(18px);position:sticky;top:0;z-index:20;box-shadow:0 10px 34px rgba(0,0,0,.35)}
 .brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:20px}
-.logo{width:36px;height:36px;object-fit:contain;border-radius:11px}
+.logo{width:36px;height:36px;object-fit:contain;border-radius:11px;filter:drop-shadow(0 4px 12px rgba(255,138,61,.35))}
 .brand b{color:var(--green)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
-.btn{border:0;border-radius:12px;padding:11px 18px;font-weight:800;font-size:13px;cursor:pointer}
-.btn.ghost{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim)}
+.btn{border:0;border-radius:12px;padding:11px 18px;font-weight:800;font-size:13px;cursor:pointer;transition:.2s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--dim);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.btn.ghost:hover{color:var(--text);border-color:var(--line2)}
 .searchbar{max-width:1220px;margin:20px auto 0;padding:0 20px;position:relative}
-.searchbar .ic{position:absolute;left:38px;top:50%;transform:translateY(-50%);color:var(--faint)}
-#q{width:100%;border:1.5px solid var(--line2);color:var(--text);border-radius:16px;padding:17px 18px 17px 50px;font-size:16px;background:rgba(0,0,0,.3);outline:none}
-#q:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(47,211,127,.12)}
+.searchbar .ic{position:absolute;left:38px;top:50%;transform:translateY(-50%);color:var(--faint);font-size:18px}
+#q{width:100%;border:1.5px solid var(--line2);color:var(--text);border-radius:18px;padding:17px 18px 17px 52px;font-size:16px;
+ background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.25));outline:none;transition:.2s;box-shadow:inset 0 2px 8px rgba(0,0,0,.35)}
+#q:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(47,211,127,.14),inset 0 2px 8px rgba(0,0,0,.35)}
 .wrap{max-width:1220px;margin:18px auto 60px;padding:0 20px;display:grid;grid-template-columns:1.2fr .9fr;gap:18px}
 @media(max-width:900px){.wrap{grid-template-columns:1fr}}
-.card{border-radius:20px;border:1px solid var(--line);padding:22px;background:linear-gradient(180deg,var(--panel),var(--panel2));margin-bottom:18px}
-.card h3{font-family:'Archivo';font-size:16px;font-weight:800;margin-bottom:12px}
-.card h3 span{color:var(--faint);font-weight:500;font-size:.78em;margin-left:8px}
-.stname{font-family:'Noto Sans TC',sans-serif;font-weight:900;line-height:1.15;font-size:clamp(24px,4vw,36px);overflow-wrap:anywhere}
+.card{position:relative;border-radius:22px;border:1px solid var(--line2);padding:22px;background:linear-gradient(180deg,var(--panel),var(--panel2));
+ margin-bottom:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);opacity:.6}
+.card h3{font-family:'Archivo';font-size:16px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.card h3::before{content:'';width:8px;height:8px;border-radius:3px;background:var(--green);box-shadow:0 0 10px rgba(47,211,127,.6)}
+.card h3 span{color:var(--faint);font-weight:500;font-size:.78em}
+.stname{font-family:'Noto Sans TC',sans-serif;font-weight:900;line-height:1.15;font-size:clamp(24px,4vw,36px);overflow-wrap:anywhere;text-shadow:0 3px 18px rgba(0,0,0,.35)}
 .stname.en{font-family:'Archivo',sans-serif}
 .stname.sz-md{font-size:clamp(19px,3vw,27px)}
 .stname.sz-sm{font-size:clamp(15px,2.3vw,20px);font-weight:800}
 .dhead{display:flex;gap:14px;align-items:center;margin-bottom:10px}
-.hchip{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:8px;font-weight:900;font-family:'Archivo';background:var(--hc,#7e8aa2);color:#fff}
-.hchip.big{width:56px;height:56px;font-size:26px;border-radius:14px}
-.status{display:inline-block;border-radius:99px;padding:8px 16px;font-weight:800;font-size:14px;margin-top:6px}
+.hchip{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:8px;font-weight:900;font-family:'Archivo';background:var(--hc,#7e8aa2);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.hchip.big{width:58px;height:58px;font-size:27px;border-radius:15px}
+.status{display:inline-block;border-radius:99px;padding:8px 16px;font-weight:800;font-size:14px;margin-top:6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
 .status.out{background:rgba(255,178,36,.15);color:var(--amber);border:1px solid rgba(255,178,36,.5)}
 .status.in{background:rgba(47,211,127,.12);color:var(--green);border:1px solid rgba(47,211,127,.45)}
+.pill{display:inline-block;font:600 12px 'IBM Plex Mono';letter-spacing:.06em;color:var(--dim);border:1px solid var(--line2);border-radius:99px;padding:7px 13px;margin:6px 6px 0 0;
+ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.pill b{color:var(--text)}
 h4{font-family:'Archivo';font-size:13px;letter-spacing:.1em;color:var(--dim);margin:16px 0 6px}
 table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
 table.mini th{font:600 10px 'IBM Plex Mono';letter-spacing:.12em;color:var(--faint);text-align:left;padding:6px;border-bottom:1px solid var(--line2)}
-table.mini td{padding:6px;border-bottom:1px solid var(--line)}
-.cand{display:flex;gap:10px;align-items:center;width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.03);cursor:pointer;color:var(--text);margin-bottom:8px;font-size:14px;text-align:left;flex-wrap:wrap}
-.cand:hover{border-color:var(--green)}
+table.mini td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.mini tbody tr:hover td{background:rgba(47,211,127,.06)}
+.cand{display:flex;gap:10px;align-items:center;width:100%;border:1px solid var(--line);border-radius:14px;padding:11px 13px;background:rgba(255,255,255,.03);cursor:pointer;color:var(--text);margin-bottom:8px;font-size:14px;text-align:left;flex-wrap:wrap;transition:.15s}
+.cand:hover{border-color:var(--green);background:rgba(47,211,127,.08);transform:translateY(-1px)}
 .cand .nm{font-weight:800}
-.orow{display:flex;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.orow{display:flex;gap:10px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.orow:last-child{border-bottom:0}
 .orow .nm{font-weight:800}
+.orow .t{margin-left:auto;font-family:'IBM Plex Mono';color:var(--amber);font-weight:600}
 .bstats{display:flex;gap:12px;flex-wrap:wrap}
-.bstats div{flex:1;min-width:90px;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;background:rgba(255,255,255,.03)}
-.bstats b{font-family:'Archivo';font-size:26px;display:block}
+.bstats div{flex:1;min-width:90px;border:1px solid var(--line2);border-radius:16px;padding:13px;text-align:center;
+ background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.bstats b{font-family:'Archivo';font-size:27px;display:block}
+.bstats div:nth-child(1) b{color:var(--blue)}
+.bstats div:nth-child(2) b{color:var(--amber)}
+.bstats div:nth-child(3) b{color:var(--red)}
 .bstats span{font-size:10px;color:var(--faint);letter-spacing:.12em}
 </style>
 </head>
@@ -82,7 +101,7 @@ table.mini td{padding:6px;border-bottom:1px solid var(--line)}
 <script src="config.js"></script>
 <script src="shared.js"></script>
 <script>
-let students={},live={},recs=[],booted=false,curSid=null,todayStart=0;
+let students={},live={},recs=[],counters={},normalLimit=0,booted=false,curSid=null,todayStart=0;
 const $=id=>document.getElementById(id);
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
 function nameBlock(st){
@@ -91,6 +110,10 @@ function nameBlock(st){
   const sz=isEn?(n.length>16?'sz-sm':n.length>10?'sz-md':''):(n.length>4?'sz-md':'');
   return `<div class="stname ${isEn?'en':''} ${sz}">${esc(n)}</div>`;
 }
+function purpCell(r){
+  const pm=purposeMeta(r.purpose);
+  return `${pm.icon} ${pm.zh}${r.reason?`<div class="dim" style="font-size:11px">📌 ${esc(r.reason)}</div>`:''}`;
+}
 requireAuth(function(){
   if(booted)return;booted=true;
   bindSignOut();
@@ -98,6 +121,8 @@ requireAuth(function(){
   db.ref('students').on('value',s=>{students=s.val()||{};renderOutside();renderBoard();if(curSid)renderDetail(curSid);});
   db.ref('live').on('value',s=>{live=s.val()||{};renderOutside();renderBoard();if(curSid)renderDetail(curSid);});
   db.ref('records').on('value',s=>{recs=[];s.forEach(c=>recs.push(c.val()));renderBoard();if(curSid)renderDetail(curSid);});
+  db.ref('counters').on('value',s=>{counters=s.val()||{};if(curSid)renderDetail(curSid);});
+  db.ref('config/normalLimit').on('value',s=>{normalLimit=parseInt(s.val(),10)||0;if(curSid)renderDetail(curSid);});
   $('q').addEventListener('input',()=>doSearch($('q').value));
 
   function doSearch(q){
@@ -115,8 +140,14 @@ requireAuth(function(){
     if(!list.length){$('detail').innerHTML='<span class="dim">Not found 查無此人</span>';curSid=null;return;}
     if(list.length===1){renderDetail(list[0].sid);return;}
     $('detail').innerHTML=`<div class="dim" style="margin-bottom:8px">${list.length} matches — tap 請選擇</div>`+
-      list.sort(byClsNo).slice(0,20).map(s=>`<button class="cand" data-sid="${esc(s.sid)}"><span class="nm">${esc(s.name||'—')}</span><span class="mono">${esc(s.sid)}</span><span class="dim">${esc(s.cls)} · No.${esc(s.no)}</span></button>`).join('');
+      list.sort(byClsNo).slice(0,20).map(s=>`<button class="cand" data-sid="${esc(s.sid)}"><span class="hchip" style="--hc:${houseMeta(s.house).color}">${esc(s.house||'?')}</span><span class="nm">${esc(s.name||'—')}</span><span class="mono">${esc(s.sid)}</span><span class="dim">${esc(s.cls)} · No.${esc(s.no)}</span></button>`).join('');
     $('detail').querySelectorAll('[data-sid]').forEach(b=>b.onclick=()=>renderDetail(b.dataset.sid));
+  }
+
+  function normalUsed(sid){
+    const d=fmtDate(Date.now());
+    const nt=counters[sid]&&counters[sid].normalToday;
+    return (nt&&nt.d===d)?(nt.n||0):0;
   }
 
   function renderDetail(sid){
@@ -127,20 +158,22 @@ requireAuth(function(){
     const my=recs.filter(r=>r.sid===sid).sort((a,b)=>(b.outAt||0)-(a.outAt||0));
     const today=my.filter(r=>r.outAt>=todayStart);
     const m=houseMeta(st.house);
+    const used=normalUsed(sid);
     $('detail').innerHTML=`
       <div class="dhead"><span class="hchip big" style="--hc:${m.color}">${esc(st.house||'?')}</span>
         <div>${nameBlock(st)}<div class="mono dim">${esc(st.sid)} · ${esc(st.cls)} · No.${esc(st.no)}</div></div></div>
       <div class="status ${l?'out':'in'}">${l?`OUTSIDE 外面 · ${fmtDur(Date.now()-l.outAt)}`:'INSIDE 在看台內'}</div>
-      ${l?`<div class="dim" style="font-size:12.5px;margin-top:6px">${purposeMeta(l.purpose).icon} ${purposeMeta(l.purpose).zh} · out ${fmtHM(l.outAt)}${l.slot?` · slot #${l.slot}`:''} · ${esc(l.gate||'')}</div>`:''}
+      ${l?`<div style="margin-top:6px"><span class="pill">${purposeMeta(l.purpose).icon} ${purposeMeta(l.purpose).zh}</span>${l.reason?`<span class="pill">📌 ${esc(l.reason)}</span>`:''}<span class="pill">out ${fmtHM(l.outAt)}</span>${l.slot?`<span class="pill">📱 #${l.slot}</span>`:''}<span class="pill">${esc(l.gate||'')}</span></div>`:''}
+      <div style="margin-top:6px"><span class="pill">🚻🍱 今日普通外出 <b>${used}${normalLimit>0?'/'+normalLimit:'/∞'}</b></span><span class="pill">♾️ 總外出 <b>${(counters[sid]&&counters[sid].outCount)||0}</b></span>${st.overlongFlag?'<span class="pill" style="color:var(--amber);border-color:rgba(255,178,36,.5)">⚠ 曾超時</span>':''}</div>
       <h4>TODAY 今日（${today.length}）</h4>
-      ${today.length?`<table class="mini"><tr><th>Out</th><th>In</th><th>Duration</th><th>Purpose</th><th>Flag</th></tr>${today.map(r=>`<tr><td>${fmtHM(r.outAt)}</td><td>${r.inAt?fmtHM(r.inAt):'—'}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${purposeMeta(r.purpose).icon}</td><td>${r.overlong?'⚠':''}</td></tr>`).join('')}</table>`:'<span class="dim">No trips today 今日無記錄</span>'}
+      ${today.length?`<table class="mini"><tr><th>Out</th><th>In</th><th>Duration</th><th>Purpose / Reason</th><th>Flag</th></tr>${today.map(r=>`<tr><td>${fmtHM(r.outAt)}</td><td>${r.inAt?fmtHM(r.inAt):'—'}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${purpCell(r)}</td><td>${r.overlong?'⚠':''}</td></tr>`).join('')}</table>`:'<span class="dim">No trips today 今日無記錄</span>'}
       <h4>RECENT 最近（${my.slice(0,8).length}）</h4>
-      ${my.slice(0,8).length?`<table class="mini"><tr><th>Date</th><th>Out</th><th>In</th><th>Duration</th><th>Flag</th></tr>${my.slice(0,8).map(r=>`<tr><td>${fmtDate(r.outAt)}</td><td>${fmtHM(r.outAt)}</td><td>${r.inAt?fmtHM(r.inAt):'—'}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${r.overlong?'⚠':''}</td></tr>`).join('')}</table>`:'<span class="dim">—</span>'}`;
+      ${my.slice(0,8).length?`<table class="mini"><tr><th>Date</th><th>Out</th><th>In</th><th>Duration</th><th>Purpose / Reason</th><th>Flag</th></tr>${my.slice(0,8).map(r=>`<tr><td>${fmtDate(r.outAt)}</td><td>${fmtHM(r.outAt)}</td><td>${r.inAt?fmtHM(r.inAt):'—'}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${purpCell(r)}</td><td>${r.overlong?'⚠':''}</td></tr>`).join('')}</table>`:'<span class="dim">—</span>'}`;
   }
 
   function renderOutside(){
     const arr=Object.keys(live).map(sid=>({sid,l:live[sid],st:students[sid]})).sort((a,b)=>(a.l.outAt||0)-(b.l.outAt||0));
-    $('outList').innerHTML=arr.length?arr.map(({sid,l,st})=>`<div class="orow"><span class="nm">${esc(st?st.name||sid:sid)}</span><span class="mono dim">${esc(st?`${st.cls} ${st.no}`:sid)}</span><span class="mono">${fmtDur(Date.now()-l.outAt)}</span><span class="dim">${purposeMeta(l.purpose).icon} ${esc(l.gate||'')}${l.slot?` #${l.slot}`:''}</span></div>`).join(''):'<span class="dim">Nobody outside 沒有人在外</span>';
+    $('outList').innerHTML=arr.length?arr.map(({sid,l,st})=>`<div class="orow"><span class="hchip" style="--hc:${houseMeta(st?st.house:'').color}">${esc(st?st.house||'?':'?')}</span><span class="nm">${esc(st?st.name||sid:sid)}</span><span class="dim">${esc(st?`${st.cls} ${st.no}`:sid)}</span><span class="dim">${purposeMeta(l.purpose).icon}${l.reason?` 📌`:''} ${esc(l.gate||'')}${l.slot?` #${l.slot}`:''}</span><span class="t">${fmtDur(Date.now()-l.outAt)}</span></div>`).join(''):'<span class="dim">Nobody outside 沒有人在外</span>';
   }
 
   function renderBoard(){
@@ -150,7 +183,7 @@ requireAuth(function(){
     $('board').innerHTML=`
       <div class="bstats"><div><b>${today.length}</b><span>EXITS 外出</span></div><div><b>${Object.keys(live).length}</b><span>OUT NOW 在外</span></div><div><b>${over.length}</b><span>OVERLONG 超時</span></div></div>
       <h4>RETURNED 已返回（${returned.length}）</h4>
-      ${returned.length?`<table class="mini"><tr><th>Name 姓名</th><th>Class</th><th>Out</th><th>In</th><th>Duration</th></tr>${returned.slice(0,30).map(r=>`<tr><td>${esc(r.name||r.sid)}</td><td>${esc(r.cls)}</td><td>${fmtHM(r.outAt)}</td><td>${fmtHM(r.inAt)}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td></tr>`).join('')}</table>`:'<span class="dim">—</span>'}`;
+      ${returned.length?`<table class="mini"><tr><th>Name 姓名</th><th>Class</th><th>Out</th><th>In</th><th>Duration</th><th>Purpose / Reason</th></tr>${returned.slice(0,30).map(r=>`<tr><td><b>${esc(r.name||r.sid)}</b></td><td>${esc(r.cls)}</td><td>${fmtHM(r.outAt)}</td><td>${fmtHM(r.inAt)}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${purpCell(r)}</td></tr>`).join('')}</table>`:'<span class="dim">—</span>'}`;
   }
 });
 </script>
