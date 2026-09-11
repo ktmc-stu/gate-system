@@ -4,91 +4,76 @@
 <link rel="apple-touch-icon" href="enquiry-logo.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="GATE">
+<meta name="apple-mobile-web-app-title" content="Gate Enquiry">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Enquiry · 查詢</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Enquiry · 老師查詢</title>
+<link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#081120;--panel:rgba(17,29,54,.86);--panel2:rgba(10,19,36,.9);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.28);
- --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;--shadow:0 20px 60px rgba(2,8,20,.55)}
-*{margin:0;padding:0;box-sizing:border-box}
+:root{--panel:rgba(17,29,54,.86);--panel2:rgba(10,19,36,.9);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.28);
+ --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
 html{color-scheme:dark}
 body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
- background:radial-gradient(1000px 500px at 90% -10%,rgba(47,211,127,.14),transparent 60%),radial-gradient(800px 500px at -6% 110%,rgba(75,139,255,.14),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
+ background:radial-gradient(1100px 520px at 92% -10%,rgba(75,139,255,.16),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
-.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--line);
- background:rgba(8,14,26,.72);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
-.brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:20px;letter-spacing:.06em}
-.logo{width:32px;height:32px;object-fit:contain;border-radius:9px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 22px;border-bottom:1px solid var(--line);background:rgba(8,14,26,.72);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:20px}
+.logo{width:36px;height:36px;object-fit:contain;border-radius:11px}
 .brand b{color:var(--green)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
-.clock{font-family:'IBM Plex Mono';font-weight:600;font-size:18px;letter-spacing:.06em}
-.btn{border:0;border-radius:12px;padding:12px 20px;font-weight:800;font-size:13.5px;cursor:pointer}
+.btn{border:0;border-radius:12px;padding:11px 18px;font-weight:800;font-size:13px;cursor:pointer}
 .btn.ghost{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim)}
-.btn.ghost:hover{color:var(--text);border-color:var(--line2)}
-main{max-width:960px;margin:0 auto;padding:34px 20px}
-.searchbar{display:flex;gap:10px;flex-wrap:wrap}
-#q{flex:1;min-width:240px;border:1.5px solid var(--line2);color:var(--text);border-radius:16px;padding:17px 18px 17px 50px;font-size:16px;
- font-family:'IBM Plex Mono',monospace;outline:none;transition:.2s;
- background:rgba(0,0,0,.3) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236d7ea6' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 18px center}
-#q:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(47,211,127,.14)}
-.chipbtn{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim);padding:0 22px;border-radius:16px;font-weight:700;cursor:pointer;font-size:14px;transition:.2s}
-.chipbtn.on,.chipbtn:hover{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.08)}
-.hint{font-size:12.5px;color:var(--faint);margin-top:12px}
-#res{margin-top:26px}
-.detail{border-radius:22px;border:1px solid var(--line);padding:28px;background:linear-gradient(180deg,var(--panel),var(--panel2));box-shadow:var(--shadow);animation:up .35s ease}
-@keyframes up{from{opacity:0;transform:translateY(12px)}}
-.grid2{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
-@media(max-width:640px){.grid2{grid-template-columns:1fr;justify-items:center}}
-.house{width:126px;aspect-ratio:1;border-radius:22px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
- box-shadow:0 14px 40px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.35)}
-.house::before{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 90% at 20% 0%,rgba(255,255,255,.35),transparent 45%)}
-.house .hl{font-family:'Archivo';font-weight:900;font-size:64px;line-height:1}
-.house .hs{font:700 10px 'IBM Plex Mono';letter-spacing:.35em;opacity:.9;margin-top:5px}
-.row{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);padding:9px 2px;font-size:14.5px}
-.row .k{color:var(--dim)}.row .v{font-weight:700}
-.status{margin-top:20px;border-radius:16px;padding:17px 20px;font-weight:800;font-size:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.status small{font-weight:600;font-size:.72em;opacity:.9}
-.status.out{border:1.5px solid var(--amber);background:rgba(255,178,36,.12);color:var(--amber)}
-.status.in{border:1.5px solid var(--green);background:rgba(47,211,127,.12);color:var(--green)}
-.mini{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.pill{font:600 12px 'IBM Plex Mono';border:1px solid var(--line);border-radius:99px;padding:9px 15px;color:var(--dim);background:rgba(255,255,255,.03)}
-.pill b{color:var(--text)}
-.flagline{margin-top:16px;border:1.5px solid var(--amber);color:var(--amber);background:rgba(255,178,36,.12);border-radius:14px;padding:11px 16px;font-weight:800;font-size:14px}
-h3.sec{font-family:'Archivo';font-weight:800;font-size:15px;margin:24px 0 12px;letter-spacing:.04em}
-h3.sec span{color:var(--faint);font-weight:500;font-size:.8em;margin-left:8px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{font:600 10px 'IBM Plex Mono';letter-spacing:.14em;color:var(--faint);text-align:left;padding:9px;border-bottom:1px solid var(--line2);text-transform:uppercase}
-td{padding:8px 9px;border-bottom:1px solid var(--line)}
-.list{display:grid;gap:10px}
-.litem{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:16px;padding:14px 18px;cursor:pointer;transition:.2s;
- background:linear-gradient(180deg,var(--panel),var(--panel2));animation:up .3s ease both}
-.litem:hover{border-color:rgba(47,211,127,.5);transform:translateX(4px)}
-.hbar{width:6px;align-self:stretch;border-radius:4px}
-.dot{width:9px;height:9px;border-radius:50%;margin-left:auto;flex:none}
-.dot.in{background:var(--green)}
-.dot.out{background:var(--amber);box-shadow:0 0 10px var(--amber);animation:led 1.6s infinite}
-@keyframes led{50%{opacity:.4}}
-.back{background:none;border:0;color:var(--dim);font-weight:700;cursor:pointer;font-size:14px;margin-bottom:16px;transition:.15s}
-.back:hover{color:var(--green)}
-.empty{text-align:center;color:var(--faint);padding:60px 0;font-size:15px}
+.searchbar{max-width:1220px;margin:20px auto 0;padding:0 20px;position:relative}
+.searchbar .ic{position:absolute;left:38px;top:50%;transform:translateY(-50%);color:var(--faint)}
+#q{width:100%;border:1.5px solid var(--line2);color:var(--text);border-radius:16px;padding:17px 18px 17px 50px;font-size:16px;background:rgba(0,0,0,.3);outline:none}
+#q:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(47,211,127,.12)}
+.wrap{max-width:1220px;margin:18px auto 60px;padding:0 20px;display:grid;grid-template-columns:1.2fr .9fr;gap:18px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}}
+.card{border-radius:20px;border:1px solid var(--line);padding:22px;background:linear-gradient(180deg,var(--panel),var(--panel2));margin-bottom:18px}
+.card h3{font-family:'Archivo';font-size:16px;font-weight:800;margin-bottom:12px}
+.card h3 span{color:var(--faint);font-weight:500;font-size:.78em;margin-left:8px}
+.stname{font-family:'Noto Sans TC',sans-serif;font-weight:900;line-height:1.15;font-size:clamp(24px,4vw,36px);overflow-wrap:anywhere}
+.stname.en{font-family:'Archivo',sans-serif}
+.stname.sz-md{font-size:clamp(19px,3vw,27px)}
+.stname.sz-sm{font-size:clamp(15px,2.3vw,20px);font-weight:800}
+.dhead{display:flex;gap:14px;align-items:center;margin-bottom:10px}
+.hchip{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:8px;font-weight:900;font-family:'Archivo';background:var(--hc,#7e8aa2);color:#fff}
+.hchip.big{width:56px;height:56px;font-size:26px;border-radius:14px}
+.status{display:inline-block;border-radius:99px;padding:8px 16px;font-weight:800;font-size:14px;margin-top:6px}
+.status.out{background:rgba(255,178,36,.15);color:var(--amber);border:1px solid rgba(255,178,36,.5)}
+.status.in{background:rgba(47,211,127,.12);color:var(--green);border:1px solid rgba(47,211,127,.45)}
+h4{font-family:'Archivo';font-size:13px;letter-spacing:.1em;color:var(--dim);margin:16px 0 6px}
+table.mini{width:100%;border-collapse:collapse;font-size:12.5px}
+table.mini th{font:600 10px 'IBM Plex Mono';letter-spacing:.12em;color:var(--faint);text-align:left;padding:6px;border-bottom:1px solid var(--line2)}
+table.mini td{padding:6px;border-bottom:1px solid var(--line)}
+.cand{display:flex;gap:10px;align-items:center;width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.03);cursor:pointer;color:var(--text);margin-bottom:8px;font-size:14px;text-align:left;flex-wrap:wrap}
+.cand:hover{border-color:var(--green)}
+.cand .nm{font-weight:800}
+.orow{display:flex;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+.orow .nm{font-weight:800}
+.bstats{display:flex;gap:12px;flex-wrap:wrap}
+.bstats div{flex:1;min-width:90px;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;background:rgba(255,255,255,.03)}
+.bstats b{font-family:'Archivo';font-size:26px;display:block}
+.bstats span{font-size:10px;color:var(--faint);letter-spacing:.12em}
 </style>
 </head>
 <body>
 <header class="top">
-  <div class="brand"><img class="logo" src="logo.png" onerror="this.remove()" alt="">G<b>A</b>TE ENQUIRY<span>老師查詢</span></div>
-  <time class="clock" id="clock">--:--:--</time>
+  <div class="brand"><img class="logo" src="logo.png" onerror="this.style.display='none'" alt="">EN<b>Q</b>UIRY<span>老師查詢</span></div>
   <button class="btn ghost" data-signout>Sign Out 登出</button>
 </header>
-<main>
-  <div class="searchbar">
-    <input id="q" placeholder="Student ID / Card / Class — e.g. 25001 · A123456 · 3B 12" autocomplete="off">
-    <button class="chipbtn" id="btnOut">Currently Outside 正在外面</button>
-    <button class="chipbtn" id="btnBoard">Trip Board 外出總覽</button>
+<div class="searchbar">
+  <span class="ic">🔍</span>
+  <input id="q" placeholder="Student ID / Class+No / Class / Name 學生編號／班別+學號／班別／姓名">
+</div>
+<main class="wrap">
+  <section class="card"><h3>Student Detail<span>學生詳情</span></h3><div id="detail" class="dim">Search a student 請搜尋學生</div></section>
+  <div>
+    <section class="card"><h3>Currently Outside<span>正在外面</span></h3><div id="outList"></div></section>
+    <section class="card"><h3>Today's Trip Board<span>今日外出總覽</span></h3><div id="board"></div></section>
   </div>
-  <div class="hint">Enter Student ID, card number, or class (e.g. “3B” or “3B 12”). 輸入學生編號、卡號或班別查詢。</div>
-  <div id="res"><div class="empty">Search to begin 請輸入查詢</div></div>
 </main>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -97,130 +82,75 @@ td{padding:8px 9px;border-bottom:1px solid var(--line)}
 <script src="config.js"></script>
 <script src="shared.js"></script>
 <script>
-let students={},live={},counters={},scenario='track',booted=false,tickDetail=null;
+let students={},live={},recs=[],booted=false,curSid=null,todayStart=0;
 const $=id=>document.getElementById(id);
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
-
-requireAuth(function init(){
+function nameBlock(st){
+  const n=String((st&&st.name)||'').trim(); if(!n)return '';
+  const isEn=/^[A-Za-z][A-Za-z\s.\-']*$/.test(n);
+  const sz=isEn?(n.length>16?'sz-sm':n.length>10?'sz-md':''):(n.length>4?'sz-md':'');
+  return `<div class="stname ${isEn?'en':''} ${sz}">${esc(n)}</div>`;
+}
+requireAuth(function(){
   if(booted)return;booted=true;
   bindSignOut();
-  setInterval(()=>{$('clock').textContent=fmtClock(Date.now());tickElapsed();},1000);
-  db.ref('students').on('value',s=>{students=s.val()||{};});
-  db.ref('live').on('value',s=>{live=s.val()||{};tickElapsed();});
-  db.ref('counters').on('value',s=>{counters=s.val()||{};});
-  watchScenario(v=>{scenario=v;});
+  const d=new Date();d.setHours(0,0,0,0);todayStart=d.getTime();
+  db.ref('students').on('value',s=>{students=s.val()||{};renderOutside();renderBoard();if(curSid)renderDetail(curSid);});
+  db.ref('live').on('value',s=>{live=s.val()||{};renderOutside();renderBoard();if(curSid)renderDetail(curSid);});
+  db.ref('records').on('value',s=>{recs=[];s.forEach(c=>recs.push(c.val()));renderBoard();if(curSid)renderDetail(curSid);});
+  $('q').addEventListener('input',()=>doSearch($('q').value));
 
-  let deb;
-  $('q').addEventListener('input',()=>{clearTimeout(deb);deb=setTimeout(()=>doSearch($('q').value),220);});
-  $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(deb);doSearch($('q').value);}});
-  $('btnOut').onclick=()=>{$('q').value='';$('btnOut').classList.add('on');$('btnBoard').classList.remove('on');renderOutList();};
-  $('btnBoard').onclick=()=>{$('q').value='';$('btnBoard').classList.add('on');$('btnOut').classList.remove('on');renderBoard();};
-
-  function doSearch(raw){
-    $('btnOut').classList.remove('on');$('btnBoard').classList.remove('on');
-    const q=raw.trim().toUpperCase();
-    if(!q){$('res').innerHTML='<div class="empty">Search to begin 請輸入查詢</div>';return;}
+  function doSearch(q){
+    q=String(q||'').trim().toUpperCase();
+    if(!q){$('detail').innerHTML='<span class="dim">Search a student 請搜尋學生</span>';curSid=null;return;}
     let list=[];
     if(students[q])list=[students[q]];
-    else{
-      const bySid=Object.values(students).filter(s=>String(s.sid||'').toUpperCase()===q);
-      if(bySid.length)list=bySid;
-      else{
-        const tk=q.split(/\s+/);
-        list=Object.values(students).filter(s=>{
-          if(tk.length>=2&&String(s.cls||'').toUpperCase()===tk[0]&&String(s.no||'').toUpperCase()===tk[1])return true;
-          return [s.sid,s.card,s.cls].some(v=>String(v||'').toUpperCase().includes(q))||String(s.no||'')===q;
-        }).sort(byClsNo).slice(0,60);
-      }
+    else list=Object.values(students).filter(s=>String(s.sid||'').toUpperCase()===q);
+    if(!list.length){
+      const m=q.match(/^([0-9]+[A-Z]+)[\s\-]?([0-9]+)$/);
+      if(m)list=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===m[1]&&String(parseInt(s.no,10)||s.no)===String(parseInt(m[2],10)));
     }
-    if(!list.length){$('res').innerHTML=`<div class="empty">No match 未找到 “${esc(q)}”</div>`;return;}
-    if(list.length===1)renderDetail(list[0]);else renderList(list);
+    if(!list.length)list=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===q);
+    if(!list.length)list=Object.values(students).filter(s=>String(s.name||'').toUpperCase().includes(q)||String(s.sid||'').includes(q));
+    if(!list.length){$('detail').innerHTML='<span class="dim">Not found 查無此人</span>';curSid=null;return;}
+    if(list.length===1){renderDetail(list[0].sid);return;}
+    $('detail').innerHTML=`<div class="dim" style="margin-bottom:8px">${list.length} matches — tap 請選擇</div>`+
+      list.sort(byClsNo).slice(0,20).map(s=>`<button class="cand" data-sid="${esc(s.sid)}"><span class="nm">${esc(s.name||'—')}</span><span class="mono">${esc(s.sid)}</span><span class="dim">${esc(s.cls)} · No.${esc(s.no)}</span></button>`).join('');
+    $('detail').querySelectorAll('[data-sid]').forEach(b=>b.onclick=()=>renderDetail(b.dataset.sid));
   }
-  function renderList(list){
-    tickDetail=null;
-    $('res').innerHTML=`<div class="list">`+list.map(s=>{
-      const m=houseMeta(s.house),out=!!live[s.card];
-      return `<div class="litem" data-card="${esc(s.card)}">
-        <span class="hbar" style="background:${m.color}"></span>
-        <span class="mono dim" style="font-size:12px">${esc(s.house||'?')}</span>
-        <b class="mono">${esc(s.sid)}</b>
-        <span class="dim" style="font-size:13px">${esc(s.cls)} · No.${esc(s.no)}</span>
-        ${out?`<span class="dim mono" style="font-size:12px" data-el="${esc(s.card)}">${fmtHM(live[s.card].outAt)}</span><span class="dot out"></span>`:'<span class="dot in"></span>'}
-      </div>`;}).join('')+`</div>`;
-    document.querySelectorAll('.litem').forEach(el=>el.onclick=()=>{
-      const st=students[el.dataset.card]; if(st)renderDetail(st);
-    });
+
+  function renderDetail(sid){
+    curSid=sid;
+    const st=students[sid];
+    if(!st){$('detail').innerHTML='<span class="dim">Not found 查無此人</span>';return;}
+    const l=live[sid];
+    const my=recs.filter(r=>r.sid===sid).sort((a,b)=>(b.outAt||0)-(a.outAt||0));
+    const today=my.filter(r=>r.outAt>=todayStart);
+    const m=houseMeta(st.house);
+    $('detail').innerHTML=`
+      <div class="dhead"><span class="hchip big" style="--hc:${m.color}">${esc(st.house||'?')}</span>
+        <div>${nameBlock(st)}<div class="mono dim">${esc(st.sid)} · ${esc(st.cls)} · No.${esc(st.no)}</div></div></div>
+      <div class="status ${l?'out':'in'}">${l?`OUTSIDE 外面 · ${fmtDur(Date.now()-l.outAt)}`:'INSIDE 在看台內'}</div>
+      ${l?`<div class="dim" style="font-size:12.5px;margin-top:6px">${purposeMeta(l.purpose).icon} ${purposeMeta(l.purpose).zh} · out ${fmtHM(l.outAt)}${l.slot?` · slot #${l.slot}`:''} · ${esc(l.gate||'')}</div>`:''}
+      <h4>TODAY 今日（${today.length}）</h4>
+      ${today.length?`<table class="mini"><tr><th>Out</th><th>In</th><th>Duration</th><th>Purpose</th><th>Flag</th></tr>${today.map(r=>`<tr><td>${fmtHM(r.outAt)}</td><td>${r.inAt?fmtHM(r.inAt):'—'}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${purposeMeta(r.purpose).icon}</td><td>${r.overlong?'⚠':''}</td></tr>`).join('')}</table>`:'<span class="dim">No trips today 今日無記錄</span>'}
+      <h4>RECENT 最近（${my.slice(0,8).length}）</h4>
+      ${my.slice(0,8).length?`<table class="mini"><tr><th>Date</th><th>Out</th><th>In</th><th>Duration</th><th>Flag</th></tr>${my.slice(0,8).map(r=>`<tr><td>${fmtDate(r.outAt)}</td><td>${fmtHM(r.outAt)}</td><td>${r.inAt?fmtHM(r.inAt):'—'}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td>${r.overlong?'⚠':''}</td></tr>`).join('')}</table>`:'<span class="dim">—</span>'}`;
   }
-  function renderOutList(){
-    const cards=Object.keys(live);
-    if(!cards.length){$('res').innerHTML='<div class="empty">Nobody is outside 沒有學生正在外面</div>';return;}
-    const list=cards.map(c=>students[c]).filter(Boolean).sort(byClsNo);
-    renderList(list);
+
+  function renderOutside(){
+    const arr=Object.keys(live).map(sid=>({sid,l:live[sid],st:students[sid]})).sort((a,b)=>(a.l.outAt||0)-(b.l.outAt||0));
+    $('outList').innerHTML=arr.length?arr.map(({sid,l,st})=>`<div class="orow"><span class="nm">${esc(st?st.name||sid:sid)}</span><span class="mono dim">${esc(st?`${st.cls} ${st.no}`:sid)}</span><span class="mono">${fmtDur(Date.now()-l.outAt)}</span><span class="dim">${purposeMeta(l.purpose).icon} ${esc(l.gate||'')}${l.slot?` #${l.slot}`:''}</span></div>`).join(''):'<span class="dim">Nobody outside 沒有人在外</span>';
   }
-  function tickElapsed(){document.querySelectorAll('[data-el]').forEach(el=>{
-    const l=live[el.dataset.el];if(l)el.textContent=fmtHM(l.outAt)+' · '+fmtDur(Date.now()-l.outAt);});}
-  function renderDetail(st){
-    tickDetail=st.card;
-    const sc=scenarioMeta(scenario);
-    const m=houseMeta(st.house),l=live[st.card];
-    const cnt=counters[st.card]?.outCount||0;
-    $('res').innerHTML=`<div class="detail">
-      <button class="back" id="backBtn">← Back 返回</button>
-      <div class="grid2">
-        <div class="house" style="background:${m.color};color:${m.text}"><span class="hl">${esc(st.house||'?')}</span><span class="hs">HOUSE 社</span></div>
-        <div>
-          <div class="row"><span class="k">Student ID 學生編號</span><span class="v mono">${esc(st.sid||'—')}</span></div>
-          <div class="row"><span class="k">Class 班別</span><span class="v">${esc(st.cls||'—')}</span></div>
-          <div class="row"><span class="k">Class Number 學號</span><span class="v">${esc(st.no||'—')}</span></div>
-          <div class="row"><span class="k">Card 卡號</span><span class="v mono" style="font-size:13px">${esc(st.card)}</span></div>
-        </div>
-      </div>
-      ${l?`<div class="status out">● ${sc.out.en} ${sc.out.zh} <small>since 離開 ${fmtClock(l.outAt)} · <span data-el="${esc(st.card)}">${fmtDur(Date.now()-l.outAt)}</span> · ${esc(l.gate||'')}</small></div>`
-         :`<div class="status in">● ${sc.in.en} ${sc.in.zh}</div>`}
-      <div class="mini">
-        <span class="pill">TOTAL TRIPS OUT 外出次數 <b>${cnt}</b></span>
-        ${l&&l.purpose?`<span class="pill">${purposeMeta(l.purpose).icon} ${purposeMeta(l.purpose).en} ${purposeMeta(l.purpose).zh}</span>`:''}
-        ${l&&l.slot?`<span class="pill">📱 SLOT 格 #${l.slot} · ${esc(l.slotGate||'')}</span>`:''}
-      </div>
-      ${st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:''}
-      <h3 class="sec">Recent Records<span>最近記錄</span></h3>
-      <div id="hist"><div class="dim" style="font-size:13px">Loading…</div></div>
-    </div>`;
-    $('backBtn').onclick=()=>doSearch($('q').value||'');
-    db.ref('records').orderByChild('card').equalTo(st.card).limitToLast(12).once('value').then(s=>{
-      const rows=[];s.forEach(c=>rows.push(c.val()));rows.sort((a,b)=>b.outAt-a.outAt);
-      $('hist').innerHTML=rows.length?`<table><tr><th>Date</th><th>目的</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>格位</th><th>Flag</th></tr>`+
-        rows.map(r=>`<tr><td class="mono">${fmtDate(r.outAt)}</td><td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td><td class="mono">${fmtHM(r.outAt)}</td>
-          <td class="mono">${r.inAt?fmtHM(r.inAt):'<span class="dim">未返</span>'}</td>
-          <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td class="mono">${r.slot?'#'+r.slot:'—'}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
-        :`<div class="dim" style="font-size:13px">No records 暫無記錄</div>`;
-    });
-  }
+
   function renderBoard(){
-    tickDetail=null;
-    const d=new Date();d.setHours(0,0,0,0);
-    db.ref('records').orderByChild('outAt').startAt(d.getTime()).once('value').then(s=>{
-      const recs=[];s.forEach(c=>recs.push(c.val()));recs.sort((a,b)=>b.outAt-a.outAt);
-      const counts={};recs.forEach(r=>counts[r.card]=(counts[r.card]||0)+1);
-      const outCards=Object.keys(live);
-      const returned=recs.filter(r=>r.inAt).slice(0,80);
-      const over=recs.filter(r=>r.overlong).length;
-      $('res').innerHTML=`
-        <div class="mini" style="margin:0 0 18px">
-          <span class="pill">TODAY TRIPS 今日外出 <b>${recs.length}</b></span>
-          <span class="pill">OUT NOW 正在外面 <b>${outCards.length}</b></span>
-          <span class="pill">OVERLONG 超時 <b>${over}</b></span>
-        </div>
-        <h3 class="sec">Currently Outside<span>正在外面</span></h3>
-        ${outCards.length?`<table><tr><th>Student</th><th>Class</th><th>House</th><th>Purpose 目的</th><th>Out 離開</th><th>Elapsed 已外出</th><th>Slot 格</th><th>Device 裝置</th><th>Trips 次數</th></tr>`+
-          outCards.map(c=>{const st=students[c],l=live[c];if(!st)return '';const pm=purposeMeta(l.purpose);
-            return `<tr><td class="mono">${esc(st.sid)}</td><td>${esc(st.cls)} · ${esc(st.no)}</td><td>${esc(st.house||'')}</td><td>${pm.icon} ${pm.zh}</td><td class="mono">${fmtHM(l.outAt)}</td><td class="mono" data-el="${esc(c)}">${fmtDur(Date.now()-l.outAt)}</td><td class="mono">${l.slot?'#'+l.slot:'—'}</td><td>${esc(l.gate||'')}</td><td>×${counts[c]||1}</td></tr>`;}).join('')+`</table>`
-         :`<div class="empty">Nobody is outside 沒有學生正在外面</div>`}
-        <h3 class="sec">Returned Today<span>今日已返回（最近 80 筆）</span></h3>
-        ${returned.length?`<table><tr><th>Student</th><th>Class</th><th>Purpose 目的</th><th>Out 離開</th><th>In 返回</th><th>Duration 時長</th><th>Slot 格</th><th>Device 裝置</th><th></th></tr>`+
-          returned.map(r=>`<tr><td class="mono">${esc(r.sid)}</td><td>${esc(r.cls)} · ${esc(r.no)}</td><td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td><td class="mono">${fmtHM(r.outAt)}</td><td class="mono">${fmtHM(r.inAt)}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td><td class="mono">${r.slot?'#'+r.slot:'—'}</td><td>${esc(r.gateIn||'')}</td><td>${r.overlong?'<span style="color:var(--amber)">⚠</span>':''}</td></tr>`).join('')+`</table>`
-         :`<div class="empty">No returns yet 暫無返回記錄</div>`}`;
-    });
+    const today=recs.filter(r=>r.outAt>=todayStart);
+    const returned=today.filter(r=>r.inAt).sort((a,b)=>(b.inAt||0)-(a.inAt||0));
+    const over=today.filter(r=>r.overlong);
+    $('board').innerHTML=`
+      <div class="bstats"><div><b>${today.length}</b><span>EXITS 外出</span></div><div><b>${Object.keys(live).length}</b><span>OUT NOW 在外</span></div><div><b>${over.length}</b><span>OVERLONG 超時</span></div></div>
+      <h4>RETURNED 已返回（${returned.length}）</h4>
+      ${returned.length?`<table class="mini"><tr><th>Name 姓名</th><th>Class</th><th>Out</th><th>In</th><th>Duration</th></tr>${returned.slice(0,30).map(r=>`<tr><td>${esc(r.name||r.sid)}</td><td>${esc(r.cls)}</td><td>${fmtHM(r.outAt)}</td><td>${fmtHM(r.inAt)}</td><td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td></tr>`).join('')}</table>`:'<span class="dim">—</span>'}`;
   }
 });
 </script>
