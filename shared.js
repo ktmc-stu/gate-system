@@ -27,6 +27,38 @@ const SCENARIOS={
 function scenarioMeta(s){return SCENARIOS[s]||SCENARIOS.track;}
 function watchThreshold(cb){db.ref('config/overlongMin').on('value',s=>cb(parseInt(s.val(),10)||15));}
 function watchScenario(cb){db.ref('config/scenario').on('value',s=>cb(s.val()||'track'));}
+/* ---- 音效（WebAudio 嗶聲）---- */
+let AC=null;
+function ac(){
+  if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  if(AC&&AC.state==='suspended'){ AC.resume(); }
+  return AC;
+}
+function tone(f,d,type,g){
+  if(window.MUTED)return;
+  const c=ac(); if(!c)return;
+  d=d||0.12; type=type||'sine'; g=(g===undefined)?0.18:g;
+  const o=c.createOscillator(), v=c.createGain();
+  o.type=type; o.frequency.value=f;
+  v.gain.setValueAtTime(0.0001,c.currentTime);
+  v.gain.exponentialRampToValueAtTime(g,c.currentTime+0.012);
+  v.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+d);
+  o.connect(v); v.connect(c.destination);
+  o.start(); o.stop(c.currentTime+d+0.03);
+}
+function sound(kind){
+  if(window.MUTED)return;
+  ac();
+  if(kind==='out'){ tone(660,.1); setTimeout(()=>tone(880,.14),110); }
+  else if(kind==='in'){ tone(880,.1); setTimeout(()=>tone(660,.14),110); }
+  else if(kind==='warn'){ tone(520,.16,'square',.14); setTimeout(()=>tone(520,.16,'square',.14),200); }
+  else if(kind==='err'){ tone(300,.2,'sawtooth',.16); setTimeout(()=>tone(220,.26,'sawtooth',.16),180); }
+  else tone(700,.08);
+}
+/* 瀏覽器要求用戶手勢先至准開聲：任何點擊／按鍵自動解鎖 AudioContext */
+function unlockAudio(){ const c=ac(); if(c&&c.state==='suspended')c.resume(); }
+document.addEventListener('pointerdown',unlockAudio,{passive:true});
+document.addEventListener('keydown',unlockAudio,{passive:true});
 
 /* ---- 登出：事件委託 ---- */
 function bindSignOut(){}
