@@ -156,7 +156,7 @@ function showLock(){
     <h2>Staff Access <span>職員登入</span></h2>
     <p class="lk-hint">Enter the shared staff password using the on-screen keypad.<br>請使用螢幕鍵盤輸入職員共用密碼。</p>
     <p class="lk-err" id="lockErr"></p>
-    <button class="lk-btn" id="lockGo">CONFIRM 確定</button>
+    <button class="lk-btn" id="lockGo">UNLOCK 進入</button>
   </div>`;
   document.body.appendChild(el);
   el.querySelector('#lockGo').onclick=()=>{
