@@ -1,49 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="apple-touch-icon" href="ios-logo.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="GATE">
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Gate Pass System 進出記錄系統</title>
 <link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;900&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
+:root{--panel:rgba(17,29,54,.88);--panel2:rgba(10,19,36,.92);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.3);
+ --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;
+ --shadow:0 24px 70px rgba(2,8,20,.6);--grad:linear-gradient(135deg,#ffc95e,#ff8a3d)}
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
-body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:30px;
- font-family:'IBM Plex Mono',monospace;color:#f2f6ff;
- background:radial-gradient(1100px 550px at 85% -10%,rgba(75,139,255,.18),transparent 60%),radial-gradient(900px 520px at -5% 110%,rgba(255,178,36,.14),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
-.logo{width:88px;height:88px;object-fit:contain;border-radius:22px;display:block}
-h1{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(28px,6vw,52px);letter-spacing:.04em;text-align:center;line-height:1.15}
-h1 b{color:#ffb224}
-h1 span{display:block;font-size:.3em;color:#6d7ea6;font-weight:400;letter-spacing:.32em;margin-top:12px}
-.board{width:min(680px,94vw);border:1px solid rgba(148,180,255,.16);border-radius:24px;overflow:hidden;
- background:linear-gradient(180deg,rgba(17,29,54,.88),rgba(10,19,36,.92));box-shadow:0 30px 80px rgba(2,8,20,.55);backdrop-filter:blur(14px)}
-.row{display:flex;align-items:center;gap:18px;padding:22px 28px;border-bottom:1px solid rgba(148,180,255,.1);text-decoration:none;color:inherit;transition:.2s}
+html{color-scheme:dark}
+body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:30px;
+ background:radial-gradient(1300px 640px at 85% -12%,rgba(75,139,255,.2),transparent 62%),radial-gradient(1000px 620px at -10% 112%,rgba(255,178,36,.16),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+ background-image:linear-gradient(rgba(160,190,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(160,190,255,.05) 1px,transparent 1px);
+ background-size:44px 44px;mask-image:radial-gradient(ellipse 90% 70% at 50% 35%,#000 20%,transparent 75%)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}
+.lockbtn{position:fixed;top:14px;right:14px;z-index:50;background:rgba(255,255,255,.05);border:1px solid var(--line2);color:var(--dim);
+ border-radius:99px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;transition:.2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.lockbtn:hover{color:var(--amber);border-color:var(--amber)}
+.logo{width:clamp(64px,12vh,96px);object-fit:contain;border-radius:20px;filter:drop-shadow(0 8px 24px rgba(255,138,61,.4))}
+h1{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(28px,6vw,52px);letter-spacing:.04em;text-align:center;line-height:1.12;
+ background:linear-gradient(180deg,#ffffff,#ffd58a 78%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 30px rgba(255,178,36,.25))}
+h1 span{display:block;font-size:.3em;color:var(--faint);font-weight:500;letter-spacing:.32em;margin-top:12px;-webkit-text-fill-color:var(--faint)}
+.board{position:relative;width:min(680px,94vw);border:1px solid var(--line2);border-radius:24px;overflow:hidden;
+ background:linear-gradient(180deg,var(--panel),var(--panel2));box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(14px)}
+.board::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.75}
+.row{display:flex;align-items:center;gap:18px;padding:22px 28px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit;transition:.2s;position:relative}
 .row:last-child{border-bottom:0}
-.row:hover{background:rgba(255,178,36,.06)}
-.tag{width:12px;height:12px;border-radius:4px;box-shadow:0 0 12px currentColor}
-.row .name{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:22px;letter-spacing:.06em;flex:1}
-.row .name span{display:block;font:400 12px 'Noto Sans TC';color:#6d7ea6;letter-spacing:.22em;margin-top:3px}
-.row .go{color:#ffb224;font-size:20px;transition:.2s}
-.row:hover .go{transform:translateX(6px)}
-p.note{font-size:12px;color:#6d7ea6;text-align:center;max-width:620px;line-height:1.8}
-.lockbtn{position:fixed;top:14px;right:14px;z-index:50;background:rgba(255,255,255,.05);border:1px solid rgba(148,180,255,.25);color:#a5b4d4;border-radius:99px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer}
-.lockbtn:hover{color:#ffb224;border-color:#ffb224}
+.row:hover{background:rgba(255,178,36,.07)}
+.row:hover .go{transform:translateX(6px);color:var(--amber)}
+.row:active{transform:scale(.995)}
+.tag{width:12px;height:12px;border-radius:4px;flex:none;box-shadow:0 0 14px currentColor;background:currentColor}
+.row .name{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:21px;letter-spacing:.06em;flex:1}
+.row .name span{display:block;font:400 12px 'Noto Sans TC';color:var(--faint);letter-spacing:.22em;margin-top:3px}
+.row .go{color:var(--dim);font-size:20px;transition:.2s}
+p.note{font-size:12px;color:var(--faint);text-align:center;max-width:620px;line-height:1.8}
+p.note b{color:var(--dim)}
 </style>
 </head>
 <body>
 <button class="lockbtn" data-signout>🔒 Lock 鎖定</button>
 <img class="logo" src="logo.png" onerror="this.style.display='none'" alt="">
-<h1>G<b>A</b>TE PASS SYSTEM<span>陸運會・水運會 封閉區進出記錄</span></h1>
+<h1>GATE PASS SYSTEM<span>陸運會・水運會 封閉區進出記錄</span></h1>
 <div class="board">
-  <a class="row" href="gate.html"><span class="tag" style="color:#ffb224;background:#ffb224"></span><span class="name">GATE<span>閘口 · 掃 QR／手動輸入（免密碼）</span></span><span class="go">≫</span></a>
-  <a class="row" href="admin.html"><span class="tag" style="color:#4b8bff;background:#4b8bff"></span><span class="name">ADMIN<span>管理 · 場景／匯入匯出</span></span><span class="go">≫</span></a>
-  <a class="row" href="enquiry.html"><span class="tag" style="color:#2fd37f;background:#2fd37f"></span><span class="name">ENQUIRY<span>老師查詢</span></span><span class="go">≫</span></a>
+  <a class="row" href="gate.html"><span class="tag" style="color:var(--amber)"></span><span class="name">GATE<span>閘口 · 掃 QR／手動輸入（開啟免密碼）</span></span><span class="go">≫</span></a>
+  <a class="row" href="admin.html"><span class="tag" style="color:var(--blue)"></span><span class="name">ADMIN<span>管理 · 名單／記錄／匯出／設定</span></span><span class="go">≫</span></a>
+  <a class="row" href="enquiry.html"><span class="tag" style="color:var(--green)"></span><span class="name">ENQUIRY<span>老師查詢 · 即時狀態／外出總覽</span></span><span class="go">≫</span></a>
+  <a class="row" href="manual.html"><span class="tag" style="color:var(--red)"></span><span class="name">MANUAL<span>使用手冊 · 流程／信號／故障排除</span></span><span class="go">≫</span></a>
 </div>
-<p class="note">This page requires the shared staff password 本頁需輸入共用密碼 · Gate 閘口頁免密碼 · Data stored in Firebase Realtime Database</p>
+<p class="note">This page requires the shared staff password 本頁需輸入共用密碼 · Gate 閘口頁開啟免密碼 · Data stored in Firebase Realtime Database · <b>Lock</b> 右上角可即時鎖定</p>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
