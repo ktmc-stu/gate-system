@@ -529,6 +529,18 @@ function initGate(){
     else if(kbBuf.length<24)kbBuf+=k;
     kbRender();
   });
+   // 實體鍵盤支援（設定鎖／閘口名稱螢幕鍵盤）
+  document.addEventListener('keydown',e=>{
+    if(!$('setOv').classList.contains('open'))return;
+    if(e.key==='Enter'){e.preventDefault();$('setGo').click();return;}
+    if(e.key==='Escape'){e.preventDefault();$('setOv').classList.remove('open');pwCallback=null;kbDone=null;return;}
+    if(e.key==='Backspace'){kbBuf=kbBuf.slice(0,-1);kbRender();e.preventDefault();return;}
+    if(e.key.length===1&&kbBuf.length<24){
+      let ch=e.key;
+      if(/[a-zA-Z]/.test(ch)&&kbMode==='L'){ch=kbUpper?ch.toUpperCase():ch.toLowerCase();}
+      kbBuf+=ch;kbRender();e.preventDefault();
+    }
+  });
   function kbRender(){const v=$('setVal');if(v)v.textContent=kbBuf?(kbMask?'•'.repeat(kbBuf.length):kbBuf):'\u00a0';}
   function openKeypad(o){
     kbBuf=o.initial||'';kbMask=!!o.mask;kbDone=o.onDone||null;
