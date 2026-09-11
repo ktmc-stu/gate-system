@@ -10,7 +10,7 @@ function fmtClock(t){return new Date(t).toTimeString().slice(0,8);}
 function fmtHM(t){const d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
 function fmtDate(t){const d=new Date(t);return d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');}
 function fmtDur(ms){const s=Math.floor(ms/1000);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;return (h?h+'h ':'')+m+'m '+ss+'s';}
-const HOUSE_COLORS={K:'#4b8bff',T:'#2fd37f',M:'#ff8a3d',C:'#a78bfa'};
+const HOUSE_COLORS={K:'#ff5d55',T:'#4b8bff',M:'#2fd37f',C:'#ffb224'};
 function houseMeta(h){return {color:HOUSE_COLORS[String(h||'').toUpperCase()]||'#7e8aa2'};}
 const PURPOSES={
   toilet:{en:'Toilet',zh:'廁所',icon:'🚻'},
