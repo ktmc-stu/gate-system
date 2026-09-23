@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Roll Call · 點名</title>
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--panel:rgba(17,29,54,.88);--panel2:rgba(10,19,36,.92);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.3);
+ --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;
+ --shadow:0 24px 70px rgba(2,8,20,.6);--grad:linear-gradient(135deg,#ffc95e,#ff8a3d)}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
+html{color-scheme:dark}
+body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
+ background:radial-gradient(1300px 640px at 92% -12%,rgba(75,139,255,.2),transparent 62%),radial-gradient(1000px 620px at -8% 112%,rgba(255,178,36,.15),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}
+.mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--line2);
+ background:rgba(8,14,26,.82);backdrop-filter:blur(18px);position:sticky;top:0;z-index:20;box-shadow:0 10px 34px rgba(0,0,0,.35)}
+.brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:20px}
+.logo{width:36px;height:36px;object-fit:contain;border-radius:11px;filter:drop-shadow(0 4px 12px rgba(255,138,61,.35))}
+.brand b{color:var(--amber)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
+.btn{border:0;border-radius:12px;padding:12px 20px;font-weight:800;font-size:13.5px;cursor:pointer;transition:.2s}
+.btn.primary{background:var(--grad);color:#2a1800;box-shadow:0 10px 26px rgba(255,150,40,.3)}
+.btn.green{background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f}
+.btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--dim)}
+.btn.danger{background:none;border:1px solid rgba(255,93,85,.5);color:var(--red)}
+.btn:active{transform:scale(.98)}
+main{max-width:1100px;margin:0 auto;padding:26px 20px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.tile{position:relative;border-radius:18px;border:1px solid var(--line2);padding:16px 18px;background:linear-gradient(180deg,var(--panel),var(--panel2));box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.tile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--green)}
+.tile.l::before{background:var(--amber)}.tile.a::before{background:var(--red)}.tile.t::before{background:var(--blue)}
+.tnum{font-family:'Archivo';font-weight:900;font-size:34px;display:block}
+.tile.l .tnum{color:var(--amber)}.tile.a .tnum{color:var(--red)}.tile.t .tnum{color:var(--blue)}
+.tlab{font-size:10.5px;color:var(--faint);letter-spacing:.14em;font-weight:600}
+.card{position:relative;border-radius:22px;border:1px solid var(--line2);padding:22px;margin-bottom:18px;background:linear-gradient(180deg,var(--panel),var(--panel2));box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.6}
+.card h3{font-family:'Archivo';font-size:16px;font-weight:800;display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.card h3::before{content:'';width:8px;height:8px;border-radius:3px;background:var(--amber);box-shadow:0 0 10px rgba(255,178,36,.6)}
+.card h3 span{color:var(--faint);font-weight:500;font-size:.78em}
+.field{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.field label{font-size:13px;color:var(--dim);font-weight:600}
+.field input{background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;outline:none}
+.field input:focus{border-color:var(--amber)}
+.field input[type=date]::-webkit-calendar-picker-indicator,.field input[type=time]::-webkit-calendar-picker-indicator{filter:invert(.8);cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{border:1px solid var(--line2);background:rgba(255,255,255,.04);color:var(--dim);border-radius:99px;padding:9px 16px;font-size:13.5px;font-weight:800;cursor:pointer;transition:.15s;font-family:'Archivo'}
+.chip.on{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.12)}
+.chip.sm{padding:7px 13px;font-size:12.5px}
+.rrow{display:flex;gap:12px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.rrow:last-child{border-bottom:0}
+.rrow .nm{font-weight:800;font-size:15px}
+.rrow .meta{font-size:12px;color:var(--faint)}
+.rrow .st{margin-left:auto;font-weight:800;font-size:13px}
+.st.ok{color:var(--green)}.st.late{color:var(--amber)}.st.abs{color:var(--red)}
+.hchip{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:8px;font-weight:900;font-family:'Archivo';background:var(--hc,#7e8aa2);color:#fff;flex:none}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font:600 10.5px 'IBM Plex Mono';letter-spacing:.12em;color:var(--faint);text-align:left;padding:9px;border-bottom:1px solid var(--line2);text-transform:uppercase}
+td{padding:8px 9px;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:rgba(255,178,36,.05)}
+#toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:rgba(23,37,66,.96);border:1px solid var(--amber);color:var(--text);padding:13px 24px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99}
+#toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img class="logo" src="logo.png" onerror="this.style.display='none'" alt="">R<b>O</b>LL CALL<span>點名系統</span></div>
+  <button class="btn ghost" data-signout>Sign Out 登出</button>
+</header>
+<main>
+  <div class="stats">
+    <div class="tile t"><span class="tnum" id="stTotal">0</span><span class="tlab">EXPECTED 應到</span></div>
+    <div class="tile"><span class="tnum" id="stPresent">0</span><span class="tlab">PRESENT 出席</span></div>
+    <div class="tile l"><span class="tnum" id="stLate">0</span><span class="tlab">LATE 遲到</span></div>
+    <div class="tile a"><span class="tnum" id="stAbsent">0</span><span class="tlab">ABSENT 缺席</span></div>
+  </div>
+
+  <section class="card">
+    <h3>Session Settings<span>場次設定</span></h3>
+    <div class="field">
+      <label>Session 場次 <input type="text" id="rName" placeholder="e.g. Morning Assembly 早會" style="min-width:220px"></label>
+      <label>Date 日期 <input type="date" id="rDate"></label>
+      <label>Late after 遲到線 <input type="time" id="rCut"></label>
+      <button class="btn primary" id="btnSaveRoll">Save 儲存</button>
+      <button class="btn danger" id="btnResetRoll">Reset 清空本次</button>
+    </div>
+    <label style="font-size:13px;color:var(--dim);font-weight:600">Participating Classes 參與班別（㩒選取）</label>
+    <div class="chips" id="clsChips"></div>
+  </section>
+
+  <section class="card">
+    <h3>Roll Call<span>點名（選班 → 㩒學生到達）</span></h3>
+    <div class="chips" id="clsTabs"></div>
+    <div class="field"><button class="btn green" id="btnMarkAll">Mark All Present 全班到達</button><span class="dim" id="progLine"></span></div>
+    <div id="rollList"></div>
+  </section>
+
+  <section class="card">
+    <h3>Records & Export<span>記錄與匯出</span></h3>
+    <div class="field"><button class="btn primary" id="btnExpRoll">Export Excel 一鍵匯出</button></div>
+    <div style="overflow-x:auto"><table id="rollTable"></table></div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+let students={},roll={},booted=false,activeCls=null;
+let cfgRoll={name:'',date:fmtDate(Date.now()),cutoff:'08:30',classes:[]};
+const $=id=>document.getElementById(id);
+const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400);}
+function who(){return (auth.currentUser&&auth.currentUser.email)||'';}
+function recs(){return roll[cfgRoll.date]||{};}
+function allClasses(){return [...new Set(Object.values(students).map(s=>String(s.cls||'').toUpperCase()).filter(Boolean))].sort();}
+function partStudents(){return Object.values(students).filter(s=>cfgRoll.classes.includes(String(s.cls||'').toUpperCase()));}
+function studentsIn(c){return Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===c).sort(byClsNo);}
+function cutoffMs(){const p=String(cfgRoll.cutoff||'08:30').split(':');const d=new Date(cfgRoll.date+'T00:00:00');d.setHours(+p[0]||0,+p[1]||0,0,0);return d.getTime();}
+function isLate(at){return at>=cutoffMs();}
+
+requireAuth(function(){
+  if(booted)return;booted=true;
+  bindSignOut();
+  db.ref('students').on('value',s=>{students=s.val()||{};renderAll();});
+  db.ref('roll').on('value',s=>{roll=s.val()||{};renderAll();});
+  db.ref('config/roll').on('value',s=>{
+    const v=s.val()||{};
+    cfgRoll={name:v.name||'',date:v.date||fmtDate(Date.now()),cutoff:v.cutoff||'08:30',classes:v.classes||[]};
+    if(document.activeElement!==$('rName'))$('rName').value=cfgRoll.name;
+    if(document.activeElement!==$('rDate'))$('rDate').value=cfgRoll.date;
+    if(document.activeElement!==$('rCut'))$('rCut').value=cfgRoll.cutoff;
+    renderAll();
+  });
+  bindKeypadInput($('rName'),{title:'Session<span>場次名稱</span>'});
+
+  $('btnSaveRoll').onclick=()=>{
+    db.ref('config/roll').update({name:$('rName').value.trim(),date:$('rDate').value||fmtDate(Date.now()),cutoff:$('rCut').value||'08:30'})
+      .then(()=>toast('Saved 已儲存'));
+  };
+  $('btnResetRoll').onclick=()=>{
+    if(confirm(`Clear ALL roll records for ${cfgRoll.date}?\n清空當日全部點名記錄？`))
+      db.ref('roll/'+cfgRoll.date).remove().then(()=>toast('Cleared 已清空'));
+  };
+  $('btnMarkAll').onclick=()=>{
+    if(!activeCls)return;
+    const now=Date.now(),upd={},r=recs();
+    studentsIn(activeCls).forEach(s=>{ if(!r[s.sid]) upd[`roll/${cfgRoll.date}/${s.sid}`]={sid:s.sid,at:now,by:who()}; });
+    if(Object.keys(upd).length)db.ref().update(upd).then(()=>toast('Class marked 全班已點'));
+    else toast('All already marked 已全部點名');
+  };
+  $('btnExpRoll').onclick=exportRoll;
+
+  function toggleClass(c){
+    const set=new Set(cfgRoll.classes);
+    set.has(c)?set.delete(c):set.add(c);
+    db.ref('config/roll/classes').set([...set]);
+  }
+  function mark(sid){ db.ref(`roll/${cfgRoll.date}/${sid}`).set({sid,at:Date.now(),by:who()}); }
+  function unmark(sid){ db.ref(`roll/${cfgRoll.date}/${sid}`).remove(); }
+
+  function exportRoll(){
+    const cut=cutoffMs();
+    const rows=partStudents().sort(byClsNo).map(s=>{
+      const r=recs()[s.sid];
+      const status=!r?'Absent 缺席':(isLate(r.at)?'Late 遲到':'Present 出席');
+      return {'Session 場次':cfgRoll.name||'Roll Call','Date 日期':cfgRoll.date,'Class 班別':s.cls,'Student ID 學生編號':s.sid,
+        'Name 姓名':s.name||'','No. 學號':s.no,'House 社':s.house,'Status 狀態':status,
+        'Arrival 到達時間':r?fmtClock(r.at):'','Late Cutoff 遲到線':cfgRoll.cutoff};
+    });
+    const ws=XLSX.utils.json_to_sheet(rows);
+    ws['!cols']=[{wch:20},{wch:11},{wch:8},{wch:12},{wch:16},{wch:7},{wch:6},{wch:12},{wch:12},{wch:10}];
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Roll');
+    XLSX.writeFile(wb,`roll_${cfgRoll.date}_${(cfgRoll.name||'roll').replace(/\s+/g,'_')}.xlsx`);
+    toast('Exported 已匯出');
+  }
+
+  function renderAll(){
+    // settings chips
+    $('clsChips').innerHTML=allClasses().map(c=>`<button class="chip ${cfgRoll.classes.includes(c)?'on':''}" data-cls="${esc(c)}">${esc(c)}</button>`).join('')||'<span class="dim">No classes 無班別（先匯入學生）</span>';
+    $('clsChips').querySelectorAll('[data-cls]').forEach(b=>b.onclick=()=>toggleClass(b.dataset.cls));
+    // tabs
+    if(!cfgRoll.classes.includes(activeCls))activeCls=cfgRoll.classes[0]||null;
+    $('clsTabs').innerHTML=cfgRoll.classes.map(c=>`<button class="chip sm ${c===activeCls?'on':''}" data-tab="${esc(c)}">${esc(c)}</button>`).join('')||'<span class="dim">Select participating classes above 請先選參與班別</span>';
+    $('clsTabs').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{activeCls=b.dataset.tab;renderAll();});
+    // stats
+    const ps=partStudents(),r=recs();
+    const present=ps.filter(s=>r[s.sid]);
+    const late=present.filter(s=>isLate(r[s.sid].at));
+    $('stTotal').textContent=ps.length;
+    $('stPresent').textContent=present.length;
+    $('stLate').textContent=late.length;
+    $('stAbsent').textContent=ps.length-present.length;
+    // roll list
+    if(!activeCls){$('rollList').innerHTML='<span class="dim">No class selected 未選班別</span>';}
+    else{
+      const list=studentsIn(activeCls);
+      const pc=list.filter(s=>r[s.sid]).length;
+      $('progLine').textContent=`${activeCls}: ${pc}/${list.length} present 已點`;
+      $('rollList').innerHTML=list.map(s=>{
+        const rc=r[s.sid];const m=houseMeta(s.house);
+        const st=!rc?`<span class="st abs">ABSENT 缺席</span>`:(isLate(rc.at)?`<span class="st late">LATE 遲到 ${fmtHM(rc.at)}</span>`:`<span class="st ok">✓ ${fmtHM(rc.at)}</span>`);
+        const btn=rc?`<button class="btn ghost" data-un="${esc(s.sid)}">Undo 取消</button>`:`<button class="btn green" data-mk="${esc(s.sid)}">Mark 到達</button>`;
+        return `<div class="rrow"><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span><span class="nm">${esc(s.name||'—')}</span><span class="meta mono">${esc(s.sid)} · ${esc(s.cls)} ${esc(s.no)}</span>${st}${btn}</div>`;
+      }).join('')||'<span class="dim">No students 無學生</span>';
+      $('rollList').querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>mark(b.dataset.mk));
+      $('rollList').querySelectorAll('[data-un]').forEach(b=>b.onclick=()=>unmark(b.dataset.un));
+    }
+    // table
+    $('rollTable').innerHTML='<tr><th>Class</th><th>Student ID</th><th>Name 姓名</th><th>House</th><th>Status 狀態</th><th>Arrival 到達</th></tr>'+
+      partStudents().sort(byClsNo).map(s=>{
+        const rc=r[s.sid];const m=houseMeta(s.house);
+        const st=!rc?'<span class="st abs">Absent 缺席</span>':(isLate(rc.at)?`<span class="st late">Late 遲到</span>`:`<span class="st ok">Present 出席</span>`);
+        return `<tr><td>${esc(s.cls)}</td><td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name||'—')}</b></td><td><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span></td><td>${st}</td><td class="mono">${rc?fmtClock(rc.at):'—'}</td></tr>`;
+      }).join('')||'<tr><td colspan="6" class="dim">No participating students 無參與學生</td></tr>';
+  }
+});
+</script>
+</body>
+</html>
