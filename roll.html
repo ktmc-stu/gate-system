@@ -62,6 +62,17 @@ table{width:100%;border-collapse:collapse;font-size:13px}
 th{font:600 10.5px 'IBM Plex Mono';letter-spacing:.12em;color:var(--faint);text-align:left;padding:9px;border-bottom:1px solid var(--line2);text-transform:uppercase}
 td{padding:8px 9px;border-bottom:1px solid var(--line)}
 tbody tr:hover td{background:rgba(255,178,36,.05)}
+#reader{width:min(320px,80vw);margin:6px auto 0;border-radius:20px;overflow:hidden;border:1px solid var(--line2);background:#000;box-shadow:0 16px 44px rgba(0,0,0,.5)}
+#reader video{width:100%!important;height:auto!important;object-fit:cover}
+#reader__dashboard,#reader__filescan_input{display:none!important}
+.camerr{min-height:1.2em;font-size:12.5px;color:var(--red);text-align:center;margin-top:6px}
+.rres{border-radius:14px;margin-top:10px;text-align:center;transition:.2s}
+.rres b{display:block;font-family:'Archivo';font-size:20px;font-weight:900}
+.rres span{display:block;font-size:15px;font-weight:800;margin-top:2px}
+.rres i{display:block;font-style:normal;font-size:12.5px;color:var(--dim);margin-top:2px}
+.rres.ok{background:rgba(47,211,127,.14);border:1px solid var(--green);color:var(--green);padding:12px}
+.rres.late{background:rgba(255,178,36,.14);border:1px solid var(--amber);color:var(--amber);padding:12px}
+.rres.err{background:rgba(255,93,85,.14);border:1px solid var(--red);color:var(--red);padding:12px}
 #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:rgba(23,37,66,.96);border:1px solid var(--amber);color:var(--text);padding:13px 24px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99}
 #toast.show{opacity:1;transform:translateX(-50%)}
 </style>
@@ -72,6 +83,16 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
   <button class="btn ghost" data-signout>Sign Out 登出</button>
 </header>
 <main>
+  <section class="card" id="scanCard">
+    <h3>Scan to Roll<span>掃描學生證 QR 點名</span></h3>
+    <div id="reader"></div>
+    <div class="camerr" id="camErr"></div>
+    <div class="field">
+      <button class="btn ghost" id="btnManualRoll">Manual 手動輸入</button>
+      <button class="btn ghost" id="btnCamRoll">📷 鏡頭開關</button>
+    </div>
+    <div id="rollResult" class="rres"></div>
+  </section>
   <div class="stats">
     <div class="tile t"><span class="tnum" id="stTotal">0</span><span class="tlab">EXPECTED 應到</span></div>
     <div class="tile"><span class="tnum" id="stPresent">0</span><span class="tlab">PRESENT 出席</span></div>
@@ -113,18 +134,23 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="config.js"></script>
 <script src="shared.js"></script>
 <script>
 let students={},roll={},booted=false,activeCls=null;
-let cfgRoll={name:'',date:fmtDate(Date.now()),cutoff:'08:30',classes:[]};
+let cfgRoll={name:'',date:fmtDate(Date.now()),cutoff:'08:30',classes:[],houses:[]};
 const $=id=>document.getElementById(id);
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400);}
 function who(){return (auth.currentUser&&auth.currentUser.email)||'';}
 function recs(){return roll[cfgRoll.date]||{};}
 function allClasses(){return [...new Set(Object.values(students).map(s=>String(s.cls||'').toUpperCase()).filter(Boolean))].sort();}
-function partStudents(){return Object.values(students).filter(s=>cfgRoll.classes.includes(String(s.cls||'').toUpperCase()));}
+function isPart(st){
+  const c=String(st.cls||'').toUpperCase(), h=String(st.house||'').toUpperCase();
+  return (cfgRoll.classes.length===0||cfgRoll.classes.includes(c)) && (cfgRoll.houses.length===0||cfgRoll.houses.includes(h));
+}
+function partStudents(){ return Object.values(students).filter(isPart); }
 function studentsIn(c){return Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===c).sort(byClsNo);}
 function cutoffMs(){const p=String(cfgRoll.cutoff||'08:30').split(':');const d=new Date(cfgRoll.date+'T00:00:00');d.setHours(+p[0]||0,+p[1]||0,0,0);return d.getTime();}
 function isLate(at){return at>=cutoffMs();}
@@ -136,13 +162,60 @@ requireAuth(function(){
   db.ref('roll').on('value',s=>{roll=s.val()||{};renderAll();});
   db.ref('config/roll').on('value',s=>{
     const v=s.val()||{};
-    cfgRoll={name:v.name||'',date:v.date||fmtDate(Date.now()),cutoff:v.cutoff||'08:30',classes:v.classes||[]};
+    cfgRoll={name:v.name||'',date:v.date||fmtDate(Date.now()),cutoff:v.cutoff||'08:30',classes:v.classes||[],houses:v.houses||[]};
     if(document.activeElement!==$('rName'))$('rName').value=cfgRoll.name;
     if(document.activeElement!==$('rDate'))$('rDate').value=cfgRoll.date;
     if(document.activeElement!==$('rCut'))$('rCut').value=cfgRoll.cutoff;
     renderAll();
   });
   bindKeypadInput($('rName'),{title:'Session<span>場次名稱</span>'});
+  /* ---- QR 掃描點名 ---- */
+  let qr=null,camOn=true,lastCode='',lastAt=0;
+  function findStudent(q){
+    q=String(q||'').trim().toUpperCase();if(!q)return null;
+    if(students[q])return students[q];
+    for(const k in students){if(String(students[k].sid||'').toUpperCase()===q)return students[k];}
+    return null;
+  }
+  function showResult(kind,title,sub,who2){
+    const el=$('rollResult');
+    el.className='rres '+kind;
+    el.innerHTML=`<b>${esc(title)}</b><span>${esc(who2||'')}</span><i>${esc(sub)}</i>`;
+    clearTimeout(el._t);el._t=setTimeout(()=>{el.innerHTML='';el.className='rres';},3000);
+  }
+  function handleRollScan(raw){
+    raw=String(raw||'').trim();if(!raw)return;
+    const now=Date.now();
+    if(raw===lastCode&&now-lastAt<2500)return;   // 同一碼 2.5 秒內唔重複
+    lastCode=raw;lastAt=now;
+    const st=findStudent(raw);
+    if(!st){showResult('err','NOT FOUND','查無此學生',raw);sound('err');return;}
+    if(!isPart(st)){showResult('err','NOT IN SESSION','此學生唔喺參與班別／社別範圍',`${st.name||''} ${st.cls||''}`);sound('warn');return;}
+    const r=recs()[st.sid];
+    if(r){showResult('late','ALREADY MARKED 已點名',`${fmtHM(r.at)} · ${isLate(r.at)?'LATE 遲到':'ON TIME 準時'}`,st.name||st.sid);sound('warn');return;}
+    db.ref(`roll/${cfgRoll.date}/${st.sid}`).set({sid:st.sid,at:now,by:who()}).then(()=>{
+      const late=isLate(now);
+      showResult(late?'late':'ok',late?'LATE 遲到':'PRESENT 出席',`${fmtHM(now)} · ${st.cls} ${st.no}`,st.name||st.sid);
+      sound(late?'warn':'in');
+    });
+  }
+  function stopScan(){if(!qr)return;const q=qr;qr=null;if(q.isScanning){q.stop().then(()=>{try{q.clear()}catch(e){}}).catch(()=>{});}else{try{q.clear()}catch(e){}}}
+  function startScan(){
+    if(!camOn)return;
+    if(!window.Html5Qrcode){$('camErr').textContent='Scanner library not loaded';return;}
+    stopScan();
+    const opts={fps:10,qrbox:{width:220,height:220}};
+    const onQr=t=>handleRollScan(t);
+    try{
+      qr=new Html5Qrcode('reader');
+      qr.start({facingMode:'environment'},opts,onQr,()=>{})
+        .catch(()=>qr.start({facingMode:'user'},opts,onQr,()=>{}))
+        .catch(()=>{$('camErr').textContent='Camera unavailable 相機不可用';});
+    }catch(e){$('camErr').textContent='Camera error';}
+  }
+  $('btnCamRoll').onclick=()=>{camOn=!camOn;if(camOn)startScan();else stopScan();$('btnCamRoll').textContent=camOn?'📷 鏡頭開關':'📴 鏡頭已關';};
+  $('btnManualRoll').onclick=()=>{KeyPad.open({title:'Student ID<span>學生編號</span>',onDone:v=>handleRollScan(v)});};
+  startScan();
 
   $('btnSaveRoll').onclick=()=>{
     db.ref('config/roll').update({name:$('rName').value.trim(),date:$('rDate').value||fmtDate(Date.now()),cutoff:$('rCut').value||'08:30'})
@@ -155,7 +228,7 @@ requireAuth(function(){
   $('btnMarkAll').onclick=()=>{
     if(!activeCls)return;
     const now=Date.now(),upd={},r=recs();
-    studentsIn(activeCls).forEach(s=>{ if(!r[s.sid]) upd[`roll/${cfgRoll.date}/${s.sid}`]={sid:s.sid,at:now,by:who()}; });
+    partStudents().filter(s=>String(s.cls||'').toUpperCase()===activeCls).forEach(s=>{ if(!r[s.sid]) upd[`roll/${cfgRoll.date}/${s.sid}`]={sid:s.sid,at:now,by:who()}; });
     if(Object.keys(upd).length)db.ref().update(upd).then(()=>toast('Class marked 全班已點'));
     else toast('All already marked 已全部點名');
   };
@@ -165,6 +238,11 @@ requireAuth(function(){
     const set=new Set(cfgRoll.classes);
     set.has(c)?set.delete(c):set.add(c);
     db.ref('config/roll/classes').set([...set]);
+  }
+  function toggleHouse(h){
+    const set=new Set(cfgRoll.houses);
+    set.has(h)?set.delete(h):set.add(h);
+    db.ref('config/roll/houses').set([...set]);
   }
   function mark(sid){ db.ref(`roll/${cfgRoll.date}/${sid}`).set({sid,at:Date.now(),by:who()}); }
   function unmark(sid){ db.ref(`roll/${cfgRoll.date}/${sid}`).remove(); }
@@ -186,12 +264,15 @@ requireAuth(function(){
   }
 
   function renderAll(){
-    // settings chips
+    // settings chips (classes + houses)
     $('clsChips').innerHTML=allClasses().map(c=>`<button class="chip ${cfgRoll.classes.includes(c)?'on':''}" data-cls="${esc(c)}">${esc(c)}</button>`).join('')||'<span class="dim">No classes 無班別（先匯入學生）</span>';
     $('clsChips').querySelectorAll('[data-cls]').forEach(b=>b.onclick=()=>toggleClass(b.dataset.cls));
-    // tabs
-    if(!cfgRoll.classes.includes(activeCls))activeCls=cfgRoll.classes[0]||null;
-    $('clsTabs').innerHTML=cfgRoll.classes.map(c=>`<button class="chip sm ${c===activeCls?'on':''}" data-tab="${esc(c)}">${esc(c)}</button>`).join('')||'<span class="dim">Select participating classes above 請先選參與班別</span>';
+    $('houseChips').innerHTML=['K','T','M','C'].map(h=>`<button class="chip ${cfgRoll.houses.includes(h)?'on':''}" data-hs="${h}">${h}</button>`).join('');
+    $('houseChips').querySelectorAll('[data-hs]').forEach(b=>b.onclick=()=>toggleHouse(b.dataset.hs));
+    // tabs = classes that have participating students
+    const tabClasses=[...new Set(partStudents().map(s=>String(s.cls||'').toUpperCase()))].sort();
+    if(!tabClasses.includes(activeCls))activeCls=tabClasses[0]||null;
+    $('clsTabs').innerHTML=tabClasses.map(c=>`<button class="chip sm ${c===activeCls?'on':''}" data-tab="${esc(c)}">${esc(c)}</button>`).join('')||'<span class="dim">No participating students 無參與學生（請選班別／社別）</span>';
     $('clsTabs').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{activeCls=b.dataset.tab;renderAll();});
     // stats
     const ps=partStudents(),r=recs();
@@ -204,7 +285,7 @@ requireAuth(function(){
     // roll list
     if(!activeCls){$('rollList').innerHTML='<span class="dim">No class selected 未選班別</span>';}
     else{
-      const list=studentsIn(activeCls);
+      const list=partStudents().filter(s=>String(s.cls||'').toUpperCase()===activeCls).sort(byClsNo);
       const pc=list.filter(s=>r[s.sid]).length;
       $('progLine').textContent=`${activeCls}: ${pc}/${list.length} present 已點`;
       $('rollList').innerHTML=list.map(s=>{
