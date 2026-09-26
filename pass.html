@@ -148,57 +148,57 @@ requireAuth(function(){
       ctx.clearRect(0,0,W,H);
       ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);
       const st=current;
-      // logo（貼左上、高固定、闊按比例）
-      const LX=0,LY=0,LH=205;
-      let LW=195;
+      const F=(w,s,fam)=>`${w} ${s}px ${fam}`;
+      function fit(text,x,y,maxW,base,min,fam){
+        let t=String(text||'');let size=base;
+        ctx.font=F(400,size,fam);
+        while(ctx.measureText(t).width>maxW&&size>min){size-=2;ctx.font=F(400,size,fam);}
+        if(ctx.measureText(t).width>maxW){while(t.length>1&&ctx.measureText(t+'…').width>maxW)t=t.slice(0,-1);t+='…';}
+        ctx.fillText(t,x,y);
+      }
+      // logo
+      const LX=0,LY=0,LH=205;let LW=195;
       if(logoImg&&logoImg.complete&&logoImg.naturalWidth>0){
         LW=Math.min(480,Math.max(40,Math.round(LH*logoImg.naturalWidth/logoImg.naturalHeight)));
         ctx.drawImage(logoImg,LX,LY,LW,LH);
       }else{
         ctx.fillStyle='#000';ctx.fillRect(LX,LY,LW,LH);ctx.fillStyle='#fff';ctx.textAlign='center';
-        ctx.font='400 64px "Archivo",sans-serif';ctx.fillText('LO',LX+LW/2,LY+88);ctx.fillText('GO',LX+LW/2,LY+162);ctx.textAlign='left';
+        ctx.font=F(400,64,'"Archivo",sans-serif');ctx.fillText('LO',LX+LW/2,LY+88);ctx.fillText('GO',LX+LW/2,LY+162);ctx.textAlign='left';
       }
-      // titles（大、唔粗）
+      // layout
+      const HS=375,HX=0,HY=H-HS;
+      const sidLine=80,QS=520,QX=W-QS,QY=H-sidLine-QS;
+      const infoX=HX+HS+45, infoMaxW=QX-infoX-30;
+      const titleX=LX+LW+30, titleMaxW=W-titleX-20;
       ctx.fillStyle='#111';
-      ctx.font='400 84px "Noto Sans TC",sans-serif';
-      ctx.fillText(`${$('evZh').value||''}臨時進出憑證`, LX+LW+30, LY+95);
-      ctx.font='400 54px "IBM Plex Sans","Noto Sans TC",sans-serif';
-      ctx.fillText(`${$('evEn').value||''} Temporary Entry/Exit Pass`, LX+LW+30, LY+185);
-      // issuing + valid（貼左、大）
-      const now=new Date(), pad=n=>String(n).padStart(2,'0');
+      // titles
+      fit(`${$('evZh').value||''}臨時進出憑證`, titleX, LY+95, titleMaxW, 84, 40, '"Noto Sans TC",sans-serif');
+      fit(`${$('evEn').value||''} Temporary Entry/Exit Pass`, titleX, LY+185, titleMaxW, 54, 28, '"IBM Plex Sans","Noto Sans TC",sans-serif');
+      // issuing + valid
+      const now=new Date(),pad=n=>String(n).padStart(2,'0');
       const issue=`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-      ctx.font='400 84px "IBM Plex Sans",sans-serif';
-      ctx.fillText(`Issuing Time: ${issue}`, 0, LY+LH+110);
-      ctx.fillText(`Valid Until: ${$('vUntil').value||''}`, 0, LY+LH+250);
+      fit(`Issuing Time: ${issue}`, 0, LY+LH+110, W-20, 84, 40, '"IBM Plex Sans",sans-serif');
+      fit(`Valid Until: ${$('vUntil').value||''}`, 0, LY+LH+250, QX-20, 84, 40, '"IBM Plex Sans",sans-serif');
       if(!st){
-        ctx.fillStyle='#999';ctx.font='400 60px "Noto Sans TC",sans-serif';
-        ctx.fillText('請先輸入班別+學號 / 學生編號 / 卡號', 0, 560);
+        ctx.fillStyle='#999';fit('請先輸入班別+學號 / 學生編號 / 卡號',0,560,W-20,60,30,'"Noto Sans TC",sans-serif');
         return;
       }
-      // house box（貼左下、大字母）
-      const HS=375,HX=0,HY=H-HS;
+      // house
       ctx.fillStyle='#000';ctx.fillRect(HX,HY,HS,HS);
-      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='400 300px "Archivo",sans-serif';
+      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font=F(400,300,'"Archivo",sans-serif');
       ctx.fillText(String(st.house||'?'),HX+HS/2,HY+HS/2+105);ctx.textAlign='left';
-      // info（大、唔粗）
+      // info（自動縮字防越界）
       ctx.fillStyle='#111';
-      ctx.font='400 84px "IBM Plex Sans",sans-serif';
-      ctx.fillText(`${st.cls||''} ${st.no||''}`, HX+HS+45, HY+80);
-      ctx.font='400 110px "Noto Sans TC",sans-serif';
-      ctx.fillText(st.name||'—', HX+HS+45, HY+220);
-      ctx.font='400 74px "Archivo","IBM Plex Sans",sans-serif';
-      ctx.fillText(String(st.ename||'').toUpperCase(), HX+HS+45, HY+340);
-      // QR（重點：大、貼右、下方編號）
-      const sidLine=80, QS=520, QX=W-QS, QY=H-sidLine-QS;
+      fit(`${st.cls||''} ${st.no||''}`, infoX, HY+80, infoMaxW, 84, 40, '"IBM Plex Sans",sans-serif');
+      fit(st.name||'—', infoX, HY+220, infoMaxW, 110, 44, '"Noto Sans TC",sans-serif');
+      fit(String(st.ename||'').toUpperCase(), infoX, HY+340, infoMaxW, 74, 30, '"Archivo","IBM Plex Sans",sans-serif');
+      // QR
       if(typeof qrcode==='function'){ drawQR(ctx,String(st.sid),QX,QY,QS,2); }
-      else{ ctx.fillStyle='#000';ctx.fillRect(QX,QS?QY:QY,QS,QS); }
-      ctx.fillStyle='#111';ctx.textAlign='center';ctx.font='400 60px "IBM Plex Sans",sans-serif';
+      else{ ctx.fillStyle='#000';ctx.fillRect(QX,QY,QS,QS); }
+      ctx.fillStyle='#111';ctx.textAlign='center';ctx.font=F(400,60,'"IBM Plex Sans",sans-serif');
       ctx.fillText(String(st.sid), QX+QS/2, H-20);
       ctx.textAlign='left';
-    }catch(e){
-      console.error('pass redraw error:',e);
-      toast('Render error: '+(e&&e.message||e));
-    }
+    }catch(e){ console.error('pass redraw error:',e); toast('Render error: '+(e&&e.message||e)); }
   }
 
   function download(){
