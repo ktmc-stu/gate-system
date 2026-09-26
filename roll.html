@@ -254,23 +254,27 @@ requireAuth(function(){
 
   /* ---- QR 掃描點名 ---- */
   let qr=null,camOn=true,lastCode='',lastAt=0;
+  const nz=v=>String(v??'').trim().toUpperCase().replace(/^0+/,'');
   function findStudent(q){
-    q=String(q||'').trim().toUpperCase();if(!q)return null;
+    q=String(q||'').trim().toUpperCase(); if(!q)return null;
     if(students[q])return students[q];
-    for(const k in students){if(String(students[k].sid||'').toUpperCase()===q)return students[k];}
+    const Q=nz(q);
+    for(const k in students){ const s=students[k];
+      if(nz(s.sid)===Q||nz(s.card)===Q) return s; }
     return null;
   }
   function findStudents(q){
     q=String(q||'').trim().toUpperCase().replace(/\s+/g,' ');if(!q)return[];
     if(students[q])return[students[q]];
-    let out=Object.values(students).filter(s=>String(s.sid||'').toUpperCase()===q);
+    const Q=nz(q);
+    let out=Object.values(students).filter(s=>nz(s.sid)===Q||nz(s.card)===Q);
     if(out.length)return out;
     const m=q.match(/^([0-9]+[A-Z]+)[\s\-]?([0-9]+)$/);
     if(m){out=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===m[1]&&String(parseInt(s.no,10)||s.no)===String(parseInt(m[2],10)));
       if(out.length)return out.sort(byClsNo);}
     out=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===q);
     if(out.length)return out.sort(byClsNo);
-    out=Object.values(students).filter(s=>String(s.sid||'').includes(q)||String(s.name||'').toUpperCase().includes(q)||String(s.ename||'').toUpperCase().includes(q));
+    out=Object.values(students).filter(s=>nz(s.sid).includes(Q)||nz(s.card).includes(Q)||String(s.name||'').toUpperCase().includes(q)||String(s.ename||'').toUpperCase().includes(q));
     return out.sort(byClsNo).slice(0,12);
   }
   function showResult(kind,title,sub,who2){
