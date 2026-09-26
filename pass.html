@@ -130,23 +130,25 @@ requireAuth(function(){
   }
   function setSt(st){current=st;redraw();toast(`${st.name||st.sid} 已載入`);}
 
-   function drawQR(ctx,text,x,y,size){
+  function drawQR(ctx,text,x,y,size,q){
+    q=(q==null)?2:q;
     const qr=qrcode(0,'M');
     qr.addData(text);qr.make();
     const n=qr.getModuleCount();
-    const cell=size/n;
+    const total=n+2*q;
+    const cell=size/total;
+    const ox=x+q*cell, oy=y+q*cell;
     ctx.fillStyle='#fff';ctx.fillRect(x,y,size,size);
     ctx.fillStyle='#000';
-    for(let r=0;r<n;r++)for(let c=0;c<n;c++){ if(qr.isDark(r,c)) ctx.fillRect(x+c*cell,y+r*cell,Math.ceil(cell),Math.ceil(cell)); }
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++){ if(qr.isDark(r,c)) ctx.fillRect(ox+c*cell,oy+r*cell,Math.ceil(cell),Math.ceil(cell)); }
   }
-    async function redraw(){
+  async function redraw(){
     const cv=$('cardCanvas'),ctx=cv.getContext('2d');
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle='#dddddd';ctx.lineWidth=3;ctx.strokeRect(4,4,W-8,H-8);
     const st=current;
-    // logo（高度固定 150，闊度按原圖比例）
-    const LX=60,LY=50,LH=150;
+    // logo（貼左上、高固定、闊按比例）
+    const LX=0,LY=0,LH=150;
     let LW=150;
     if(logoImg&&logoImg.complete&&logoImg.naturalWidth>0){
       LW=Math.min(600,Math.max(40,Math.round(LH*logoImg.naturalWidth/logoImg.naturalHeight)));
@@ -155,42 +157,45 @@ requireAuth(function(){
       ctx.fillStyle='#000';ctx.fillRect(LX,LY,LW,LH);ctx.fillStyle='#fff';ctx.textAlign='center';
       ctx.font='700 50px "Archivo",sans-serif';ctx.fillText('LO',LX+LW/2,LY+64);ctx.fillText('GO',LX+LW/2,LY+118);ctx.textAlign='left';
     }
-    // titles（跟住 logo 實際闊度右移）
+    // titles
     ctx.fillStyle='#111';
     ctx.font='700 54px "Noto Sans TC",sans-serif';
     ctx.fillText(`${$('evZh').value||''}臨時進出憑證`, LX+LW+40, LY+66);
     ctx.font='500 38px "IBM Plex Sans","Noto Sans TC",sans-serif';
     ctx.fillText(`${$('evEn').value||''} Temporary Entry/Exit Pass`, LX+LW+40, LY+124);
-    // issuing + valid
+    // issuing + valid（貼左）
     const now=new Date();
     const pad=n=>String(n).padStart(2,'0');
     const issue=`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
     ctx.font='500 44px "IBM Plex Sans",sans-serif';
-    ctx.fillText(`Issuing Time: ${issue}`, LX, LY+LS+78);
-    ctx.fillText(`Valid Until: ${$('vUntil').value||''}`, LX, LY+LS+140);
+    ctx.fillText(`Issuing Time: ${issue}`, 0, LY+LH+78);
+    ctx.fillText(`Valid Until: ${$('vUntil').value||''}`, 0, LY+LH+140);
     if(!st){
       ctx.fillStyle='#999';ctx.font='500 44px "Noto Sans TC",sans-serif';
-      ctx.fillText('請先輸入班別+學號或學生編號', LX, 560);
+      ctx.fillText('請先輸入班別+學號或學生編號', 0, 560);
       return;
     }
-    // house box
-    const HS=320,HX=60,HY=H-60-HS;
+    // house box（貼左下）
+    const HS=320,HX=0,HY=H-HS;
     ctx.fillStyle='#000';ctx.fillRect(HX,HY,HS,HS);
     ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='900 210px "Archivo",sans-serif';
     ctx.fillText(String(st.house||'?'),HX+HS/2,HY+HS/2+74);ctx.textAlign='left';
     // info
     ctx.fillStyle='#111';
     ctx.font='600 60px "IBM Plex Sans",sans-serif';
-    ctx.fillText(`${st.cls||''} ${st.no||''}`, HX+HS+50, HY+80);
+    ctx.fillText(`${st.cls||''} ${st.no||''}`, HX+HS+40, HY+80);
     ctx.font='700 80px "Noto Sans TC",sans-serif';
-    ctx.fillText(st.name||'—', HX+HS+50, HY+180);
+    ctx.fillText(st.name||'—', HX+HS+40, HY+180);
     ctx.font='600 46px "Archivo","IBM Plex Sans",sans-serif';
-    ctx.fillText(String(st.ename||'').toUpperCase(), HX+HS+50, HY+262);
-    // QR
-    const QS=320,QX=W-QS-60,QY=H-60-QS;
-    ctx.fillStyle='#fff';ctx.fillRect(QX-14,QY-14,QS+28,QS+28);
-    if(typeof qrcode==='function'){ drawQR(ctx,String(st.sid),QX,QY,QS); }
-    else{ ctx.fillStyle='#000';ctx.fillRect(QX,QY,QS,QS);ctx.fillStyle='#fff';ctx.font='700 44px "Archivo",sans-serif';ctx.textAlign='center';ctx.fillText('QR',QX+QS/2,QY+QS/2);ctx.textAlign='left'; }
+    ctx.fillText(String(st.ename||'').toUpperCase(), HX+HS+40, HY+262);
+    // QR（貼右、放大、下方學生編號）
+    const sidLine=70;
+    const QS=430,QX=W-QS,QY=H-sidLine-QS;
+    if(typeof qrcode==='function'){ drawQR(ctx,String(st.sid),QX,QY,QS,2); }
+    else{ ctx.fillStyle='#000';ctx.fillRect(QX,QY,QS,QS); }
+    ctx.fillStyle='#111';ctx.textAlign='center';ctx.font='600 60px "IBM Plex Sans",sans-serif';
+    ctx.fillText(String(st.sid), QX+QS/2, H-16);
+    ctx.textAlign='left';
   }
  
   function download(){
