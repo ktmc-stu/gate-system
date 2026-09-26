@@ -102,8 +102,10 @@ requireAuth(function(){
     q=String(q||'').trim().toUpperCase();
     if(!q){$('detail').innerHTML='<span class="dim">Search a student 請搜尋學生</span>';curSid=null;return;}
     let list=[];
+    const nz=v=>String(v??'').trim().toUpperCase().replace(/^0+/,'');
+    const Q=nz(q);
     if(students[q])list=[students[q]];
-    else list=Object.values(students).filter(s=>String(s.sid||'').toUpperCase()===q);
+    else list=Object.values(students).filter(s=>nz(s.sid)===Q||nz(s.card)===Q);
     if(!list.length){
       const m=q.match(/^([0-9]+[A-Z]+)[\s\-]?([0-9]+)$/);
       if(m)list=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===m[1]&&String(parseInt(s.no,10)||s.no)===String(parseInt(m[2],10)));
