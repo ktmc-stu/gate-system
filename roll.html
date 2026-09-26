@@ -16,7 +16,7 @@
 html{color-scheme:dark}
 body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
  background:radial-gradient(1300px 640px at 92% -12%,rgba(75,139,255,.2),transparent 62%),radial-gradient(1000px 620px at -8% 112%,rgba(255,178,36,.15),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
-::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}::-webkit-scrollbar-track{background:transparent}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
 .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--line2);
  background:rgba(8,14,26,.82);backdrop-filter:blur(18px);position:sticky;top:0;z-index:20;box-shadow:0 10px 34px rgba(0,0,0,.35)}
@@ -73,6 +73,25 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
 .rres.ok{background:rgba(47,211,127,.14);border:1px solid var(--green);color:var(--green);padding:12px}
 .rres.late{background:rgba(255,178,36,.14);border:1px solid var(--amber);color:var(--amber);padding:12px}
 .rres.err{background:rgba(255,93,85,.14);border:1px solid var(--red);color:var(--red);padding:12px}
+.overlay{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(4,8,16,.72);backdrop-filter:blur(6px);padding:20px}
+.overlay.open{display:flex}
+.pad{width:min(390px,94vw);border-radius:24px;padding:22px;border:1px solid var(--line2);background:linear-gradient(180deg,rgba(23,37,66,.96),rgba(10,19,36,.96));box-shadow:var(--shadow);position:relative;max-height:88vh;overflow:auto}
+.pad.wide{width:min(560px,94vw)}
+.pad-head{display:flex;justify-content:space-between;align-items:center;font-family:'Archivo';font-weight:800;font-size:18px}
+.pad-head span{font-size:.65em;color:var(--faint);font-weight:500;margin-left:6px}
+.xbtn{background:none;border:0;color:var(--faint);font-size:18px;cursor:pointer}
+.pad-disp{margin:14px 0 6px;min-height:52px;display:flex;align-items:center;padding:0 16px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid var(--line2);font-size:22px;letter-spacing:.12em}
+.pad-hint{font-size:12px;color:var(--faint);margin-bottom:12px;line-height:1.6}
+.pad-keys{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.pad-keys button{padding:13px 0;font-size:17px;font-weight:700;border-radius:12px;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text)}
+.pad-keys button:active{background:var(--amber);color:#241500}
+.pad-keys button.alpha{border-color:rgba(255,178,36,.45);color:var(--amber);background:rgba(255,178,36,.06)}
+.pad .go{width:100%;margin-top:14px;padding:15px;border:0;border-radius:14px;background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f;font-weight:900;font-size:16px;cursor:pointer}
+.cands{display:grid;gap:8px;max-height:50vh;overflow:auto}
+.cand{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.03);cursor:pointer;color:var(--text);font-size:15px;text-align:left;flex-wrap:wrap}
+.cand:hover{border-color:var(--amber);background:rgba(255,178,36,.1)}
+.cand .nm{font-weight:800}
+.cand .dim{font-size:12.5px}
 #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:rgba(23,37,66,.96);border:1px solid var(--amber);color:var(--text);padding:13px 24px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99}
 #toast.show{opacity:1;transform:translateX(-50%)}
 </style>
@@ -84,15 +103,17 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
 </header>
 <main>
   <section class="card" id="scanCard">
-    <h3>Scan to Roll<span>掃描學生證 QR 點名</span></h3>
+    <h3>Scan to Roll<span>掃碼／刷卡 點名（QR 或 讀卡機）</span></h3>
     <div id="reader"></div>
     <div class="camerr" id="camErr"></div>
+    <p class="dim" style="font-size:12px;text-align:center;margin-top:6px">相機掃碼 QR 與 讀卡機刷卡（鍵盤模擬）同時可用 · Camera QR & card-reader (HID) both work</p>
     <div class="field">
       <button class="btn ghost" id="btnManualRoll">Manual 手動輸入</button>
       <button class="btn ghost" id="btnCamRoll">📷 鏡頭開關</button>
     </div>
     <div id="rollResult" class="rres"></div>
   </section>
+
   <div class="stats">
     <div class="tile t"><span class="tnum" id="stTotal">0</span><span class="tlab">EXPECTED 應到</span></div>
     <div class="tile"><span class="tnum" id="stPresent">0</span><span class="tlab">PRESENT 出席</span></div>
@@ -128,6 +149,22 @@ tbody tr:hover td{background:rgba(255,178,36,.05)}
     <div style="overflow-x:auto"><table id="rollTable"></table></div>
   </section>
 </main>
+
+<div class="overlay" id="rollPadOv">
+  <div class="pad">
+    <div class="pad-head"><div>Manual Entry<span>手動輸入</span></div><button class="xbtn" id="rollPadClose">✕</button></div>
+    <div class="pad-disp mono" id="rollPadVal">&nbsp;</div>
+    <div class="pad-hint">Student ID / Class+No / Class<br>學生編號／班別+學號／班別<br>e.g. 25001 · 3B12 · 3B</div>
+    <div class="pad-keys" id="rollPadKeys"></div>
+    <button class="go" id="rollPadGo">CONFIRM 確定</button>
+  </div>
+</div>
+<div class="overlay" id="rollCandOv">
+  <div class="pad wide">
+    <div class="pad-head"><div>Multiple Matches<span>多個符合 — 請選擇</span></div><button class="xbtn" id="rollCandClose">✕</button></div>
+    <div class="cands" id="rollCandList"></div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -169,53 +206,6 @@ requireAuth(function(){
     renderAll();
   });
   bindKeypadInput($('rName'),{title:'Session<span>場次名稱</span>'});
-  /* ---- QR 掃描點名 ---- */
-  let qr=null,camOn=true,lastCode='',lastAt=0;
-  function findStudent(q){
-    q=String(q||'').trim().toUpperCase();if(!q)return null;
-    if(students[q])return students[q];
-    for(const k in students){if(String(students[k].sid||'').toUpperCase()===q)return students[k];}
-    return null;
-  }
-  function showResult(kind,title,sub,who2){
-    const el=$('rollResult');
-    el.className='rres '+kind;
-    el.innerHTML=`<b>${esc(title)}</b><span>${esc(who2||'')}</span><i>${esc(sub)}</i>`;
-    clearTimeout(el._t);el._t=setTimeout(()=>{el.innerHTML='';el.className='rres';},3000);
-  }
-  function handleRollScan(raw){
-    raw=String(raw||'').trim();if(!raw)return;
-    const now=Date.now();
-    if(raw===lastCode&&now-lastAt<2500)return;   // 同一碼 2.5 秒內唔重複
-    lastCode=raw;lastAt=now;
-    const st=findStudent(raw);
-    if(!st){showResult('err','NOT FOUND','查無此學生',raw);sound('err');return;}
-    if(!isPart(st)){showResult('err','NOT IN SESSION','此學生唔喺參與班別／社別範圍',`${st.name||''} ${st.cls||''}`);sound('warn');return;}
-    const r=recs()[st.sid];
-    if(r){showResult('late','ALREADY MARKED 已點名',`${fmtHM(r.at)} · ${isLate(r.at)?'LATE 遲到':'ON TIME 準時'}`,st.name||st.sid);sound('warn');return;}
-    db.ref(`roll/${cfgRoll.date}/${st.sid}`).set({sid:st.sid,at:now,by:who()}).then(()=>{
-      const late=isLate(now);
-      showResult(late?'late':'ok',late?'LATE 遲到':'PRESENT 出席',`${fmtHM(now)} · ${st.cls} ${st.no}`,st.name||st.sid);
-      sound(late?'warn':'in');
-    });
-  }
-  function stopScan(){if(!qr)return;const q=qr;qr=null;if(q.isScanning){q.stop().then(()=>{try{q.clear()}catch(e){}}).catch(()=>{});}else{try{q.clear()}catch(e){}}}
-  function startScan(){
-    if(!camOn)return;
-    if(!window.Html5Qrcode){$('camErr').textContent='Scanner library not loaded';return;}
-    stopScan();
-    const opts={fps:10,qrbox:{width:220,height:220}};
-    const onQr=t=>handleRollScan(t);
-    try{
-      qr=new Html5Qrcode('reader');
-      qr.start({facingMode:'environment'},opts,onQr,()=>{})
-        .catch(()=>qr.start({facingMode:'user'},opts,onQr,()=>{}))
-        .catch(()=>{$('camErr').textContent='Camera unavailable 相機不可用';});
-    }catch(e){$('camErr').textContent='Camera error';}
-  }
-  $('btnCamRoll').onclick=()=>{camOn=!camOn;if(camOn)startScan();else stopScan();$('btnCamRoll').textContent=camOn?'📷 鏡頭開關':'📴 鏡頭已關';};
-  $('btnManualRoll').onclick=()=>{KeyPad.open({title:'Student ID<span>學生編號</span>',onDone:v=>handleRollScan(v)});};
-  startScan();
 
   $('btnSaveRoll').onclick=()=>{
     db.ref('config/roll').update({name:$('rName').value.trim(),date:$('rDate').value||fmtDate(Date.now()),cutoff:$('rCut').value||'08:30'})
@@ -248,33 +238,161 @@ requireAuth(function(){
   function unmark(sid){ db.ref(`roll/${cfgRoll.date}/${sid}`).remove(); }
 
   function exportRoll(){
-    const cut=cutoffMs();
     const rows=partStudents().sort(byClsNo).map(s=>{
       const r=recs()[s.sid];
       const status=!r?'Absent 缺席':(isLate(r.at)?'Late 遲到':'Present 出席');
       return {'Session 場次':cfgRoll.name||'Roll Call','Date 日期':cfgRoll.date,'Class 班別':s.cls,'Student ID 學生編號':s.sid,
-        'Name 姓名':s.name||'','No. 學號':s.no,'House 社':s.house,'Status 狀態':status,
+        'Name 姓名':s.name||'','English Name 英文名':s.ename||'','No. 學號':s.no,'House 社':s.house,'Status 狀態':status,
         'Arrival 到達時間':r?fmtClock(r.at):'','Late Cutoff 遲到線':cfgRoll.cutoff};
     });
     const ws=XLSX.utils.json_to_sheet(rows);
-    ws['!cols']=[{wch:20},{wch:11},{wch:8},{wch:12},{wch:16},{wch:7},{wch:6},{wch:12},{wch:12},{wch:10}];
+    ws['!cols']=[{wch:20},{wch:11},{wch:8},{wch:12},{wch:16},{wch:18},{wch:7},{wch:6},{wch:12},{wch:12},{wch:10}];
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Roll');
     XLSX.writeFile(wb,`roll_${cfgRoll.date}_${(cfgRoll.name||'roll').replace(/\s+/g,'_')}.xlsx`);
     toast('Exported 已匯出');
   }
 
+  /* ---- QR 掃描點名 ---- */
+  let qr=null,camOn=true,lastCode='',lastAt=0;
+  function findStudent(q){
+    q=String(q||'').trim().toUpperCase();if(!q)return null;
+    if(students[q])return students[q];
+    for(const k in students){if(String(students[k].sid||'').toUpperCase()===q)return students[k];}
+    return null;
+  }
+  function findStudents(q){
+    q=String(q||'').trim().toUpperCase().replace(/\s+/g,' ');if(!q)return[];
+    if(students[q])return[students[q]];
+    let out=Object.values(students).filter(s=>String(s.sid||'').toUpperCase()===q);
+    if(out.length)return out;
+    const m=q.match(/^([0-9]+[A-Z]+)[\s\-]?([0-9]+)$/);
+    if(m){out=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===m[1]&&String(parseInt(s.no,10)||s.no)===String(parseInt(m[2],10)));
+      if(out.length)return out.sort(byClsNo);}
+    out=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===q);
+    if(out.length)return out.sort(byClsNo);
+    out=Object.values(students).filter(s=>String(s.sid||'').includes(q)||String(s.name||'').toUpperCase().includes(q)||String(s.ename||'').toUpperCase().includes(q));
+    return out.sort(byClsNo).slice(0,12);
+  }
+  function showResult(kind,title,sub,who2){
+    const el=$('rollResult');
+    el.className='rres '+kind;
+    el.innerHTML=`<b>${esc(title)}</b><span>${esc(who2||'')}</span><i>${esc(sub)}</i>`;
+    clearTimeout(el._t);el._t=setTimeout(()=>{el.innerHTML='';el.className='rres';},3000);
+  }
+  function markStudent(st){
+    const now=Date.now();
+    if(!isPart(st)){showResult('err','NOT IN SESSION','此學生唔喺參與班別／社別範圍',`${st.name||''} ${st.cls||''}`);sound('warn');return;}
+    const r=recs()[st.sid];
+    if(r){showResult('late','ALREADY MARKED 已點名',`${fmtHM(r.at)} · ${isLate(r.at)?'LATE 遲到':'ON TIME 準時'}`,st.name||st.sid);sound('warn');return;}
+    db.ref(`roll/${cfgRoll.date}/${st.sid}`).set({sid:st.sid,at:now,by:who()}).then(()=>{
+      const late=isLate(now);
+      showResult(late?'late':'ok',late?'LATE 遲到':'PRESENT 出席',`${fmtHM(now)} · ${st.cls} ${st.no}`,st.name||st.sid);
+      sound(late?'warn':'in');
+    });
+  }
+  function resolveAndMark(q){
+    q=String(q||'').trim();if(!q)return;
+    const list=findStudents(q);
+    if(!list.length){showResult('err','NOT FOUND','查無此學生',q);sound('err');return;}
+    if(list.length===1){markStudent(list[0]);return;}
+    showCands(list);
+  }
+  function handleRollScan(raw){
+    raw=String(raw||'').trim();if(!raw)return;
+    if(raw===lastCode&&Date.now()-lastAt<2500)return;
+    lastCode=raw;lastAt=Date.now();
+    resolveAndMark(raw);
+  }
+  function stopScan(){if(!qr)return;const q=qr;qr=null;if(q.isScanning){q.stop().then(()=>{try{q.clear()}catch(e){}}).catch(()=>{});}else{try{q.clear()}catch(e){}}}
+  function startScan(){
+    if(!camOn)return;
+    if(!window.Html5Qrcode){$('camErr').textContent='Scanner library not loaded';return;}
+    stopScan();
+    const opts={fps:10,qrbox:{width:220,height:220}};
+    const onQr=t=>handleRollScan(t);
+    try{
+      qr=new Html5Qrcode('reader');
+      qr.start({facingMode:'environment'},opts,onQr,()=>{})
+        .catch(()=>qr.start({facingMode:'user'},opts,onQr,()=>{}))
+        .catch(()=>{$('camErr').textContent='Camera unavailable 相機不可用';});
+    }catch(e){$('camErr').textContent='Camera error';}
+  }
+  $('btnCamRoll').onclick=()=>{camOn=!camOn;if(camOn)startScan();else stopScan();$('btnCamRoll').textContent=camOn?'📷 鏡頭開關':'📴 鏡頭已關';};
+
+  /* ---- 手動輸入（對標 gate）---- */
+  let padBuf='';
+  const PAD_KEYS=['1','2','3','4','5','6','7','8','9','0','CLR','⌫',
+    'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+  (function(){
+    const wrap=$('rollPadKeys');
+    PAD_KEYS.forEach(k=>{
+      const b=document.createElement('button');b.textContent=k;
+      b.dataset.k=k==='CLR'?'clr':k==='⌫'?'bk':k;
+      if(/^[A-Z]$/.test(k))b.classList.add('alpha');
+      wrap.appendChild(b);
+    });
+    wrap.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.k;
+      if(k==='clr')padBuf='';
+      else if(k==='bk')padBuf=padBuf.slice(0,-1);
+      else if(padBuf.length<24)padBuf+=k;
+      updRollPad();});
+  })();
+  function updRollPad(){const v=$('rollPadVal');if(v)v.innerHTML=padBuf?esc(padBuf).replace(/ /g,'&nbsp;'):'&nbsp;';}
+  function openRollPad(){padBuf='';updRollPad();$('rollPadOv').classList.add('open');}
+  function closeRollPad(){$('rollPadOv').classList.remove('open');}
+  function showCands(list){
+    $('rollCandList').innerHTML=list.map(s=>{const m=houseMeta(s.house);
+      return `<button class="cand" data-cand="${esc(s.sid)}"><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span><span class="nm">${esc(s.name||'—')}${s.ename?` <i class="dim" style="font-style:normal;font-size:11px">${esc(s.ename)}</i>`:''}</span><span class="mono">${esc(s.sid)}</span><span class="dim">${esc(s.cls)} · No.${esc(s.no)}</span></button>`;}).join('');
+    $('rollCandOv').classList.add('open');
+    $('rollCandList').querySelectorAll('[data-cand]').forEach(b=>b.onclick=()=>{
+      $('rollCandOv').classList.remove('open');
+      const st=students[b.dataset.cand];if(st)markStudent(st);
+    });
+  }
+  function rollPadConfirm(){
+    const q=padBuf.trim();
+    closeRollPad();
+    resolveAndMark(q);
+  }
+  $('rollPadClose').onclick=closeRollPad;
+  $('rollCandClose').onclick=()=>$('rollCandOv').classList.remove('open');
+  $('rollPadGo').onclick=rollPadConfirm;
+  $('btnManualRoll').onclick=openRollPad;
+  document.addEventListener('keydown',e=>{
+    if(!$('rollPadOv').classList.contains('open'))return;
+    if(/^[0-9a-zA-Z]$/.test(e.key)&&padBuf.length<24){padBuf+=e.key.toUpperCase();updRollPad();}
+    else if(e.key==='Backspace'){padBuf=padBuf.slice(0,-1);updRollPad();e.preventDefault();}
+    else if(e.key==='Enter'){rollPadConfirm();}
+    else if(e.key==='Escape'){closeRollPad();}
+  });
+  /* ---- 刷卡（讀卡機／掃描槍 鍵盤模擬 HID）---- */
+  let hidBuf='',hidLast=0;
+  document.addEventListener('keydown',e=>{
+    if($('rollPadOv').classList.contains('open'))return;
+    const t=e.target;
+    if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable))return;
+    const now=Date.now();
+    if(e.key==='Enter'){
+      if(hidBuf.length>=3&&(now-hidLast)<200)resolveAndMark(hidBuf);
+      hidBuf='';hidLast=0;return;
+    }
+    if(e.key.length===1){
+      if(now-hidLast>150)hidBuf='';
+      hidBuf+=e.key;hidLast=now;
+    }else{hidBuf='';hidLast=0;}
+  });
+  startScan();
+
+  /* ---- 渲染 ---- */
   function renderAll(){
-    // settings chips (classes + houses)
     $('clsChips').innerHTML=allClasses().map(c=>`<button class="chip ${cfgRoll.classes.includes(c)?'on':''}" data-cls="${esc(c)}">${esc(c)}</button>`).join('')||'<span class="dim">No classes 無班別（先匯入學生）</span>';
     $('clsChips').querySelectorAll('[data-cls]').forEach(b=>b.onclick=()=>toggleClass(b.dataset.cls));
     $('houseChips').innerHTML=['K','T','M','C'].map(h=>`<button class="chip ${cfgRoll.houses.includes(h)?'on':''}" data-hs="${h}">${h}</button>`).join('');
     $('houseChips').querySelectorAll('[data-hs]').forEach(b=>b.onclick=()=>toggleHouse(b.dataset.hs));
-    // tabs = classes that have participating students
     const tabClasses=[...new Set(partStudents().map(s=>String(s.cls||'').toUpperCase()))].sort();
     if(!tabClasses.includes(activeCls))activeCls=tabClasses[0]||null;
     $('clsTabs').innerHTML=tabClasses.map(c=>`<button class="chip sm ${c===activeCls?'on':''}" data-tab="${esc(c)}">${esc(c)}</button>`).join('')||'<span class="dim">No participating students 無參與學生（請選班別／社別）</span>';
     $('clsTabs').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{activeCls=b.dataset.tab;renderAll();});
-    // stats
     const ps=partStudents(),r=recs();
     const present=ps.filter(s=>r[s.sid]);
     const late=present.filter(s=>isLate(r[s.sid].at));
@@ -282,8 +400,7 @@ requireAuth(function(){
     $('stPresent').textContent=present.length;
     $('stLate').textContent=late.length;
     $('stAbsent').textContent=ps.length-present.length;
-    // roll list
-    if(!activeCls){$('rollList').innerHTML='<span class="dim">No class selected 未選班別</span>';}
+    if(!activeCls){$('rollList').innerHTML='<span class="dim">No participating class 無參與班別（請選班別／社別）</span>';}
     else{
       const list=partStudents().filter(s=>String(s.cls||'').toUpperCase()===activeCls).sort(byClsNo);
       const pc=list.filter(s=>r[s.sid]).length;
@@ -292,17 +409,16 @@ requireAuth(function(){
         const rc=r[s.sid];const m=houseMeta(s.house);
         const st=!rc?`<span class="st abs">ABSENT 缺席</span>`:(isLate(rc.at)?`<span class="st late">LATE 遲到 ${fmtHM(rc.at)}</span>`:`<span class="st ok">✓ ${fmtHM(rc.at)}</span>`);
         const btn=rc?`<button class="btn ghost" data-un="${esc(s.sid)}">Undo 取消</button>`:`<button class="btn green" data-mk="${esc(s.sid)}">Mark 到達</button>`;
-        return `<div class="rrow"><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span><span class="nm">${esc(s.name||'—')}</span><span class="meta mono">${esc(s.sid)} · ${esc(s.cls)} ${esc(s.no)}</span>${st}${btn}</div>`;
+        return `<div class="rrow"><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span><span class="nm">${esc(s.name||'—')}${s.ename?` <i class="dim" style="font-style:normal;font-size:11px">${esc(s.ename)}</i>`:''}</span><span class="meta mono">${esc(s.sid)} · ${esc(s.cls)} ${esc(s.no)}</span>${st}${btn}</div>`;
       }).join('')||'<span class="dim">No students 無學生</span>';
       $('rollList').querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>mark(b.dataset.mk));
       $('rollList').querySelectorAll('[data-un]').forEach(b=>b.onclick=()=>unmark(b.dataset.un));
     }
-    // table
     $('rollTable').innerHTML='<tr><th>Class</th><th>Student ID</th><th>Name 姓名</th><th>House</th><th>Status 狀態</th><th>Arrival 到達</th></tr>'+
       partStudents().sort(byClsNo).map(s=>{
         const rc=r[s.sid];const m=houseMeta(s.house);
         const st=!rc?'<span class="st abs">Absent 缺席</span>':(isLate(rc.at)?`<span class="st late">Late 遲到</span>`:`<span class="st ok">Present 出席</span>`);
-        return `<tr><td>${esc(s.cls)}</td><td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name||'—')}</b></td><td><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span></td><td>${st}</td><td class="mono">${rc?fmtClock(rc.at):'—'}</td></tr>`;
+        return `<tr><td>${esc(s.cls)}</td><td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name||'—')}</b>${s.ename?`<div class="dim" style="font-size:11px">${esc(s.ename)}</div>`:''}</td><td><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span></td><td>${st}</td><td class="mono">${rc?fmtClock(rc.at):'—'}</td></tr>`;
       }).join('')||'<tr><td colspan="6" class="dim">No participating students 無參與學生</td></tr>';
   }
 });
