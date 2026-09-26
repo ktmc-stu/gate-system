@@ -156,12 +156,12 @@ requireAuth(function(){
         ctx.fillStyle='#000';ctx.fillRect(LX,LY,LW,LH);ctx.fillStyle='#fff';ctx.textAlign='center';
         ctx.font='700 50px "Archivo",sans-serif';ctx.fillText('LO',LX+LW/2,LY+64);ctx.fillText('GO',LX+LW/2,LY+118);ctx.textAlign='left';
       }
-      // titles
+      // titles（放大）
       ctx.fillStyle='#111';
-      ctx.font='700 54px "Noto Sans TC",sans-serif';
-      ctx.fillText(`${$('evZh').value||''}臨時進出憑證`, LX+LW+40, LY+66);
-      ctx.font='500 38px "IBM Plex Sans","Noto Sans TC",sans-serif';
-      ctx.fillText(`${$('evEn').value||''} Temporary Entry/Exit Pass`, LX+LW+40, LY+124);
+      ctx.font='900 78px "Noto Sans TC",sans-serif';
+      ctx.fillText(`${$('evZh').value||''}臨時進出憑證`, LX+LW+40, LY+90);
+      ctx.font='600 52px "IBM Plex Sans","Noto Sans TC",sans-serif';
+      ctx.fillText(`${$('evEn').value||''} Temporary Entry/Exit Pass`, LX+LW+40, LY+154);
       // issuing + valid（貼左）
       const now=new Date(), pad=n=>String(n).padStart(2,'0');
       const issue=`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
