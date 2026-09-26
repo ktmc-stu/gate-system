@@ -1,4 +1,4 @@
-/* shared.js — 共享初始化／工具／鎖／螢幕鍵盤 */
+/* shared.js — 共享初始化／工具／鎖／螢幕鍵盤／音效 */
 firebase.initializeApp(FIREBASE_CONFIG);
 let db   = firebase.database();
 let auth = firebase.auth();
@@ -14,10 +14,10 @@ const HOUSE_COLORS={K:'#ff5d55',T:'#4b8bff',M:'#2fd37f',C:'#ffb224'};
 function houseMeta(h){return {color:HOUSE_COLORS[String(h||'').toUpperCase()]||'#7e8aa2'};}
 const PURPOSES={
   toilet:{en:'Toilet',zh:'廁所',icon:'🚻'},
-  food:  {en:'Food',  zh:'小食部',icon:'🍱'},
+  food:{en:'Food',zh:'小食部',icon:'🍱'},
   competition:{en:'Competition',zh:'參賽',icon:'🏅'},
   helper:{en:'Student Helper',zh:'工作人員',icon:'🦺'},
-  other: {en:'Other', zh:'其他',icon:'📌'}
+  other:{en:'Other',zh:'其他',icon:'📌'}
 };
 function purposeMeta(p){return PURPOSES[p]||{en:'—',zh:'—',icon:'·'};}
 const SCENARIOS={
@@ -27,31 +27,35 @@ const SCENARIOS={
 function scenarioMeta(s){return SCENARIOS[s]||SCENARIOS.track;}
 function watchThreshold(cb){db.ref('config/overlongMin').on('value',s=>cb(parseInt(s.val(),10)||15));}
 function watchScenario(cb){db.ref('config/scenario').on('value',s=>cb(s.val()||'track'));}
-/* ---- 音效（WebAudio 嗶聲）---- */
-let AC=null, audioUnlocked=false;
-function ac(){
-  if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
-  return AC;
+function nameBlock(st){
+  const cn=String((st&&st.name)||'').trim(), en=String((st&&st.ename)||'').trim();
+  if(!cn&&!en)return '';
+  if(cn&&en)return `<div class="stname ${cn.length>4?'sz-md':''}">${esc(cn)}</div><div class="stname-en ${en.length>18?'sz-sm':''}">${esc(en)}</div>`;
+  if(cn)return `<div class="stname ${cn.length>4?'sz-md':''}">${esc(cn)}</div>`;
+  return `<div class="stname en ${en.length>16?'sz-sm':en.length>10?'sz-md':''}">${esc(en)}</div>`;
 }
-/* iOS（尤其主畫面捷徑／standalone）必須喺用戶手勢內 resume + 播放一段靜音 buffer 先至開到聲音路由 */
+
+/* ---- 登出：事件委託 ---- */
+function bindSignOut(){}
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-signout]')){ auth.signOut().then(()=>location.reload()); }
+});
+
+/* ---- 音效（WebAudio）---- */
+let AC=null, audioUnlocked=false;
+function ac(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return AC; }
 function primeAudio(){
   const c=ac(); if(!c)return;
   if(c.state==='suspended'){ c.resume().catch(()=>{}); }
   if(!audioUnlocked && c.state==='running'){
-    try{
-      const b=c.createBuffer(1,1,22050);
-      const s=c.createBufferSource(); s.buffer=b; s.connect(c.destination); s.start(0);
-      audioUnlocked=true;
-    }catch(e){}
+    try{ const b=c.createBuffer(1,1,22050); const s=c.createBufferSource(); s.buffer=b; s.connect(c.destination); s.start(0); audioUnlocked=true; }catch(e){}
   }
 }
 function unlockAudio(){
   const c=ac(); if(!c)return;
-  if(c.state==='suspended'){ c.resume().then(primeAudio).catch(primeAudio); }
-  else primeAudio();
+  if(c.state==='suspended'){ c.resume().then(primeAudio).catch(primeAudio); } else primeAudio();
 }
-['pointerdown','touchend','click','keydown'].forEach(ev=>
-  document.addEventListener(ev,unlockAudio,{passive:true}));
+['pointerdown','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,unlockAudio,{passive:true}));
 function tone(f,d,type,g){
   if(window.MUTED)return;
   const c=ac(); if(!c)return;
@@ -74,13 +78,8 @@ function sound(kind){
   else if(kind==='err'){ tone(300,.2,'sawtooth',.16); setTimeout(()=>tone(220,.26,'sawtooth',.16),180); }
   else tone(700,.08);
 }
-/* ---- 登出：事件委託 ---- */
-function bindSignOut(){}
-document.addEventListener('click',e=>{
-  if(e.target.closest('[data-signout]')){ auth.signOut().then(()=>location.reload()); }
-});
 
-/* ==== 共享螢幕鍵盤（廢除系統鍵盤）==== */
+/* ==== 共享螢幕鍵盤 ==== */
 (function(){
   const st=document.createElement('style');
   st.textContent=`
@@ -184,7 +183,7 @@ document.addEventListener('click',e=>{
   };
 })();
 
-/* ---- 密碼鎖（螢幕鍵盤）---- */
+/* ---- 密碼鎖 ---- */
 function showLock(){
   const st=document.createElement('style');
   st.textContent=`
@@ -200,9 +199,9 @@ function showLock(){
   el.id='lock';
   el.innerHTML=`<div class="card">
     <h2>Staff Access <span>職員登入</span></h2>
-    <p class="lk-hint">Enter the shared staff password using the on-screen keypad.<br>請使用螢幕鍵盤輸入職員共用密碼。</p>
+    <p class="lk-hint">Enter the shared staff password using the on-screen keypad.<br>請使用螢幕鍵盤輸入共用職員密碼（實體鍵盤亦可）。</p>
     <p class="lk-err" id="lockErr"></p>
-    <button class="lk-btn" id="lockGo">UNLOCK 進入</button>
+    <button class="lk-btn" id="lockGo">CONFIRM 確定</button>
   </div>`;
   document.body.appendChild(el);
   el.querySelector('#lockGo').onclick=()=>{
