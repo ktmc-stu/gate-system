@@ -312,7 +312,7 @@ const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false,cam:true};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
-let threshold=15, normalLimit=0, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, state='boot', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
+let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, state='boot', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null;
 const $=id=>document.getElementById(id), board=$('board');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
@@ -332,6 +332,7 @@ function initGate(){
   db.ref('participantList').on('value',s=>{compList=s.val()||{};});
   db.ref('helperList').on('value',s=>{helperList=s.val()||{};});
   db.ref('config/normalLimit').on('value',s=>{normalLimit=parseInt(s.val(),10)||0;});
+  db.ref('config/eventStarted').on('value',s=>{eventStarted=s.val()!==false;if(state==='ready')toReady();});
   db.ref('.info/connected').on('value',s=>{const on=!!s.val();$('conn').className='conn '+(on?'on':'off');$('connTx').textContent=on?'LIVE 連線':'OFFLINE 離線';});
   watchThreshold(v=>{threshold=v;const p=$('pillThB');if(p)p.textContent=v+' min';refreshSlots();});
   watchScenario(v=>{scenario=v;applyHeader();if(state==='ready')toReady();});
@@ -727,11 +728,13 @@ function initGate(){
         }
         db.ref('records/'+recKey).set({sid,cls:st.cls,no:st.no,name:st.name||'',ename:st.ename||'',house:st.house,scenario,
           code:pendingCode,purpose,reason:reason||'',slot:slot||null,slotGate:slot?cfg.name:null,gateOut:cfg.name,outAt:now,gateIn:null,inAt:null,durationSec:null,overlong:false});
-        if(NORMAL(purpose))bumpNormal(sid);
-        db.ref('counters/'+sid+'/outCount').transaction(v=>(v||0)+1).then(r=>{
-          lastReason=reason||'';
-          showOut(st,r.snapshot.val()||1,!!st.overlongFlag,purpose,slot||null);
-        });
+        if(eventStarted&&NORMAL(purpose))bumpNormal(sid);
+        lastReason=reason||'';
+        if(eventStarted){
+          db.ref('counters/'+sid+'/outCount').transaction(v=>(v||0)+1).then(r=>showOut(st,r.snapshot.val()||1,!!st.overlongFlag,purpose,slot||null));
+        }else{
+          showOut(st,(countersMap[sid]&&countersMap[sid].outCount)||0,false,purpose,slot||null);
+        }
       });
     };
     if(needSlot){
@@ -753,12 +756,14 @@ function initGate(){
       if(wrongGateReturn){showWrongGateReturn(st,captured);return;}
       if(!res.committed||!captured){showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null);return;}
       const now=Date.now(), durMs=Math.max(0,now-captured.outAt);
-      const over=!NO_LIMIT(captured.purpose)&&durMs>=threshold*60000;
+      const over=eventStarted&&!NO_LIMIT(captured.purpose)&&durMs>=threshold*60000;
       const upd={};
-      upd['records/'+captured.recordId+'/inAt']=now;
-      upd['records/'+captured.recordId+'/gateIn']=cfg.name;
-      upd['records/'+captured.recordId+'/durationSec']=Math.round(durMs/1000);
-      upd['records/'+captured.recordId+'/overlong']=over;
+      if(captured.recordId){
+        upd['records/'+captured.recordId+'/inAt']=now;
+        upd['records/'+captured.recordId+'/gateIn']=cfg.name;
+        upd['records/'+captured.recordId+'/durationSec']=Math.round(durMs/1000);
+        upd['records/'+captured.recordId+'/overlong']=over;
+      }
       if(over)upd['students/'+sid+'/overlongFlag']=true;
       let phone=null;let slotNo=captured.slot||null;
       if(!slotNo){for(let i=1;i<=12;i++){const o=slotsMap[i];if(o&&o.sid===sid){slotNo=i;break;}}}
@@ -799,6 +804,7 @@ function initGate(){
         <span class="pill">CHANNEL 通道 <b id="pillChan">${channelType()==='special'?'SPECIAL 專用':'NORMAL 普通'}</b></span>
         <span class="pill">NOW OUTSIDE 正在外面 <b id="pillOutB">${Object.keys(liveMap).length}</b></span>
         <span class="pill">LIMIT 時限 <b id="pillThB">${threshold} min</b></span>
+        ${eventStarted?'':'<span class="pill" style="color:var(--amber);border-color:rgba(255,178,36,.5)">⏸ NOT STARTED 未開始・不計時/不計次</span>'}
         <button class="ghostbtn" data-act="manual">Manual Entry 手動輸入</button>
       </div>`;
     refreshSlots(); startScanner();
@@ -916,7 +922,7 @@ function initGate(){
       const pu=p.dataset.purpose;
       if(pu==='competition'&&!compList[pendingSt.sid]){showWarn(pendingSt,'NOT ON LIST','參賽者名單無此學生 — 不能以參賽原因外出 Not in competition list',null);sound('warn');return;}
       if(pu==='helper'&&!helperList[pendingSt.sid]){showWarn(pendingSt,'NOT ON LIST','工作人員名單無此學生 — 不能以工作人員原因外出 Not in helper list',null);sound('warn');return;}
-      if(NORMAL(pu)&&normalLimit>0&&normalUsed(pendingSt.sid)>=normalLimit){
+      if(eventStarted&&NORMAL(pu)&&normalLimit>0&&normalUsed(pendingSt.sid)>=normalLimit){
         showWarn(pendingSt,'LIMIT REACHED',`今日廁所／小食外出已達上限 (${normalUsed(pendingSt.sid)}/${normalLimit}) Daily toilet/food limit reached`,null);sound('warn');return;}
       if(pu==='other'){ openOther(pendingSt); return; }
       if(!NO_LIMIT(pu)&&!houseAllowed(pendingSt)){ wrongGate(pendingSt); return; }
