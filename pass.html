@@ -149,51 +149,51 @@ requireAuth(function(){
       ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);
       const st=current;
       // logo（貼左上、高固定、闊按比例）
-      const LX=0,LY=0,LH=150;
-      let LW=150;
+      const LX=0,LY=0,LH=205;
+      let LW=195;
       if(logoImg&&logoImg.complete&&logoImg.naturalWidth>0){
-        LW=Math.min(600,Math.max(40,Math.round(LH*logoImg.naturalWidth/logoImg.naturalHeight)));
+        LW=Math.min(480,Math.max(40,Math.round(LH*logoImg.naturalWidth/logoImg.naturalHeight)));
         ctx.drawImage(logoImg,LX,LY,LW,LH);
       }else{
         ctx.fillStyle='#000';ctx.fillRect(LX,LY,LW,LH);ctx.fillStyle='#fff';ctx.textAlign='center';
-        ctx.font='700 50px "Archivo",sans-serif';ctx.fillText('LO',LX+LW/2,LY+64);ctx.fillText('GO',LX+LW/2,LY+118);ctx.textAlign='left';
+        ctx.font='400 64px "Archivo",sans-serif';ctx.fillText('LO',LX+LW/2,LY+88);ctx.fillText('GO',LX+LW/2,LY+162);ctx.textAlign='left';
       }
-      // titles（放大）
+      // titles（大、唔粗）
       ctx.fillStyle='#111';
-      ctx.font='900 78px "Noto Sans TC",sans-serif';
-      ctx.fillText(`${$('evZh').value||''}臨時進出憑證`, LX+LW+40, LY+90);
-      ctx.font='600 52px "IBM Plex Sans","Noto Sans TC",sans-serif';
-      ctx.fillText(`${$('evEn').value||''} Temporary Entry/Exit Pass`, LX+LW+40, LY+154);
-      // issuing + valid（貼左）
+      ctx.font='400 84px "Noto Sans TC",sans-serif';
+      ctx.fillText(`${$('evZh').value||''}臨時進出憑證`, LX+LW+30, LY+95);
+      ctx.font='400 54px "IBM Plex Sans","Noto Sans TC",sans-serif';
+      ctx.fillText(`${$('evEn').value||''} Temporary Entry/Exit Pass`, LX+LW+30, LY+185);
+      // issuing + valid（貼左、大）
       const now=new Date(), pad=n=>String(n).padStart(2,'0');
       const issue=`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-      ctx.font='500 44px "IBM Plex Sans",sans-serif';
-      ctx.fillText(`Issuing Time: ${issue}`, 0, LY+LH+78);
-      ctx.fillText(`Valid Until: ${$('vUntil').value||''}`, 0, LY+LH+140);
+      ctx.font='400 84px "IBM Plex Sans",sans-serif';
+      ctx.fillText(`Issuing Time: ${issue}`, 0, LY+LH+110);
+      ctx.fillText(`Valid Until: ${$('vUntil').value||''}`, 0, LY+LH+250);
       if(!st){
-        ctx.fillStyle='#999';ctx.font='500 44px "Noto Sans TC",sans-serif';
+        ctx.fillStyle='#999';ctx.font='400 60px "Noto Sans TC",sans-serif';
         ctx.fillText('請先輸入班別+學號 / 學生編號 / 卡號', 0, 560);
         return;
       }
-      // house box（貼左下）
-      const HS=320,HX=0,HY=H-HS;
+      // house box（貼左下、大字母）
+      const HS=375,HX=0,HY=H-HS;
       ctx.fillStyle='#000';ctx.fillRect(HX,HY,HS,HS);
-      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='900 210px "Archivo",sans-serif';
-      ctx.fillText(String(st.house||'?'),HX+HS/2,HY+HS/2+74);ctx.textAlign='left';
-      // info
+      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='400 300px "Archivo",sans-serif';
+      ctx.fillText(String(st.house||'?'),HX+HS/2,HY+HS/2+105);ctx.textAlign='left';
+      // info（大、唔粗）
       ctx.fillStyle='#111';
-      ctx.font='600 60px "IBM Plex Sans",sans-serif';
-      ctx.fillText(`${st.cls||''} ${st.no||''}`, HX+HS+40, HY+80);
-      ctx.font='700 80px "Noto Sans TC",sans-serif';
-      ctx.fillText(st.name||'—', HX+HS+40, HY+180);
-      ctx.font='600 46px "Archivo","IBM Plex Sans",sans-serif';
-      ctx.fillText(String(st.ename||'').toUpperCase(), HX+HS+40, HY+262);
-      // QR（貼右、放大、下方學生編號）
-      const sidLine=70, QS=430, QX=W-QS, QY=H-sidLine-QS;
+      ctx.font='400 84px "IBM Plex Sans",sans-serif';
+      ctx.fillText(`${st.cls||''} ${st.no||''}`, HX+HS+45, HY+80);
+      ctx.font='400 110px "Noto Sans TC",sans-serif';
+      ctx.fillText(st.name||'—', HX+HS+45, HY+220);
+      ctx.font='400 74px "Archivo","IBM Plex Sans",sans-serif';
+      ctx.fillText(String(st.ename||'').toUpperCase(), HX+HS+45, HY+340);
+      // QR（重點：大、貼右、下方編號）
+      const sidLine=80, QS=520, QX=W-QS, QY=H-sidLine-QS;
       if(typeof qrcode==='function'){ drawQR(ctx,String(st.sid),QX,QY,QS,2); }
-      else{ ctx.fillStyle='#000';ctx.fillRect(QX,QY,QS,QS); }
-      ctx.fillStyle='#111';ctx.textAlign='center';ctx.font='600 60px "IBM Plex Sans",sans-serif';
-      ctx.fillText(String(st.sid), QX+QS/2, H-16);
+      else{ ctx.fillStyle='#000';ctx.fillRect(QX,QS?QY:QY,QS,QS); }
+      ctx.fillStyle='#111';ctx.textAlign='center';ctx.font='400 60px "IBM Plex Sans",sans-serif';
+      ctx.fillText(String(st.sid), QX+QS/2, H-20);
       ctx.textAlign='left';
     }catch(e){
       console.error('pass redraw error:',e);
