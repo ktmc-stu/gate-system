@@ -636,6 +636,23 @@ function initGate(){
     else if(e.key==='Backspace'){padBuf=padBuf.slice(0,-1);updPad();e.preventDefault();}
     else if(e.key==='Enter'){$('padGo').click();}
     else if(e.key==='Escape'){closePad();if(state==='ready')startScanner();}});
+  /* ---- 刷卡（讀卡機／掃描槍 鍵盤模擬 HID）---- */
+  let hidBuf='',hidLast=0;
+  document.addEventListener('keydown',e=>{
+    if(state!=='ready')return;
+    if($('padOv').classList.contains('open')||$('setOv').classList.contains('open')||$('othOv').classList.contains('open')||$('slotOv').classList.contains('open'))return;
+    const t=e.target;
+    if(t&&(t.tagName==='INPUT'||t.tagName='TEXTAREA'||t.isContentEditable))return;
+    const now=Date.now();
+    if(e.key==='Enter'){
+      if(hidBuf.length>=3&&(now-hidLast)<200){ handleScan(hidBuf,true); }
+      hidBuf='';hidLast=0;return;
+    }
+    if(e.key.length===1){
+      if(now-hidLast>150)hidBuf='';
+      hidBuf+=e.key;hidLast=now;
+    }else{hidBuf='';hidLast=0;}
+  });
 
   /* ---- 其他原因 ---- */
   const OTH_REASONS=['見老師 Teacher','物資 Equipment','身體不適 Unwell','比賽相關 Competition','班務 Class duty'];
@@ -795,7 +812,7 @@ function initGate(){
     board.innerHTML=`
       <div class="micro">EVENT PASS TERMINAL · ${sc.en.toUpperCase()} ${sc.zh} · DEVICE ${esc(cfg.name)}</div>
       <div class="ready-word">SCAN<span class="cursor"></span></div>
-      <div class="ready-sub">Scan student QR code<span class="zh">請掃描學生證 QR 碼</span></div>
+      <div class="ready-sub">Scan student QR code or swipe card<span class="zh">請掃描學生證 QR 碼或刷卡</span></div>
       ${cfg.cam?`<div id="reader"></div><div class="camerr" id="camErr"></div>`
         :`<div class="camoff">📴 CAMERA OFF · 省電模式<span>鏡頭已關閉・節省電量</span><button class="ghostbtn" data-act="camon">開啟鏡頭</button></div>`}
       ${channelType()==='normal'?slotsStrip():''}
