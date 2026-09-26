@@ -95,7 +95,9 @@ requireAuth(function(){
     if(!$('evEn').dataset.touched)$('evEn').value=scenarioMeta(v).en;
     redraw();
   });
-  $('evZh').value='陸運會';$('evEn').value='Sports Day';$('vUntil').value='2099-12-31';
+  const _n=new Date();
+  $('evZh').value='陸運會';$('evEn').value='Sports Day';
+  $('vUntil').value=`${_n.getFullYear()}-${_n.getMonth()+1}-${_n.getDate()}`;
   ['evZh','evEn','vUntil'].forEach(id=>$(id).addEventListener('input',()=>{ $(id).dataset.touched='1'; redraw(); }));
   bindKeypadInput($('pQ'),{title:'Student<span>班別+學號 / 編號 / 卡號</span>'});
   $('btnLook').onclick=()=>lookup($('pQ').value);
