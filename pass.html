@@ -67,8 +67,8 @@ main{max-width:1100px;margin:0 auto;padding:26px 20px}
   </section>
   <section class="card">
     <h3>Preview & Download<span>預覽與下載</span></h3>
-    <div class="prevwrap"><canvas id="cardCanvas" width="2000" height="1200"></canvas></div>
-    <div class="field"><button class="btn green" id="btnDl">Download PNG 下載 PNG</button><span class="dim" id="dlHint">2000×1200 px（約 300DPI 列印）</span></div>
+    <div class="prevwrap"><canvas id="cardCanvas" width="1700" height="1000"></canvas></div>
+    <div class="field"><button class="btn green" id="btnDl">Download PNG 下載 PNG</button><span class="dim" id="dlHint">1700×1000 px ＝ 85×50mm @20px/mm（58mm 紙短邊足夠）</span></div>
   </section>
 </main>
 <canvas id="qrCanvas" style="display:none"></canvas>
@@ -83,7 +83,7 @@ main{max-width:1100px;margin:0 auto;padding:26px 20px}
 <script>
 let students={},booted=false,current=null,logoImg=null,qrReady=false;
 const $=id=>document.getElementById(id);
-const W=2000,H=1200;
+const W=1700,H=1000;   // 85mm × 50mm @ 20px/mm
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400);}
 
 requireAuth(function(){
@@ -130,54 +130,58 @@ requireAuth(function(){
   }
   function setSt(st){current=st;redraw();toast(`${st.name||st.sid} 已載入`);}
 
-  async function redraw(){
+    async function redraw(){
     const cv=$('cardCanvas'),ctx=cv.getContext('2d');
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);
-    // cut border
-    ctx.strokeStyle='#dddddd';ctx.lineWidth=4;ctx.strokeRect(6,6,W-12,H-12);
+    ctx.strokeStyle='#dddddd';ctx.lineWidth=3;ctx.strokeRect(4,4,W-8,H-8);
     const st=current;
-    // logo box
-    const LX=80,LY=60,LS=210;
+    // logo
+    const LX=60,LY=50,LS=150;
     if(logoImg&&logoImg.complete&&logoImg.naturalWidth>0){ ctx.drawImage(logoImg,LX,LY,LS,LS); }
     else{ ctx.fillStyle='#000';ctx.fillRect(LX,LY,LS,LS);ctx.fillStyle='#fff';ctx.textAlign='center';
-      ctx.font='700 70px "Archivo",sans-serif';ctx.fillText('LO',LX+LS/2,LY+90);ctx.fillText('GO',LX+LS/2,LY+165);ctx.textAlign='left'; }
-    // title
-    ctx.fillStyle='#111111';
-    ctx.font='700 76px "Noto Sans TC",sans-serif';
-    ctx.fillText(`${$('evZh').value||''}臨時進出憑證`, LX+LS+50, LY+95);
-    ctx.font='500 54px "IBM Plex Sans","Noto Sans TC",sans-serif';
-    ctx.fillText(`${$('evEn').value||''} Temporary Entry/Exit Pass`, LX+LS+50, LY+170);
-    ctx.font='500 60px "IBM Plex Sans",sans-serif';
-    ctx.fillText(`Valid Until: ${$('vUntil').value||''}`, LX, LY+LS+115);
+      ctx.font='700 50px "Archivo",sans-serif';ctx.fillText('LO',LX+LS/2,LY+64);ctx.fillText('GO',LX+LS/2,LY+118);ctx.textAlign='left'; }
+    // titles
+    ctx.fillStyle='#111';
+    ctx.font='700 54px "Noto Sans TC",sans-serif';
+    ctx.fillText(`${$('evZh').value||''}臨時進出憑證`, LX+LS+40, LY+66);
+    ctx.font='500 38px "IBM Plex Sans","Noto Sans TC",sans-serif';
+    ctx.fillText(`${$('evEn').value||''} Temporary Entry/Exit Pass`, LX+LS+40, LY+124);
+    // issuing + valid
+    const now=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    const issue=`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    ctx.font='500 44px "IBM Plex Sans",sans-serif';
+    ctx.fillText(`Issuing Time: ${issue}`, LX, LY+LS+78);
+    ctx.fillText(`Valid Until: ${$('vUntil').value||''}`, LX, LY+LS+140);
     if(!st){
-      ctx.fillStyle='#999';ctx.font='500 60px "Noto Sans TC",sans-serif';
-      ctx.fillText('請先輸入班別+學號或學生編號', LX, 700);
+      ctx.fillStyle='#999';ctx.font='500 44px "Noto Sans TC",sans-serif';
+      ctx.fillText('請先輸入班別+學號或學生編號', LX, 560);
       return;
     }
     // house box
-    const HX=80,HY=700,HS=380;
+    const HS=320,HX=60,HY=H-60-HS;
     ctx.fillStyle='#000';ctx.fillRect(HX,HY,HS,HS);
-    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='900 250px "Archivo",sans-serif';
-    ctx.fillText(String(st.house||'?'),HX+HS/2,HY+HS/2+88);ctx.textAlign='left';
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='900 210px "Archivo",sans-serif';
+    ctx.fillText(String(st.house||'?'),HX+HS/2,HY+HS/2+74);ctx.textAlign='left';
     // info
     ctx.fillStyle='#111';
-    ctx.font='600 84px "IBM Plex Sans",sans-serif';
-    ctx.fillText(`${st.cls||''} ${st.no||''}`, HX+HS+60, HY+110);
-    ctx.font='700 112px "Noto Sans TC",sans-serif';
-    ctx.fillText(st.name||'—', HX+HS+60, HY+245);
-    ctx.font='600 64px "Archivo","IBM Plex Sans",sans-serif';
-    ctx.fillText(String(st.ename||'').toUpperCase(), HX+HS+60, HY+345);
+    ctx.font='600 60px "IBM Plex Sans",sans-serif';
+    ctx.fillText(`${st.cls||''} ${st.no||''}`, HX+HS+50, HY+80);
+    ctx.font='700 80px "Noto Sans TC",sans-serif';
+    ctx.fillText(st.name||'—', HX+HS+50, HY+180);
+    ctx.font='600 46px "Archivo","IBM Plex Sans",sans-serif';
+    ctx.fillText(String(st.ename||'').toUpperCase(), HX+HS+50, HY+262);
     // QR
-    const QS=520,QX=W-QS-80,QY=H-QS-80;
+    const QS=320,QX=W-QS-60,QY=H-60-QS;
     try{
       const qc=$('qrCanvas');
       await QRCode.toCanvas(qc,String(st.sid),{margin:1,width:1024,color:{dark:'#000000',light:'#ffffff'}});
-      ctx.fillStyle='#fff';ctx.fillRect(QX-16,QY-16,QS+32,QS+32);
+      ctx.fillStyle='#fff';ctx.fillRect(QX-12,QY-12,QS+24,QS+24);
       ctx.drawImage(qc,QX,QY,QS,QS);
-    }catch(e){ ctx.fillStyle='#000';ctx.fillRect(QX,QY,QS,QS);ctx.fillStyle='#fff';ctx.font='700 60px "Archivo",sans-serif';ctx.textAlign='center';ctx.fillText('QR',QX+QS/2,QY+QS/2);ctx.textAlign='left'; }
+    }catch(e){ ctx.fillStyle='#000';ctx.fillRect(QX,QY,QS,QS);ctx.fillStyle='#fff';ctx.font='700 44px "Archivo",sans-serif';ctx.textAlign='center';ctx.fillText('QR',QX+QS/2,QY+QS/2);ctx.textAlign='left'; }
   }
-
+ 
   function download(){
     if(!current){toast('請先載入學生');return;}
     $('cardCanvas').toBlob(b=>{
