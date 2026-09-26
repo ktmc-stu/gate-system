@@ -642,7 +642,7 @@ function initGate(){
     if(state!=='ready')return;
     if($('padOv').classList.contains('open')||$('setOv').classList.contains('open')||$('othOv').classList.contains('open')||$('slotOv').classList.contains('open'))return;
     const t=e.target;
-    if(t&&(t.tagName==='INPUT'||t.tagName='TEXTAREA'||t.isContentEditable))return;
+    if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable))return;
     const now=Date.now();
     if(e.key==='Enter'){
       if(hidBuf.length>=3&&(now-hidLast)<200){ handleScan(hidBuf,true); }
