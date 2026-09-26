@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="KTMC Gate">
+<meta name="apple-mobile-web-app-title" content="GATE">
 <title>Gate · 閘口</title>
 <link rel="icon" href="logo.png">
-<link rel="apple-touch-icon" href="ios-logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -22,9 +22,7 @@ body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
  background-image:linear-gradient(rgba(160,190,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(160,190,255,.05) 1px,transparent 1px);
  background-size:44px 44px;mask-image:radial-gradient(ellipse 90% 70% at 50% 35%,#000 20%,transparent 75%)}
-::-webkit-scrollbar{width:8px;height:8px}
-::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}
-::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}::-webkit-scrollbar-track{background:transparent}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
 ::selection{background:rgba(255,178,36,.35)}
 .top{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 20px;
@@ -51,8 +49,7 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .board{width:min(1020px,96vw);position:relative;display:flex;flex-direction:column;gap:20px;
  padding:clamp(24px,4.5vw,50px);border-radius:28px;border:1px solid var(--line2);background:linear-gradient(180deg,var(--panel),var(--panel2));
  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(16px)}
-.board::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;border-radius:2px;
- background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.75}
+.board::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.75}
 .board>*{position:relative;animation:up .4s cubic-bezier(.2,.8,.3,1) both}
 @keyframes up{from{opacity:0;transform:translateY(14px)}}
 .micro{font:600 11px 'IBM Plex Mono';letter-spacing:.3em;color:var(--faint)}
@@ -76,6 +73,8 @@ main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:2
 .stname.en{font-family:'Archivo','IBM Plex Sans',sans-serif;letter-spacing:.01em}
 .stname.sz-md{font-size:clamp(20px,3.4vw,30px)}
 .stname.sz-sm{font-size:clamp(15px,2.5vw,21px);font-weight:800}
+.stname-en{font-family:'Archivo','IBM Plex Sans',sans-serif;font-weight:800;font-size:clamp(15px,2.4vw,24px);color:var(--dim);line-height:1.25;overflow-wrap:anywhere;margin-top:2px}
+.stname-en.sz-sm{font-size:clamp(12px,1.9vw,17px)}
 .slots-wrap{margin-top:8px}
 .slots-head{display:flex;justify-content:space-between;align-items:center;font:800 clamp(12px,1.9vh,16px) 'IBM Plex Mono';letter-spacing:.14em;color:var(--dim);margin-bottom:8px}
 .slots-head .mono{color:var(--amber);font-size:clamp(14px,2.2vh,18px)}
@@ -334,7 +333,7 @@ function initGate(){
   db.ref('helperList').on('value',s=>{helperList=s.val()||{};});
   db.ref('config/normalLimit').on('value',s=>{normalLimit=parseInt(s.val(),10)||0;});
   db.ref('.info/connected').on('value',s=>{const on=!!s.val();$('conn').className='conn '+(on?'on':'off');$('connTx').textContent=on?'LIVE 連線':'OFFLINE 離線';});
-  watchThreshold(v=>{threshold=v;$('thNote')&&($('thNote').textContent=v);const p=$('pillThB');if(p)p.textContent=v+' min';refreshSlots();});
+  watchThreshold(v=>{threshold=v;const p=$('pillThB');if(p)p.textContent=v+' min';refreshSlots();});
   watchScenario(v=>{scenario=v;applyHeader();if(state==='ready')toReady();});
 
   /* ---- 手機格 ---- */
@@ -374,7 +373,7 @@ function initGate(){
     });
   }
 
-  /* ---- 普通原因（廁所／小食）每日總次數 ---- */
+  /* ---- 普通原因每日總次數 ---- */
   function normalUsed(sid){
     const d=fmtDate(Date.now());
     const nt=countersMap[sid]&&countersMap[sid].normalToday;
@@ -393,7 +392,7 @@ function initGate(){
   function openSlotDetail(i){
     const o=slotsMap[i]; if(!o)return;
     sdCard=o.sid; sdSlot=i;
-    const st=students[o.sid]||{sid:o.sid,cls:'—',no:'—',name:'',house:''};
+    const st=students[o.sid]||{sid:o.sid,cls:'—',no:'—',name:'',ename:'',house:''};
     const live=liveMap[o.sid];
     const outAt=(live&&live.outAt)||o.outAt||null;
     const cnt=(countersMap[o.sid]&&countersMap[o.sid].outCount)||0;
@@ -493,7 +492,7 @@ function initGate(){
     if(state==='ready')toReady();
   };
 
-  /* ---- 自訂鍵盤（gate 零系統鍵盤依賴）---- */
+  /* ---- 自訂鍵盤（7 欄 compact＋大小寫／數字符號）---- */
   let pwCallback=null, kbBuf='', kbMask=false, kbDone=null;
   let kbMode='L', kbUpper=false;
   const KB_L=[['A','B','C','D','E','F','G'],['H','I','J','K','L','M','N'],['O','P','Q','R','S','T','U'],['V','W','X','Y','Z','SHIFT','BK'],['123:2','CLR:2','SP:3']];
@@ -529,7 +528,6 @@ function initGate(){
     else if(kbBuf.length<24)kbBuf+=k;
     kbRender();
   });
-   // 實體鍵盤支援（設定鎖／閘口名稱螢幕鍵盤）
   document.addEventListener('keydown',e=>{
     if(!$('setOv').classList.contains('open'))return;
     if(e.key==='Enter'){e.preventDefault();$('setGo').click();return;}
@@ -638,7 +636,7 @@ function initGate(){
     else if(e.key==='Enter'){$('padGo').click();}
     else if(e.key==='Escape'){closePad();if(state==='ready')startScanner();}});
 
-  /* ---- 其他原因 overlay ---- */
+  /* ---- 其他原因 ---- */
   const OTH_REASONS=['見老師 Teacher','物資 Equipment','身體不適 Unwell','比賽相關 Competition','班務 Class duty'];
   let othPick='', othSt=null;
   (function buildChips(){
@@ -655,7 +653,7 @@ function initGate(){
     stopScanner();
     $('othOv').classList.add('open');
   }
-  $('othClose').onclick=()=>{$('othOv').classList.remove('open');othSt=null;if(state==='ready')startScanner();else if(state==='choice')startScanner();};
+  $('othClose').onclick=()=>{$('othOv').classList.remove('open');othSt=null;if(state==='ready'||state==='choice')startScanner();};
   $('othGo').onclick=()=>{
     const reason=othPick||$('othTxt').value.trim();
     if(!reason){$('othErr').textContent='請選擇或輸入原因 Please choose or type a reason';return;}
@@ -680,7 +678,7 @@ function initGate(){
       if(out.length)return out.sort(byClsNo);}
     out=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===q);
     if(out.length)return out.sort(byClsNo);
-    out=Object.values(students).filter(s=>String(s.sid||'').includes(q)||String(s.name||'').toUpperCase().includes(q));
+    out=Object.values(students).filter(s=>String(s.sid||'').includes(q)||String(s.name||'').toUpperCase().includes(q)||String(s.ename||'').toUpperCase().includes(q));
     return out.sort(byClsNo).slice(0,12);
   }
   function wrongGate(st){
@@ -727,7 +725,7 @@ function initGate(){
           if(slot)db.ref(`slots/${gateKey()}/${slot}`).set(null);
           showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',liveMap[sid]||{outAt:now});return;
         }
-        db.ref('records/'+recKey).set({sid,cls:st.cls,no:st.no,name:st.name||'',house:st.house,scenario,
+        db.ref('records/'+recKey).set({sid,cls:st.cls,no:st.no,name:st.name||'',ename:st.ename||'',house:st.house,scenario,
           code:pendingCode,purpose,reason:reason||'',slot:slot||null,slotGate:slot?cfg.name:null,gateOut:cfg.name,outAt:now,gateIn:null,inAt:null,durationSec:null,overlong:false});
         if(NORMAL(purpose))bumpNormal(sid);
         db.ref('counters/'+sid+'/outCount').transaction(v=>(v||0)+1).then(r=>{
@@ -777,12 +775,6 @@ function initGate(){
   };
   function signal(type,sub){const s=SIG[type]||SIG.go;
     return `<div class="sigwrap"><div class="signal ${s.cls}">${s.svg}</div><div class="siglabel ${s.cls}">${s.label}</div>${sub?`<div class="sigsub">${sub}</div>`:''}</div>`;}
-  function nameBlock(st){
-    const n=String((st&&st.name)||'').trim(); if(!n)return '';
-    const isEn=/^[A-Za-z][A-Za-z\s.\-']*$/.test(n);
-    const sz=isEn?(n.length>16?'sz-sm':n.length>10?'sz-md':''):(n.length>4?'sz-md':'');
-    return `<div class="stname ${isEn?'en':''} ${sz}">${esc(n)}</div>`;
-  }
   function houseBlock(st){const m=houseMeta(st.house);
     return `<div class="house" style="background:${m.color};color:${m.text}"><span class="hl">${esc(st.house||'?')}</span><span class="hs">HOUSE 社</span></div>`;}
   function rows(st){return `
@@ -817,7 +809,7 @@ function initGate(){
       <div class="micro">MULTIPLE MATCHES · 多個符合結果 — 請選擇學生</div>
       <div class="mono dim" style="font-size:13px;margin-bottom:8px">“${esc(raw)}” → ${list.length} results</div>
       <div class="cands">${list.map(s=>{const m=houseMeta(s.house);
-        return `<button class="cand" data-cand="${esc(s.sid)}"><span class="hc" style="background:${m.color}">${esc(s.house||'?')}</span><span class="nm">${esc(s.name||'—')}</span><span class="mono">${esc(s.sid)}</span><span class="dim">${esc(s.cls)} · No.${esc(s.no)}</span>${liveMap[s.sid]?'<span class="dim" style="margin-left:auto;color:var(--amber)">OUT 外面</span>':''}</button>`;}).join('')}</div>
+        return `<button class="cand" data-cand="${esc(s.sid)}"><span class="hc" style="background:${m.color}">${esc(s.house||'?')}</span><span class="nm">${esc(s.name||'—')}${s.ename?` <i class="dim" style="font-style:normal;font-size:11px">${esc(s.ename)}</i>`:''}</span><span class="mono">${esc(s.sid)}</span><span class="dim">${esc(s.cls)} · No.${esc(s.no)}</span>${liveMap[s.sid]?'<span class="dim" style="margin-left:auto;color:var(--amber)">OUT 外面</span>':''}</button>`;}).join('')}</div>
       <button class="ghostbtn" data-act="cancel" style="justify-self:center;margin-top:8px">Cancel 取消</button>`;
   }
   function showPurpose(st){
