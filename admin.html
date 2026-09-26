@@ -187,6 +187,15 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       <p class="dim" style="font-size:12.5px;margin-top:10px">Switching scenario updates all gate devices instantly. 轉換場景後所有閘口裝置即時同步。每筆記錄會蓋上當時場景。</p>
     </div>
     <div class="card">
+      <h3>Event Status<span>活動狀態</span></h3>
+      <p class="dim" style="font-size:13.5px;margin-top:6px" id="evStateTx">—</p>
+      <div class="setrow">
+        <button class="btn ghost" id="btnNotStart">Set Not Started 設為未開始（不計時/不計次）</button>
+        <button class="btn primary" id="btnAllOut">Mark All Outside 所有人視為在外</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">Not Started：閘口不計超時、不計次數/上限。「所有人視為在外」將全部學生設為當前在外（不建個別記錄）；「Start Event Day」（場景卡）則清空並設為已開始、所有人視為在內。</p>
+    </div>
+    <div class="card">
       <h3>Daily Normal Limit<span>每日普通外出總次數（廁所＋小食共用）</span></h3>
       <p class="dim" style="font-size:13.5px;margin-top:6px">Per student per day, Toilet + Food combined. Competition / Helper / Other unlimited. 0 = unlimited.<span class="zh"> 每個學生每日廁所＋小食合計上限；參賽／工作人員／其他不限；0＝不限。</span></p>
       <div class="setrow"><input type="number" class="num" id="limIn" min="0" max="99" style="width:90px"> <span class="dim">trips / day 次／日</span>
@@ -239,6 +248,19 @@ requireAuth(function init(){
   watchScenario(v=>{const el=document.querySelector(`input[name=scen][value=${v}]`);if(el)el.checked=true;});
   $('btnScen').onclick=()=>db.ref('config/scenario').set(document.querySelector('input[name=scen]:checked').value).then(()=>toast('Scenario saved 已儲存場景'));
   $('btnLim').onclick=()=>{const v=parseInt($('limIn').value,10);db.ref('config/normalLimit').set(isFinite(v)&&v>=0?v:0).then(()=>toast('Limit saved 已儲存上限'));};
+  db.ref('config/eventStarted').on('value',s=>{
+    const on=s.val()!==false;
+    $('evStateTx').innerHTML = on
+      ? '<b style="color:var(--green)">Event STARTED 活動已開始</b> — normal timing & counting 正常計時/計次。'
+      : '<b style="color:var(--amber)">Event NOT STARTED 活動未開始</b> — no overlong timing, no trip/limit counting 不計超時/不計次數。';
+  });
+  $('btnNotStart').onclick=()=>{ if(confirm('Set event to NOT STARTED?\n設為活動未開始（不計時/不計次）？')) db.ref('config/eventStarted').set(false).then(()=>toast('Set Not Started 已設為未開始')); };
+  $('btnAllOut').onclick=()=>{
+    if(!confirm('Mark ALL students as currently OUTSIDE?\n將全部學生設為當前在外？'))return;
+    const now=Date.now(),upd={};
+    Object.keys(students).forEach(sid=>{ upd['live/'+sid]={recordId:null,outAt:now,gate:'ADMIN',purpose:'other',reason:'All outside 所有人視為在外',slot:null,slotGate:null}; });
+    db.ref().update(upd).then(()=>toast('All marked outside 所有人已視為在外'));
+  };
   db.ref('slots').on('value',s=>{
     const all=s.val()||{},gates=Object.keys(all),el=$('slotsOverview');
     if(el)el.innerHTML=gates.length?gates.map(g=>{
@@ -248,7 +270,7 @@ requireAuth(function init(){
   });
   $('btnStartDay').onclick=()=>{
     if(confirm('Start event day? All OUTSIDE states and phone slots will be cleared.\n開始活動？所有外出狀態及手機格將清空（全部學生視為在內）。'))
-      Promise.all([db.ref('live').remove(),db.ref('slots').remove()]).then(()=>toast('Event day started 活動已開始（手機格已清空）'));
+      Promise.all([db.ref('live').remove(),db.ref('slots').remove(),db.ref('config/eventStarted').set(true)]).then(()=>toast('Event day started 活動已開始（手機格已清空）'));
   };
   loadToday();
 
