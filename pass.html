@@ -184,8 +184,23 @@ requireAuth(function(){
         let t=String(text||'');let size=base;
         ctx.font=F(400,size,fam);
         while(ctx.measureText(t).width>maxW&&size>min){size-=2;ctx.font=F(400,size,fam);}
-        if(ctx.measureText(t).width>maxW){while(t.length>1&&ctx.measureText(t+'…').width>maxW)t=t.slice(0,-1);t+='…';}
         ctx.fillText(t,x,y);
+      }
+      function fitWrap(text,x,y,maxW,base,min,fam,lh){
+        lh=lh||1.15;
+        let t=String(text||'');if(!t)return y;
+        let size=base;
+        ctx.font=F(400,size,fam);
+        while(ctx.measureText(t).width>maxW&&size>min){size-=2;ctx.font=F(400,size,fam);}
+        const lines=[];let line='';
+        for(const ch of t){
+          if(line&&ctx.measureText(line+ch).width>maxW){lines.push(line);line=ch;}
+          else line+=ch;
+        }
+        if(line)lines.push(line);
+        const step=size*lh;
+        lines.forEach((ln,i)=>ctx.fillText(ln,x,y+i*step));
+        return y+step*lines.length;
       }
       // logo（貼左上、高固定、闊按比例）
       const LX=0,LY=0,LH=205;let LW=195;
@@ -218,11 +233,12 @@ requireAuth(function(){
       ctx.fillStyle='#000';ctx.fillRect(HX,HY,HS,HS);
       ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font=F(400,300,F_DISP);
       ctx.fillText(String(st.house||'?'),HX+HS/2,HY+HS/2+105);ctx.textAlign='left';
-      // info（自動縮字防越界）
+      // info（自動縮字＋換行・完整顯示唔省略）
       ctx.fillStyle='#111';
-      fit(`${st.cls||''} ${st.no||''}`, infoX, HY+80, infoMaxW, 84, 40, F_LAT);
-      fit(st.name||'—', infoX, HY+220, infoMaxW, 110, 44, F_CJK);
-      fit(String(st.ename||'').toUpperCase(), infoX, HY+340, infoMaxW, 74, 30, F_LAT);
+      let iy=560;
+      iy=fitWrap(`${st.cls||''} ${st.no||''}`, infoX, iy, infoMaxW, 84, 40, F_LAT, 1.15)+14;
+      iy=fitWrap(st.name||'—', infoX, iy, infoMaxW, 92, 40, F_CJK, 1.15)+14;
+      iy=fitWrap(String(st.ename||'').toUpperCase(), infoX, iy, infoMaxW, 70, 26, F_LAT, 1.15);
       // QR（貼右、放大、下方編號）
       if(typeof qrcode==='function'){ drawQR(ctx,String(st.sid),QX,QY,QS,2); }
       else{ ctx.fillStyle='#000';ctx.fillRect(QX,QY,QS,QS); }
