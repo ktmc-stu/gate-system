@@ -63,7 +63,9 @@ main{max-width:1100px;margin:0 auto;padding:26px 20px}
       <label>Event 中文 <input type="text" id="evZh" style="min-width:150px"></label>
       <label>Event EN <input type="text" id="evEn" style="min-width:150px"></label>
       <label>Valid Until <input type="text" id="vUntil" style="width:150px"></label>
+      <label>Issuer 發行人 <input type="text" id="issuer" placeholder="必填 Required" style="min-width:160px"></label>
     </div>
+    <div class="field"><span id="issueInfo" class="dim"></span></div>
   </section>
   <section class="card">
     <h3>Preview & Download<span>預覽與下載（85×50mm 貼邊）</span></h3>
@@ -80,7 +82,7 @@ main{max-width:1100px;margin:0 auto;padding:26px 20px}
 <script src="config.js"></script>
 <script src="shared.js"></script>
 <script>
-let students={},booted=false,current=null,logoImg=null;
+let students={},booted=false,current=null,logoImg=null,issueMap={};
 const $=id=>document.getElementById(id);
 const W=1700,H=1000;   // 85mm × 50mm @ 20px/mm
 const nz=v=>String(v??'').trim().toUpperCase().replace(/^0+/,'');
@@ -90,6 +92,7 @@ requireAuth(function(){
   if(booted)return;booted=true;
   bindSignOut();
   db.ref('students').on('value',s=>{students=s.val()||{};});
+  db.ref('passIssues').on('value',s=>{issueMap=s.val()||{};updateIssueInfo();});
   watchScenario(v=>{
     if(!$('evZh').dataset.touched)$('evZh').value=scenarioMeta(v).zh;
     if(!$('evEn').dataset.touched)$('evEn').value=scenarioMeta(v).en;
@@ -100,6 +103,7 @@ requireAuth(function(){
   $('vUntil').value=`${_n.getFullYear()}-${_n.getMonth()+1}-${_n.getDate()}`;
   ['evZh','evEn','vUntil'].forEach(id=>$(id).addEventListener('input',()=>{ $(id).dataset.touched='1'; redraw(); }));
   bindKeypadInput($('pQ'),{title:'Student<span>班別+學號 / 編號 / 卡號</span>'});
+  bindKeypadInput($('issuer'),{title:'Issuer<span>發行人</span>'});
   $('btnLook').onclick=()=>lookup($('pQ').value);
   $('pQ').addEventListener('keydown',e=>{if(e.key==='Enter')lookup($('pQ').value);});
   $('btnDl').onclick=download;
@@ -127,7 +131,16 @@ requireAuth(function(){
     $('candList').innerHTML=list.slice(0,12).map(s=>`<button class="cand" data-sid="${esc(s.sid)}">${esc(s.name||'—')} · ${esc(s.cls)} ${esc(s.no)} · ${esc(s.sid)}</button>`).join('');
     $('candList').querySelectorAll('[data-sid]').forEach(b=>b.onclick=()=>{setSt(students[b.dataset.sid]);$('candList').innerHTML='';});
   }
-  function setSt(st){current=st;redraw();toast(`${st.name||st.sid} 已載入`);}
+  function setSt(st){current=st;redraw();updateIssueInfo();toast(`${st.name||st.sid} 已載入`);}
+  function issueCount(sid){return (issueMap[sid]&&issueMap[sid].count)||0;}
+  function updateIssueInfo(){
+    const el=$('issueInfo');if(!el)return;
+    if(!current){el.innerHTML='';return;}
+    const n=issueCount(current.sid);
+    el.innerHTML = n===0
+      ? '<span style="color:var(--green)">● 首次發行 First issuance</span>'
+      : `<span style="color:var(--amber)">⚠ 已發行 ${n} 次 — 今次為第 ${n+1} 次申請 Previously issued ${n}x</span>`;
+  }
 
   function drawQR(ctx,text,x,y,size,q){
     q=(q==null)?2:q;
@@ -199,18 +212,6 @@ requireAuth(function(){
       ctx.fillText(String(st.sid), QX+QS/2, H-20);
       ctx.textAlign='left';
     }catch(e){ console.error('pass redraw error:',e); toast('Render error: '+(e&&e.message||e)); }
-  }
-
-  function download(){
-    if(!current){toast('請先載入學生');return;}
-    $('cardCanvas').toBlob(b=>{
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(b);
-      a.download=`${current.sid}_pass.png`;
-      document.body.appendChild(a);a.click();a.remove();
-      setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-      toast('PNG 已下載');
-    },'image/png');
   }
 });
 </script>
