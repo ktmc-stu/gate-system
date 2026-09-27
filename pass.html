@@ -242,11 +242,12 @@ requireAuth(function(){
     }catch(e){ console.error('pass redraw error:',e); toast('Render error: '+(e&&e.message||e)); }
   }
 
-  function doDownloadPng(){
+  function doDownloadPng(fname){
+    const fn=fname||((current?current.sid:'pass')+'_pass.png');
     $('cardCanvas').toBlob(b=>{
       const a=document.createElement('a');
       a.href=URL.createObjectURL(b);
-      a.download=`${current.sid}_pass.png`;
+      a.download=fn;
       document.body.appendChild(a);a.click();a.remove();
       setTimeout(()=>URL.revokeObjectURL(a.href),2000);
     },'image/png');
@@ -264,7 +265,7 @@ requireAuth(function(){
       upd['passIssues/'+sid+'/count']=nth;
       upd['passIssues/'+sid+'/log/'+key]={sid,name:current.name||'',cls:current.cls||'',no:current.no||'',house:current.house||'',issuer,at:Date.now(),nth};
       db.ref().update(upd).then(()=>{
-        doDownloadPng();
+        doDownloadPng(sid+'_pass.png');
         toast(`已記錄第 ${nth} 次發行（發行人：${issuer}）`);
         current=null;
         $('pQ').value='';
