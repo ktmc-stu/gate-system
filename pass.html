@@ -265,8 +265,12 @@ requireAuth(function(){
       upd['passIssues/'+sid+'/log/'+key]={sid,name:current.name||'',cls:current.cls||'',no:current.no||'',house:current.house||'',issuer,at:Date.now(),nth};
       db.ref().update(upd).then(()=>{
         doDownloadPng();
-        updateIssueInfo();
         toast(`已記錄第 ${nth} 次發行（發行人：${issuer}）`);
+        current=null;
+        $('pQ').value='';
+        $('candList').innerHTML='';
+        redraw();
+        updateIssueInfo();
       });
     };
     if(prev>=1){
