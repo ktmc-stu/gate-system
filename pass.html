@@ -231,7 +231,7 @@ requireAuth(function(){
       // info（靠下固定基線・換行向上擴展・唔省略）
       ctx.fillStyle='#111';
       fitWrapB(`${st.cls||''} ${st.no||''}`, infoX, HY+80, infoMaxW, 84, 40, F_LAT, 1.15);
-      fitWrapB(st.name||'—', infoX, HY+220, infoMaxW, 92, 40, F_CJK, 1.15);
+      fitWrapB(st.name||'—', infoX, HY+220, infoMaxW, 112, 44, F_CJK, 1.15);
       fitWrapB(String(st.ename||'').toUpperCase(), infoX, HY+340, infoMaxW, 70, 26, F_LAT, 1.15);
       // QR（貼右、放大、下方編號）
       if(typeof qrcode==='function'){ drawQR(ctx,String(st.sid),QX,QY,QS,2); }
