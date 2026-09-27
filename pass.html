@@ -10,20 +10,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 /* 網站託管字體 — iOS/Android/PC 自動載入，毋須安裝 */
-/* 字體內嵌於本檔 — iOS 毋須安裝、毋須額外檔案 */
-@font-face{font-family:'Apots';src:url(data:font/woff2;base64,APOTS_BASE64) format('woff2');font-weight:400 900;font-display:swap;}
-@font-face{font-family:'華康中黑體';src:url(data:font/woff2;base64,HUAKANG_BASE64) format('woff2');font-weight:400;font-display:swap;}
-@font-face{font-family:'DFMediumHei';src:url(data:font/woff2;base64,HUAKANG_BASE64) format('woff2');font-weight:400;font-display:swap;}
 :root{--panel:rgba(17,29,54,.88);--panel2:rgba(10,19,36,.92);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.3);
  --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--grad:linear-gradient(135deg,#ffc95e,#ff8a3d)}
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
 html{color-scheme:dark}
-body{font-family:Apots,'華康中黑體','DFMediumHei','Noto Sans TC';color:var(--text);min-height:100vh;
+body{font-family:Arial,'Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
  background:radial-gradient(1300px 640px at 92% -12%,rgba(75,139,255,.2),transparent 62%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
 .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--line2);
  background:rgba(8,14,26,.82);backdrop-filter:blur(18px);position:sticky;top:0;z-index:20}
-.brand{display:flex;align-items:center;gap:12px;font-family:'Archivo',Apots,'華康中黑體';font-weight:900;font-size:20px}
+.brand{display:flex;align-items:center;gap:12px;font-family:'Archivo',Arial,'Noto Sans TC',sans-serif;font-weight:900;font-size:20px}
 .logo{width:36px;height:36px;object-fit:contain;border-radius:11px}
 .brand b{color:var(--amber)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
 .btn{border:0;border-radius:12px;padding:12px 20px;font-weight:800;font-size:13.5px;cursor:pointer;transition:.2s}
@@ -33,7 +29,7 @@ body{font-family:Apots,'華康中黑體','DFMediumHei','Noto Sans TC';color:var(
 .btn:active{transform:scale(.98)}
 main{max-width:1100px;margin:0 auto;padding:26px 20px}
 .card{position:relative;border-radius:22px;border:1px solid var(--line2);padding:22px;margin-bottom:18px;background:linear-gradient(180deg,var(--panel),var(--panel2))}
-.card h3{font-family:'Archivo',Apots,'華康中黑體';font-size:16px;font-weight:800;margin-bottom:10px}
+.card h3{font-family:'Archivo',Arial,'Noto Sans TC',sans-serif;font-size:16px;font-weight:800;margin-bottom:10px}
 .card h3 span{color:var(--faint);font-weight:500;font-size:.78em;margin-left:8px}
 .field{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
 .field label{font-size:13px;color:var(--dim);font-weight:600}
@@ -91,10 +87,10 @@ let students={},booted=false,current=null,logoImg=null,issueMap={};
 const $=id=>document.getElementById(id);
 const W=1500,H=1000;   // 75mm × 50mm @ 20px/mm（橫向出紙・紙寬 58mm）
 const nz=v=>String(v??'').trim().toUpperCase().replace(/^0+/,'');
-const F_LAT='Apots,"華康中黑體"';
-const F_CJK='"華康中黑體","DFMediumHei","Noto Sans TC"';
-const F_MIX='Apots,"華康中黑體","Noto Sans TC"';
-const F_DISP='"Archivo",Apots,"華康中黑體"';
+const F_LAT='Arial, sans-serif';
+const F_CJK='"Noto Sans TC", sans-serif';
+const F_MIX='Arial, "Noto Sans TC", sans-serif';
+const F_DISP='"Archivo", Arial, "Noto Sans TC", sans-serif';
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 requireAuth(function(){
@@ -123,9 +119,8 @@ requireAuth(function(){
   // 強制載入託管字體（iOS 毋須安裝，經 @font-face 自動下載）先至繪製
   if(document.fonts&&document.fonts.load){
     Promise.all([
-      document.fonts.load('400 84px Apots'),
-      document.fonts.load('400 96px "華康中黑體"'),
-      document.fonts.load('400 84px "華康中黑體"'),
+      document.fonts.load('400 84px Arial'),
+      document.fonts.load('400 96px "Noto Sans TC"'),
       document.fonts.load('400 300px "Archivo"')
     ]).then(()=>redraw()).catch(()=>redraw());
   }
