@@ -92,6 +92,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
   <nav class="tabs">
     <button class="tab on" data-tab="stu">Students<span>學生</span></button>
     <button class="tab" data-tab="rec">Records<span>記錄</span></button>
+    <button class="tab" data-tab="pass">Passes<span>發行記錄</span></button>
     <button class="tab" data-tab="set">Settings<span>設定</span></button>
   </nav>
   <button class="btn ghost" data-signout>Sign Out 登出</button>
@@ -170,6 +171,22 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       </div>
       <div style="overflow-x:auto"><table id="recTable"></table></div>
       <div class="count-line" id="recCount"></div>
+    </div>
+  </section>
+
+  <section class="pane" id="pane-pass">
+    <div class="card">
+      <h3>Pass Issuance Log<span>臨時憑證發行記錄</span></h3>
+      <div class="toolbar">
+        <input type="text" id="passFilter" placeholder="Search 搜尋（編號/姓名/發行人）" style="min-width:240px">
+        <button class="btn primary" id="btnExpPass">Export Excel 匯出</button>
+      </div>
+      <div style="overflow-x:auto"><table id="passTable"></table></div>
+      <div class="count-line" id="passCount"></div>
+    </div>
+    <div class="card">
+      <h3>Per-Student Count<span>每位學生發行次數（可重設）</span></h3>
+      <div style="overflow-x:auto"><table id="passSumTable"></table></div>
     </div>
   </section>
 
@@ -292,6 +309,7 @@ requireAuth(function init(){
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
     document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+t.dataset.tab));
     if(t.dataset.tab==='rec')loadRecords();
+    if(t.dataset.tab==='pass')renderPass();
   });
 
   /* ---------- 匯入（Student ID / Class / Class Num / Name / English Name / Card ID / House）---------- */
@@ -522,6 +540,46 @@ requireAuth(function init(){
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Summary');
       XLSX.writeFile(wb,`gate-summary_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
     });
+  };
+
+  /* ---------- 發行記錄 ---------- */
+  let passData={};
+  db.ref('passIssues').on('value',s=>{passData=s.val()||{};renderPass();});
+  function passLogs(){
+    const out=[];
+    Object.keys(passData).forEach(sid=>{
+      const rec=passData[sid]||{};const logs=rec.log||{};
+      Object.keys(logs).forEach(k=>{out.push(Object.assign({sid,key:k,count:rec.count||0},logs[k]||{}));});
+    });
+    out.sort((a,b)=>(b.at||0)-(a.at||0));
+    return out;
+  }
+  function renderPass(){
+    const q=String($('passFilter').value||'').trim().toUpperCase();
+    const logs=passLogs().filter(L=>{
+      if(!q)return true;
+      const st=students[L.sid]||{};
+      return [L.sid,st.name,st.ename,L.issuer,st.cls].some(v=>String(v||'').toUpperCase().includes(q));
+    });
+    $('passTable').innerHTML='<tr><th>Date</th><th>Time</th><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th>Nth 第幾次</th><th>Issuer 發行人</th></tr>'+
+      logs.slice(0,300).map(L=>{const st=students[L.sid]||{};const d=L.at?new Date(L.at):null;
+        return `<tr><td class="mono">${d?fmtDate(d.getTime()):'—'}</td><td class="mono">${d?fmtClock(d.getTime()):'—'}</td><td class="mono">${esc(L.sid)}</td><td><b>${esc(L.name||st.name||'—')}</b></td><td>${esc(L.cls||st.cls||'')}</td><td>${esc(L.no||st.no||'')}</td><td>${esc(L.house||st.house||'')}</td><td>#${esc(L.nth||'')}</td><td>${esc(L.issuer||'')}</td></tr>`;}).join('')||'<tr><td colspan="9" class="dim">No issuance records 無發行記錄</td></tr>';
+    $('passCount').textContent=`${logs.length} records 記錄（顯示首 ${Math.min(logs.length,300)} 條）`;
+    const sums=Object.keys(passData).map(sid=>({sid,count:(passData[sid]&&passData[sid].count)||0})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+    $('passSumTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>Count 次數</th><th></th></tr>'+
+      sums.map(x=>{const st=students[x.sid]||{};return `<tr><td class="mono">${esc(x.sid)}</td><td><b>${esc(st.name||'—')}</b></td><td>${esc(st.cls||'')}</td><td>#${x.count}</td><td><button class="op" data-preset="${esc(x.sid)}">Reset 重設</button></td></tr>`;}).join('')||'<tr><td colspan="5" class="dim">—</td></tr>';
+  }
+  $('passFilter').oninput=renderPass;
+  $('passSumTable').addEventListener('click',e=>{
+    const b=e.target.closest('[data-preset]');if(!b)return;
+    const sid=b.dataset.preset;
+    if(confirm(`Reset issuance count for ${sid}?\n重設此學生嘅發行次數同記錄？`))db.ref('passIssues/'+sid).remove().then(()=>toast('Reset 已重設'));
+  });
+  $('btnExpPass').onclick=()=>{
+    const rows=passLogs().slice().reverse().map(L=>{const st=students[L.sid]||{};const d=L.at?new Date(L.at):null;
+      return {'Date 日期':d?fmtDate(d.getTime()):'','Time 時間':d?fmtClock(d.getTime()):'','Student ID 學生編號':L.sid,'Name 姓名':L.name||st.name||'','English Name 英文名':st.ename||'','Class 班別':L.cls||st.cls||'','No. 學號':L.no||st.no||'','House 社':L.house||st.house||'','Nth 第幾次':L.nth||'','Issuer 發行人':L.issuer||''};});
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'PassIssues');
+    XLSX.writeFile(wb,`pass-issues_${fmtDate(Date.now())}.xlsx`);
   };
 
   /* ---------- 設定 ---------- */
