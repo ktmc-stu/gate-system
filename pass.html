@@ -10,9 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 /* 網站託管字體 — iOS/Android/PC 自動載入，毋須安裝 */
-@font-face{font-family:'Apots';src:url('fonts/Apots.woff2') format('woff2'),url('fonts/Apots.ttf') format('truetype');font-weight:400 900;font-display:swap;}
-@font-face{font-family:'華康中黑體';src:url('fonts/DFMediumHei.woff2') format('woff2'),url('fonts/DFMediumHei.ttf') format('truetype');font-weight:400;font-display:swap;}
-@font-face{font-family:'DFMediumHei';src:url('fonts/DFMediumHei.woff2') format('woff2'),url('fonts/DFMediumHei.ttf') format('truetype');font-weight:400;font-display:swap;}
+/* 字體內嵌於本檔 — iOS 毋須安裝、毋須額外檔案 */
+@font-face{font-family:'Apots';src:url(data:font/woff2;base64,APOTS_BASE64) format('woff2');font-weight:400 900;font-display:swap;}
+@font-face{font-family:'華康中黑體';src:url(data:font/woff2;base64,HUAKANG_BASE64) format('woff2');font-weight:400;font-display:swap;}
+@font-face{font-family:'DFMediumHei';src:url(data:font/woff2;base64,HUAKANG_BASE64) format('woff2');font-weight:400;font-display:swap;}
 :root{--panel:rgba(17,29,54,.88);--panel2:rgba(10,19,36,.92);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.3);
  --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--grad:linear-gradient(135deg,#ffc95e,#ff8a3d)}
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
