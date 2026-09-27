@@ -213,6 +213,41 @@ requireAuth(function(){
       ctx.textAlign='left';
     }catch(e){ console.error('pass redraw error:',e); toast('Render error: '+(e&&e.message||e)); }
   }
+
+  function doDownloadPng(){
+    $('cardCanvas').toBlob(b=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(b);
+      a.download=`${current.sid}_pass.png`;
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    },'image/png');
+  }
+  function download(){
+    if(!current){toast('請先載入學生');return;}
+    const issuer=$('issuer').value.trim();
+    if(!issuer){toast('請輸入發行人 Issuer required（未輸入不可下載）');$('issuer').focus();return;}
+    const sid=current.sid;
+    const prev=issueCount(sid);
+    const nth=prev+1;
+    const proceed=()=>{
+      const key=db.ref('passIssues/'+sid+'/log').push().key;
+      const upd={};
+      upd['passIssues/'+sid+'/count']=nth;
+      upd['passIssues/'+sid+'/log/'+key]={sid,name:current.name||'',cls:current.cls||'',no:current.no||'',house:current.house||'',issuer,at:Date.now(),nth};
+      db.ref().update(upd).then(()=>{
+        doDownloadPng();
+        updateIssueInfo();
+        toast(`已記錄第 ${nth} 次發行（發行人：${issuer}）`);
+      });
+    };
+    if(prev>=1){
+      if(confirm(`⚠ 此學生已發行過 ${prev} 次臨時憑證。\n今次為第 ${nth} 次申請發行。\n\n請發行人確認是否繼續發行？\nThis student was issued ${prev} pass(es) before. This is issuance #${nth}. Continue?`)){ proceed(); }
+      else toast('已取消發行 Cancelled');
+    }else{
+      proceed();
+    }
+  }
 });
 </script>
 </body>
