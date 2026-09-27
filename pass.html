@@ -7,18 +7,22 @@
 <link rel="icon" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
+/* 網站託管字體 — iOS/Android/PC 自動載入，毋須安裝 */
+@font-face{font-family:'Apots';src:url('fonts/Apots.woff2') format('woff2'),url('fonts/Apots.ttf') format('truetype');font-weight:400 900;font-display:swap;}
+@font-face{font-family:'華康中黑體';src:url('fonts/DFMediumHei.woff2') format('woff2'),url('fonts/DFMediumHei.ttf') format('truetype');font-weight:400;font-display:swap;}
+@font-face{font-family:'DFMediumHei';src:url('fonts/DFMediumHei.woff2') format('woff2'),url('fonts/DFMediumHei.ttf') format('truetype');font-weight:400;font-display:swap;}
 :root{--panel:rgba(17,29,54,.88);--panel2:rgba(10,19,36,.92);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.3);
  --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--grad:linear-gradient(135deg,#ffc95e,#ff8a3d)}
 *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
 html{color-scheme:dark}
-body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
+body{font-family:Apots,'華康中黑體','DFMediumHei','Noto Sans TC';color:var(--text);min-height:100vh;
  background:radial-gradient(1300px 640px at 92% -12%,rgba(75,139,255,.2),transparent 62%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
 .mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
 .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--line2);
  background:rgba(8,14,26,.82);backdrop-filter:blur(18px);position:sticky;top:0;z-index:20}
-.brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:20px}
+.brand{display:flex;align-items:center;gap:12px;font-family:'Archivo',Apots,'華康中黑體';font-weight:900;font-size:20px}
 .logo{width:36px;height:36px;object-fit:contain;border-radius:11px}
 .brand b{color:var(--amber)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
 .btn{border:0;border-radius:12px;padding:12px 20px;font-weight:800;font-size:13.5px;cursor:pointer;transition:.2s}
@@ -28,7 +32,7 @@ body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min
 .btn:active{transform:scale(.98)}
 main{max-width:1100px;margin:0 auto;padding:26px 20px}
 .card{position:relative;border-radius:22px;border:1px solid var(--line2);padding:22px;margin-bottom:18px;background:linear-gradient(180deg,var(--panel),var(--panel2))}
-.card h3{font-family:'Archivo';font-size:16px;font-weight:800;margin-bottom:10px}
+.card h3{font-family:'Archivo',Apots,'華康中黑體';font-size:16px;font-weight:800;margin-bottom:10px}
 .card h3 span{color:var(--faint);font-weight:500;font-size:.78em;margin-left:8px}
 .field{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
 .field label{font-size:13px;color:var(--dim);font-weight:600}
@@ -68,9 +72,9 @@ main{max-width:1100px;margin:0 auto;padding:26px 20px}
     <div class="field"><span id="issueInfo" class="dim"></span></div>
   </section>
   <section class="card">
-    <h3>Preview & Download<span>預覽與下載（85×50mm 貼邊）</span></h3>
-    <div class="prevwrap"><canvas id="cardCanvas" width="1700" height="1000"></canvas></div>
-    <div class="field"><button class="btn green" id="btnDl">Download PNG 下載 PNG</button><span class="dim" id="dlHint">1700×1000 px ＝ 85×50mm @20px/mm</span></div>
+    <h3>Preview & Download<span>預覽與下載（75×50mm 貼邊・橫向出紙）</span></h3>
+    <div class="prevwrap"><canvas id="cardCanvas" width="1500" height="1000"></canvas></div>
+    <div class="field"><button class="btn green" id="btnDl">Download PNG 下載 PNG</button><span class="dim" id="dlHint">1500×1000 px ＝ 75×50mm @20px/mm（紙寬 58mm・走紙 85mm）</span></div>
   </section>
 </main>
 <div id="toast"></div>
@@ -84,8 +88,12 @@ main{max-width:1100px;margin:0 auto;padding:26px 20px}
 <script>
 let students={},booted=false,current=null,logoImg=null,issueMap={};
 const $=id=>document.getElementById(id);
-const W=1700,H=1000;   // 85mm × 50mm @ 20px/mm
+const W=1500,H=1000;   // 75mm × 50mm @ 20px/mm（橫向出紙・紙寬 58mm）
 const nz=v=>String(v??'').trim().toUpperCase().replace(/^0+/,'');
+const F_LAT='Apots,"華康中黑體"';
+const F_CJK='"華康中黑體","DFMediumHei","Noto Sans TC"';
+const F_MIX='Apots,"華康中黑體","Noto Sans TC"';
+const F_DISP='"Archivo",Apots,"華康中黑體"';
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 requireAuth(function(){
@@ -111,6 +119,15 @@ requireAuth(function(){
   logoImg=new Image();
   logoImg.onload=()=>redraw();
   logoImg.src='logo.png';
+  // 強制載入託管字體（iOS 毋須安裝，經 @font-face 自動下載）先至繪製
+  if(document.fonts&&document.fonts.load){
+    Promise.all([
+      document.fonts.load('400 84px Apots'),
+      document.fonts.load('400 96px "華康中黑體"'),
+      document.fonts.load('400 84px "華康中黑體"'),
+      document.fonts.load('400 300px "Archivo"')
+    ]).then(()=>redraw()).catch(()=>redraw());
+  }
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>redraw());
   redraw();
 
@@ -169,14 +186,14 @@ requireAuth(function(){
         if(ctx.measureText(t).width>maxW){while(t.length>1&&ctx.measureText(t+'…').width>maxW)t=t.slice(0,-1);t+='…';}
         ctx.fillText(t,x,y);
       }
-      // logo
+      // logo（貼左上、高固定、闊按比例）
       const LX=0,LY=0,LH=205;let LW=195;
       if(logoImg&&logoImg.complete&&logoImg.naturalWidth>0){
         LW=Math.min(480,Math.max(40,Math.round(LH*logoImg.naturalWidth/logoImg.naturalHeight)));
         ctx.drawImage(logoImg,LX,LY,LW,LH);
       }else{
         ctx.fillStyle='#000';ctx.fillRect(LX,LY,LW,LH);ctx.fillStyle='#fff';ctx.textAlign='center';
-        ctx.font=F(400,64,'"Archivo",sans-serif');ctx.fillText('LO',LX+LW/2,LY+88);ctx.fillText('GO',LX+LW/2,LY+162);ctx.textAlign='left';
+        ctx.font=F(400,64,F_DISP);ctx.fillText('LO',LX+LW/2,LY+88);ctx.fillText('GO',LX+LW/2,LY+162);ctx.textAlign='left';
       }
       // layout
       const HS=375,HX=0,HY=H-HS;
@@ -184,31 +201,31 @@ requireAuth(function(){
       const infoX=HX+HS+45, infoMaxW=QX-infoX-30;
       const titleX=LX+LW+30, titleMaxW=W-titleX-20;
       ctx.fillStyle='#111';
-      // titles
-      fit(`${$('evZh').value||''}臨時進出憑證`, titleX, LY+95, titleMaxW, 84, 40, '"Noto Sans TC",sans-serif');
-      fit(`${$('evEn').value||''} Temporary Entry/Exit Pass`, titleX, LY+185, titleMaxW, 54, 28, '"IBM Plex Sans","Noto Sans TC",sans-serif');
-      // issuing + valid
+      // titles（中文放大、與英文保留少少間距）
+      fit(`${$('evZh').value||''}臨時進出憑證`, titleX, LY+102, titleMaxW, 96, 44, F_CJK);
+      fit(`${$('evEn').value||''} Temporary Entry/Exit Pass`, titleX, LY+176, titleMaxW, 54, 28, F_MIX);
+      // issuing + valid（貼左）
       const now=new Date(),pad=n=>String(n).padStart(2,'0');
       const issue=`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-      fit(`Issuing Time: ${issue}`, 0, LY+LH+110, W-20, 84, 40, '"IBM Plex Sans",sans-serif');
-      fit(`Valid Until: ${$('vUntil').value||''}`, 0, LY+LH+250, QX-20, 84, 40, '"IBM Plex Sans",sans-serif');
+      fit(`Issuing Time: ${issue}`, 0, LY+LH+110, W-20, 84, 40, F_LAT);
+      fit(`Valid Until: ${$('vUntil').value||''}`, 0, LY+LH+250, QX-20, 84, 40, F_LAT);
       if(!st){
-        ctx.fillStyle='#999';fit('請先輸入班別+學號 / 學生編號 / 卡號',0,560,W-20,60,30,'"Noto Sans TC",sans-serif');
+        ctx.fillStyle='#999';fit('請先輸入班別+學號 / 學生編號 / 卡號',0,560,W-20,60,30,F_CJK);
         return;
       }
-      // house
+      // house box（貼左下）
       ctx.fillStyle='#000';ctx.fillRect(HX,HY,HS,HS);
-      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font=F(400,300,'"Archivo",sans-serif');
+      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font=F(400,300,F_DISP);
       ctx.fillText(String(st.house||'?'),HX+HS/2,HY+HS/2+105);ctx.textAlign='left';
       // info（自動縮字防越界）
       ctx.fillStyle='#111';
-      fit(`${st.cls||''} ${st.no||''}`, infoX, HY+80, infoMaxW, 84, 40, '"IBM Plex Sans",sans-serif');
-      fit(st.name||'—', infoX, HY+220, infoMaxW, 110, 44, '"Noto Sans TC",sans-serif');
-      fit(String(st.ename||'').toUpperCase(), infoX, HY+340, infoMaxW, 74, 30, '"Archivo","IBM Plex Sans",sans-serif');
-      // QR
+      fit(`${st.cls||''} ${st.no||''}`, infoX, HY+80, infoMaxW, 84, 40, F_LAT);
+      fit(st.name||'—', infoX, HY+220, infoMaxW, 110, 44, F_CJK);
+      fit(String(st.ename||'').toUpperCase(), infoX, HY+340, infoMaxW, 74, 30, F_LAT);
+      // QR（貼右、放大、下方編號）
       if(typeof qrcode==='function'){ drawQR(ctx,String(st.sid),QX,QY,QS,2); }
       else{ ctx.fillStyle='#000';ctx.fillRect(QX,QY,QS,QS); }
-      ctx.fillStyle='#111';ctx.textAlign='center';ctx.font=F(400,60,'"IBM Plex Sans",sans-serif');
+      ctx.fillStyle='#111';ctx.textAlign='center';ctx.font=F(400,60,F_LAT);
       ctx.fillText(String(st.sid), QX+QS/2, H-20);
       ctx.textAlign='left';
     }catch(e){ console.error('pass redraw error:',e); toast('Render error: '+(e&&e.message||e)); }
