@@ -144,6 +144,11 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
     <div class="card">
       <h3>Competition List<span>參賽者名單（核對・無限時・免交手機）</span></h3>
       <div class="toolbar">
+        <select id="compCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
+        <select id="compStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
+        <button class="btn green" id="btnAddComp">Add 加入參賽</button>
+      </div>
+      <div class="toolbar">
         <button class="btn ghost" id="btnCompUp">Upload 上載</button>
         <button class="btn ghost" id="btnCompClear">Clear 清空</button>
         <span class="dim" id="compCount">0 people 人</span>
@@ -154,6 +159,11 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
     </div>
     <div class="card">
       <h3>Student Helper List<span>工作人員名單（核對・無限時・免交手機）</span></h3>
+      <div class="toolbar">
+        <select id="helperCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
+        <select id="helperStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
+        <button class="btn green" id="btnAddHelper">Add 加入工作人員</button>
+      </div>
       <div class="toolbar">
         <button class="btn ghost" id="btnHelperUp">Upload 上載</button>
         <button class="btn ghost" id="btnHelperClear">Clear 清空</button>
@@ -639,6 +649,34 @@ requireAuth(function init(){
       return {'Date 日期':d?fmtDate(d.getTime()):'','Time 時間':d?fmtClock(d.getTime()):'','Student ID 學生編號':L.sid,'Name 姓名':L.name||st.name||'','English Name 英文名':st.ename||'','Class 班別':L.cls||st.cls||'','No. 學號':L.no||st.no||'','House 社':L.house||st.house||'','Nth 第幾次':L.nth||'','Issuer 發行人':L.issuer||''};});
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'PassIssues');
     XLSX.writeFile(wb,`pass-issues_${fmtDate(Date.now())}.xlsx`);
+  };
+
+  /* ---------- 名單手動加入 ---------- */
+  function listClasses(){return [...new Set(Object.values(students).map(s=>String(s.cls||'').toUpperCase()).filter(Boolean))].sort();}
+  function studentsIn(c){return Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===c).sort(byClsNo);}
+  function populateCls(sel){
+    const cur=sel.value;
+    sel.innerHTML='<option value="">Class 班別</option>'+listClasses().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    sel.value=cur;
+  }
+  function populateStu(clsSel,stuSel){
+    const c=clsSel.value;
+    stuSel.innerHTML='<option value="">Student 學生</option>'+(c?studentsIn(c).map(s=>`<option value="${esc(s.sid)}">${esc(s.no)} ${esc(s.name)}（${esc(s.sid)}）</option>`).join(''):'');
+  }
+  function refreshListSelectors(){
+    populateCls($('compCls'));populateCls($('helperCls'));
+    populateStu($('compCls'),$('compStu'));populateStu($('helperCls'),$('helperStu'));
+  }
+  db.ref('students').on('value',refreshListSelectors);
+  $('compCls').onchange=()=>populateStu($('compCls'),$('compStu'));
+  $('helperCls').onchange=()=>populateStu($('helperCls'),$('helperStu'));
+  $('btnAddComp').onclick=()=>{
+    const sid=$('compStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}
+    db.ref('participantList/'+sid).set(true).then(()=>toast('Added to Competition 已加入參賽名單'));
+  };
+  $('btnAddHelper').onclick=()=>{
+    const sid=$('helperStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}
+    db.ref('helperList/'+sid).set(true).then(()=>toast('Added to Helper 已加入工作人員名單'));
   };
 
   /* ---------- 設定 ---------- */
