@@ -297,7 +297,7 @@ const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false,cam:true};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
-let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, state='boot', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null, slotsPerHouse=6;
+let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, prefectList={}, state='boot', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null, slotsPerHouse=6;
 const $=id=>document.getElementById(id), board=$('board');
 const slotName=(h,i)=>String(h||'?')+'-'+String(i).padStart(2,'0');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
@@ -317,6 +317,7 @@ function initGate(){
   db.ref('counters').on('value',s=>{countersMap=s.val()||{};});
   db.ref('participantList').on('value',s=>{compList=s.val()||{};});
   db.ref('helperList').on('value',s=>{helperList=s.val()||{};});
+  db.ref('prefectList').on('value',s=>{prefectList=s.val()||{};});
   db.ref('config/normalLimit').on('value',s=>{normalLimit=parseInt(s.val(),10)||0;});
   db.ref('config/eventStarted').on('value',s=>{eventStarted=s.val()!==false;if(state==='ready')toReady();});
   db.ref('config/slotsPerHouse').on('value',s=>{slotsPerHouse=parseInt(s.val(),10)||6;refreshSlots();if(state==='ready')toReady();});
@@ -937,7 +938,7 @@ function initGate(){
     if(p&&pendingSt){
       const pu=p.dataset.purpose;
       if(pu==='competition'&&!compList[pendingSt.sid]){showWarn(pendingSt,'NOT ON LIST','參賽者名單無此學生 — 不能以參賽原因外出 Not in competition list',null);sound('warn');return;}
-      if(pu==='helper'&&!helperList[pendingSt.sid]){showWarn(pendingSt,'NOT ON LIST','工作人員名單無此學生 — 不能以工作人員原因外出 Not in helper list',null);sound('warn');return;}
+      if(pu==='helper'&&!helperList[pendingSt.sid]&&!prefectList[pendingSt.sid]){showWarn(pendingSt,'NOT ON LIST','工作人員／風紀名單無此學生 Not in helper/prefect list',null);sound('warn');return;}
       if(eventStarted&&NORMAL(pu)&&normalLimit>0&&normalUsed(pendingSt.sid)>=normalLimit){
         showWarn(pendingSt,'LIMIT REACHED',`今日廁所／小食外出已達上限 (${normalUsed(pendingSt.sid)}/${normalLimit}) Daily toilet/food limit reached`,null);sound('warn');return;}
       if(pu==='other'){ openOther(pendingSt); return; }
