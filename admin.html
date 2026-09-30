@@ -107,6 +107,25 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
   </div>
 
   <section class="pane on" id="pane-stu">
+    <div class="card" id="stuFormCard">
+      <h3>Add / Edit Student<span>單獨新增／編輯學生</span></h3>
+      <div class="toolbar">
+        <input type="text" id="fSid" placeholder="Student ID 學生編號 *" style="min-width:140px">
+        <input type="text" id="fCls" placeholder="Class 班別" style="width:90px">
+        <input type="text" id="fNo" placeholder="No. 學號" style="width:80px">
+        <input type="text" id="fName" placeholder="Name 中文名" style="min-width:120px">
+        <input type="text" id="fEname" placeholder="English Name 英文名" style="min-width:140px">
+        <input type="text" id="fCard" placeholder="Card ID 卡號" style="min-width:130px">
+        <select id="fHouse" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px">
+          <option value="">House 社</option><option>K</option><option>T</option><option>M</option><option>C</option>
+        </select>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" id="btnSaveStu">Save 儲存</button>
+        <button class="btn ghost" id="btnClearStu">Clear 清空</button>
+        <span class="dim" id="stuFormMsg"></span>
+      </div>
+    </div>
     <div class="card">
       <h3>Import Students<span>匯入學生名單（Excel / CSV）</span></h3>
       <div class="radios">
@@ -467,13 +486,41 @@ requireAuth(function init(){
         <td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name||'—')}</b>${s.ename?`<div class="dim" style="font-size:11px">${esc(s.ename)}</div>`:''}</td><td class="mono">${esc(s.card||'—')}</td><td>${esc(s.cls)}</td><td>${esc(s.no)}</td>
         <td><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span></td>
         <td>${s.overlongFlag?`<span class="flagchip">⚠ OVERLONG 超時</span>`:'<span class="dim">—</span>'}</td>
-        <td style="white-space:nowrap">${s.overlongFlag?`<button class="op" data-flag="${esc(s.sid)}">Reset 重設</button>`:''}<button class="op del" data-del="${esc(s.sid)}">Delete 刪除</button></td></tr>`;}).join('');
+        <td style="white-space:nowrap">${s.overlongFlag?`<button class="op" data-flag="${esc(s.sid)}">Reset 重設</button>`:''}<button class="op" data-edit="${esc(s.sid)}">Edit 編輯</button><button class="op del" data-del="${esc(s.sid)}">Delete 刪除</button></td></tr>`;}).join('');
     $('stuCount').textContent=`Showing ${show.length} of ${list.length} 顯示 ${show.length} / ${list.length}`;
   }
   $('sFilter').oninput=renderStudents;
+  let editingSid=null;
+  function clearStuForm(){
+    editingSid=null;
+    ['fSid','fCls','fNo','fName','fEname','fCard'].forEach(id=>{const el=$(id);el.value='';el.readOnly=false;});
+    $('fHouse').value='';
+    $('btnSaveStu').textContent='Save 儲存';
+    $('stuFormMsg').textContent='';
+  }
+  function editStu(sid){
+    const s=students[sid];if(!s)return;
+    editingSid=sid;
+    $('fSid').value=s.sid||'';$('fSid').readOnly=true;
+    $('fCls').value=s.cls||'';$('fNo').value=s.no||'';$('fName').value=s.name||'';$('fEname').value=s.ename||'';$('fCard').value=s.card||'';
+    $('fHouse').value=s.house||'';
+    $('btnSaveStu').textContent='Update 更新';
+    $('stuFormMsg').textContent='Editing 編輯中: '+sid;
+    $('stuFormCard').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  $('btnClearStu').onclick=clearStuForm;
+  $('btnSaveStu').onclick=()=>{
+    const sid=$('fSid').value.trim();
+    if(!sid){toast('Student ID required 請輸入學生編號');$('fSid').focus();return;}
+    if(!editingSid&&students[sid]&&!confirm('Student ID already exists. Overwrite? 編號已存在，覆寫？'))return;
+    const keep=editingSid&&students[editingSid]?!!students[editingSid].overlongFlag:false;
+    db.ref('students/'+sid).set({sid,cls:$('fCls').value.trim(),no:$('fNo').value.trim(),name:$('fName').value.trim(),ename:$('fEname').value.trim(),card:$('fCard').value.trim(),house:$('fHouse').value,overlongFlag:keep})
+      .then(()=>{toast(editingSid?'Updated 已更新':'Added 已新增');clearStuForm();});
+  };
   $('stuTable').addEventListener('click',e=>{
-    const f=e.target.closest('[data-flag]'),dd=e.target.closest('[data-del]');
+    const f=e.target.closest('[data-flag]'),dd=e.target.closest('[data-del]'),ed=e.target.closest('[data-edit]');
     if(f)db.ref('students/'+f.dataset.flag+'/overlongFlag').set(false).then(()=>toast('Flag cleared 已重設標記'));
+    if(ed){editStu(ed.dataset.edit);return;}
     if(dd){const c=dd.dataset.del,s=students[c];
       if(confirm(`Delete ${s?.name||s?.sid||c} (${s?.cls||''}) ? 確定刪除？`)){
         const upd={};upd['students/'+c]=null;upd['live/'+c]=null;db.ref().update(upd);}}
