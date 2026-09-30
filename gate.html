@@ -299,6 +299,7 @@ try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){
 window.MUTED=cfg.muted;
 let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, state='boot', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null, slotsPerHouse=6;
 const $=id=>document.getElementById(id), board=$('board');
+const slotName=(h,i)=>String(h||'?')+'-'+String(i).padStart(2,'0');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
 const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
 const NO_LIMIT=p=>p==='competition'||p==='helper';
@@ -345,7 +346,7 @@ function initGate(){
       const g=$('slotsGrid_'+h);if(!g)return;
       const lim=threshold*60000;const o=houseSlots(h);let c='';
       for(let i=1;i<=slotsPerHouse;i++){const oc=o[i];const over=oc&&oc.outAt&&(Date.now()-oc.outAt)>=lim;
-        c+=`<div class="slot${oc?' occ':''}${over?' over':''}" data-slot="${i}" data-house="${h}">${i}</div>`;}
+        c+=`<div class="slot${oc?' occ':''}${over?' over':''}" data-slot="${i}" data-house="${h}">${slotName(h,i)}</div>`;}
       g.innerHTML=c;
       const f=$('slotFree_'+h);if(f)f.textContent=freeCount(h)+'/'+slotsPerHouse+' FREE';
       const ov=$('slotOver_'+h);if(ov){const n=overCount(h);if(n>0){ov.style.display='inline';ov.textContent='⚠ '+n+' OVER';}else ov.style.display='none';}
@@ -387,7 +388,7 @@ function initGate(){
     const cnt=(countersMap[o.sid]&&countersMap[o.sid].outCount)||0;
     const pm=purposeMeta(live?live.purpose:null);
     const m=houseMeta(house);
-    $('sdTitle').textContent=`SLOT 手機格 ${house} #${i} · ${cfg.name}`;
+    $('sdTitle').textContent=`SLOT 手機格 ${slotName(house,i)} · ${cfg.name}`;
     $('sdBody').innerHTML=`
       <div class="grid2" style="gap:18px">
         <div class="house" style="width:110px;background:${m.color};color:${m.text}"><span class="hl" style="font-size:56px">${esc(house)}</span><span class="hs">HOUSE 社</span></div>
@@ -859,7 +860,7 @@ function initGate(){
     const noLimit=NO_LIMIT(purpose);
     const flag=noLimit?false:wasFlag;
     const midHtml=slot
-      ?`<div class="slotbig"><b>#${slot}</b><span>PHONE SLOT 手機格 ${slotHouse?`· HOUSE ${esc(slotHouse)}`:''} · PUT PHONE IN 請放入手機</span></div>`
+      ?`<div class="slotbig"><b>${esc(slotName(slotHouse,slot))}</b><span>PHONE SLOT 手機格 · PUT PHONE IN 請放入手機</span></div>`
       :`<div class="okline" style="text-align:center;font-size:clamp(14px,2.2vh,18px)">📵 無需交手機 · ⏱ 無限時 NO PHONE · NO TIME LIMIT</div>`;
     board.innerHTML=`
       <div class="micro">GOING ${sc.out.en} ${sc.out.zh} · RECORDED 已記錄</div>
@@ -879,7 +880,7 @@ function initGate(){
       :otherPhone?`📱 手機存放於其他閘 PHONE AT ${esc(phone.gate)} #${phone.slot}`
       :noLimit?`♾️ 無限時記錄 NO TIME LIMIT · ${pm.icon} ${pm.zh}`
       :'準時返回 ON TIME · 請放行 PROCEED';
-    const phoneHtml=phone&&phone.own?`<div class="slotbig green"><b>#${phone.slot}</b><span>COLLECT PHONE 取回手機 ${phone.house?`· HOUSE ${esc(phone.house)}`:''}</span></div>`:'';
+    const phoneHtml=phone&&phone.own?`<div class="slotbig green"><b>${esc(slotName(phone.house,phone.slot))}</b><span>COLLECT PHONE 取回手機</span></div>`:'';
     board.innerHTML=`
       <div class="micro">BACK ${sc.in.en} ${sc.in.zh} · RECORDED 已記錄</div>
       ${signal(sig,sub)}
@@ -898,7 +899,7 @@ function initGate(){
       ${signal('stop')}
       <div class="warn-title" style="text-align:center">WRONG GATE FOR RETURN<span>請前往 <b>${esc(otherGate)}</b> 取回手機 Please return to ${esc(otherGate)} to collect phone</span></div>
       <div class="grid2">${houseBlock(st)}<div class="info">${nameBlock(st)}${rows(st)}
-        <span class="pill mono" style="margin-top:10px">📱 PHONE AT ${esc(otherGate)} ${live.slotHouse?`HOUSE ${esc(live.slotHouse)} `:''}SLOT #${live.slot}</span>
+        <span class="pill mono" style="margin-top:10px">📱 PHONE AT ${esc(otherGate)} ${esc(slotName(live.slotHouse,live.slot))}</span>
         </div></div>
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
     sound('err');schedule(10000);
