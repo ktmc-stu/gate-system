@@ -191,12 +191,14 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
         <select id="prefCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
         <select id="prefStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
         <button class="btn green" id="btnAddPref">Add 加入風紀</button>
-        <button class="btn ghost" id="btnPrefFile">Import Excel 匯入</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" id="btnPrefFile">Import Excel 匯入（取代）</button>
         <input type="file" id="filePref" accept=".xlsx,.xls,.csv" hidden>
         <button class="btn green" id="btnExpPref">Export 匯出</button>
+        <span class="dim" id="prefCount"></span>
       </div>
       <div style="overflow-x:auto"><table id="prefTable"></table></div>
-      <div class="count-line" id="prefCount"></div>
     </div>
 
   <section class="pane" id="pane-rec">
