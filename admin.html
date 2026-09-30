@@ -220,6 +220,9 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
     </div>
     <div class="card">
       <h3>Phone Slots<span>手機格占用（即時・所有閘口）</span></h3>
+      <div class="setrow"><span class="dim">每社分配格數 Slots per House（所有社相同・不同社不可共用）</span>
+        <input type="number" class="num" id="spHouse" min="1" max="99" style="width:90px">
+        <button class="btn primary" id="btnSpHouse">Save 儲存</button></div>
       <div id="slotsOverview" class="dim" style="font-size:13.5px;line-height:2">—</div>
     </div>
     <div class="card">
@@ -278,13 +281,22 @@ requireAuth(function init(){
     Object.keys(students).forEach(sid=>{ upd['live/'+sid]={recordId:null,outAt:now,gate:'ADMIN',purpose:'other',reason:'All outside 所有人視為在外',slot:null,slotGate:null}; });
     db.ref().update(upd).then(()=>toast('All marked outside 所有人已視為在外'));
   };
-  db.ref('slots').on('value',s=>{
-    const all=s.val()||{},gates=Object.keys(all),el=$('slotsOverview');
-    if(el)el.innerHTML=gates.length?gates.map(g=>{
-      const occ=Object.values(all[g]||{}).filter(Boolean);
-      return `<div><b class="mono">${esc(g)}</b> — ${occ.length}/12 占用：${occ.map(o=>{const st=students[o.sid];return esc(st?st.name||st.sid:o.sid);}).join(', ')||'（全空）'}</div>`;
+  let slotsAll={},slotsPerHouse=6;
+  function renderSlotsOverview(){
+    const el=$('slotsOverview');if(!el)return;
+    const gates=Object.keys(slotsAll);
+    el.innerHTML=gates.length?gates.map(g=>{
+      const gd=slotsAll[g]||{};const houses=Object.keys(gd);
+      const parts=houses.map(h=>{
+        const occ=Object.values(gd[h]||{}).filter(Boolean);
+        return `<b style="color:${houseMeta(h).color}">${esc(h)}</b> ${occ.length}/${slotsPerHouse}`+(occ.length?`（${occ.map(o=>{const st=students[o.sid];return esc(st?st.name||st.sid:o.sid);}).join(', ')}）`:'');
+      });
+      return `<div><b class="mono">${esc(g)}</b> — ${parts.join(' · ')||'（全空）'}</div>`;
     }).join(''):'（無占用 No occupancy）';
-  });
+  }
+  db.ref('slots').on('value',s=>{slotsAll=s.val()||{};renderSlotsOverview();});
+  db.ref('config/slotsPerHouse').on('value',s=>{slotsPerHouse=parseInt(s.val(),10)||6;$('spHouse').value=slotsPerHouse;renderSlotsOverview();});
+  $('btnSpHouse').onclick=()=>{const v=parseInt($('spHouse').value,10);if(v>=1&&v<=99)db.ref('config/slotsPerHouse').set(v).then(()=>toast('Slots per house saved 已儲存每社格數'));};
   $('btnStartDay').onclick=()=>{
     if(confirm('Start event day? All OUTSIDE states and phone slots will be cleared.\n開始活動？所有外出狀態及手機格將清空（全部學生視為在內）。'))
       Promise.all([db.ref('live').remove(),db.ref('slots').remove(),db.ref('config/eventStarted').set(true)]).then(()=>toast('Event day started 活動已開始（手機格已清空）'));
