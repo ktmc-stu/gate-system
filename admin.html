@@ -185,6 +185,20 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
     </div>
   </section>
 
+    <div class="card">
+      <h3>Prefect List<span>風紀名單（視同工作人員・自由進出）</span></h3>
+      <div class="toolbar">
+        <select id="prefCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
+        <select id="prefStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
+        <button class="btn green" id="btnAddPref">Add 加入風紀</button>
+        <button class="btn ghost" id="btnPrefFile">Import Excel 匯入</button>
+        <input type="file" id="filePref" accept=".xlsx,.xls,.csv" hidden>
+        <button class="btn green" id="btnExpPref">Export 匯出</button>
+      </div>
+      <div style="overflow-x:auto"><table id="prefTable"></table></div>
+      <div class="count-line" id="prefCount"></div>
+    </div>
+
   <section class="pane" id="pane-rec">
     <div class="card">
       <h3>Entry / Exit Records<span>進出記錄</span></h3>
@@ -664,8 +678,8 @@ requireAuth(function init(){
     stuSel.innerHTML='<option value="">Student 學生</option>'+(c?studentsIn(c).map(s=>`<option value="${esc(s.sid)}">${esc(s.no)} ${esc(s.name)}（${esc(s.sid)}）</option>`).join(''):'');
   }
   function refreshListSelectors(){
-    populateCls($('compCls'));populateCls($('helperCls'));
-    populateStu($('compCls'),$('compStu'));populateStu($('helperCls'),$('helperStu'));
+    populateCls($('compCls'));populateCls($('helperCls'));populateCls($('prefCls'));
+    populateStu($('compCls'),$('compStu'));populateStu($('helperCls'),$('helperStu'));populateStu($('prefCls'),$('prefStu'));
   }
   db.ref('students').on('value',refreshListSelectors);
   $('compCls').onchange=()=>populateStu($('compCls'),$('compStu'));
@@ -677,6 +691,36 @@ requireAuth(function init(){
   $('btnAddHelper').onclick=()=>{
     const sid=$('helperStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}
     db.ref('helperList/'+sid).set(true).then(()=>toast('Added to Helper 已加入工作人員名單'));
+  };
+
+  /* ---------- 風紀名單 ---------- */
+  let prefectList={};
+  db.ref('prefectList').on('value',s=>{prefectList=s.val()||{};renderPref();});
+  function renderPref(){
+    const rows=Object.keys(prefectList).map(sid=>students[sid]||{sid}).sort(byClsNo);
+    $('prefTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th></th></tr>'+
+      rows.map(s=>`<tr><td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name||'—')}</b></td><td>${esc(s.cls||'')}</td><td>${esc(s.no||'')}</td><td>${esc(s.house||'')}</td><td><button class="op del" data-prefdel="${esc(s.sid)}">Delete 刪除</button></td></tr>`).join('')||'<tr><td colspan="6" class="dim">Empty 空</td></tr>';
+    $('prefCount').textContent=`${rows.length} prefects 風紀`;
+  }
+  $('prefTable').addEventListener('click',e=>{
+    const d=e.target.closest('[data-prefdel]');if(!d)return;
+    if(confirm('Remove prefect 刪除風紀？'))db.ref('prefectList/'+d.dataset.prefdel).remove();
+  });
+  $('prefCls').onchange=()=>populateStu($('prefCls'),$('prefStu'));
+  $('btnAddPref').onclick=()=>{
+    const sid=$('prefStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}
+    db.ref('prefectList/'+sid).set(true).then(()=>toast('Added to Prefect 已加入風紀名單'));
+  };
+  $('btnPrefFile').onclick=()=>$('filePref').click();
+  $('filePref').onchange=e=>{const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();r.onload=()=>{const {list}=parseSheet(r.result);
+      const upd={};list.forEach(s=>{upd['prefectList/'+s.sid]=true;});
+      db.ref().update(upd).then(()=>toast(`Imported ${list.length} prefects 已匯入風紀`));};
+    r.readAsArrayBuffer(f);e.target.value='';};
+  $('btnExpPref').onclick=()=>{
+    const rows=Object.keys(prefectList).map(sid=>students[sid]||{sid}).sort(byClsNo).map(s=>({'Student ID 學生編號':s.sid,'Name 姓名':s.name||'','Class 班別':s.cls||'','No. 學號':s.no||'','House 社':s.house||''}));
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Prefect');
+    XLSX.writeFile(wb,`prefect_${fmtDate(Date.now())}.xlsx`);
   };
 
   /* ---------- 設定 ---------- */
