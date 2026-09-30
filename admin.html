@@ -712,10 +712,35 @@ requireAuth(function init(){
     db.ref('prefectList/'+sid).set(true).then(()=>toast('Added to Prefect 已加入風紀名單'));
   };
   $('btnPrefFile').onclick=()=>$('filePref').click();
+  const nzP=v=>String(v??'').trim().toUpperCase().replace(/^0+/,'');
+  function prefBySid(q){const Q=nzP(q);for(const k in students){if(nzP(students[k].sid)===Q||nzP(students[k].card)===Q)return students[k];}return null;}
+  function prefByClsNo(cls,no){const c=String(cls).toUpperCase(),n=String(parseInt(no,10)||no);
+    return Object.values(students).find(s=>String(s.cls||'').toUpperCase()===c&&String(parseInt(s.no,10)||s.no)===n)||null;}
+  function resolvePrefRow(row){
+    const cells=(row||[]).map(c=>String(c||'').trim()).filter(Boolean);
+    if(!cells.length)return null;
+    for(const c of cells){const s=prefBySid(c);if(s)return s.sid;}                       // 學生編號/卡號
+    for(const c of cells){const m=c.toUpperCase().match(/^([0-9]+[A-Z]+)[\s\-]?([0-9]+)$/);   // 連寫 3B12
+      if(m){const s=prefByClsNo(m[1],m[2]);if(s)return s.sid;}}
+    for(let i=0;i<cells.length;i++){const cm=cells[i].toUpperCase().match(/^([0-9]+[A-Z]+)$/); // 分欄 3B + 12
+      if(cm){for(let j=0;j<cells.length;j++){if(j===i)continue;
+        const s=prefByClsNo(cm[1],cells[j]);if(s)return s.sid;}}}
+    return null;
+  }
   $('filePref').onchange=e=>{const f=e.target.files[0];if(!f)return;
-    const r=new FileReader();r.onload=()=>{const {list}=parseSheet(r.result);
-      const upd={};list.forEach(s=>{upd['prefectList/'+s.sid]=true;});
-      db.ref().update(upd).then(()=>toast(`Imported ${list.length} prefects 已匯入風紀`));};
+    const r=new FileReader();r.onload=()=>{
+      const wb=XLSX.read(r.result,{type:'array'});
+      const arr=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
+      const map={},miss=[];
+      arr.forEach((row,idx)=>{
+        if(!(row||[]).some(c=>String(c||'').trim()!==''))return;
+        const joined=String((row||[]).join(' ')).toLowerCase();
+        if(idx<3&&/class|班|student|編號|name|姓名|no/.test(joined))return;   // 跳過表頭
+        const sid=resolvePrefRow(row);
+        if(sid)map[sid]=true;else miss.push(idx+1);
+      });
+      db.ref('prefectList').set(map).then(()=>toast(`Replaced 已取代名單：${Object.keys(map).length} prefects${miss.length?` · ${miss.length} 行未匹配`:''}`));
+    };
     r.readAsArrayBuffer(f);e.target.value='';};
   $('btnExpPref').onclick=()=>{
     const rows=Object.keys(prefectList).map(sid=>students[sid]||{sid}).sort(byClsNo).map(s=>({'Student ID 學生編號':s.sid,'Name 姓名':s.name||'','Class 班別':s.cls||'','No. 學號':s.no||'','House 社':s.house||''}));
