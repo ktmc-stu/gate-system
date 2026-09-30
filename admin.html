@@ -174,6 +174,22 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       <div id="helperList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
     <div class="card">
+      <h3>Prefect List<span>風紀名單（視同工作人員・自由進出）</span></h3>
+      <div class="toolbar">
+        <select id="prefCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
+        <select id="prefStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
+        <button class="btn green" id="btnAddPref">Add 加入風紀</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" id="btnPrefUp">Upload 上載</button>
+        <button class="btn ghost" id="btnPrefClear">Clear 清空</button>
+        <span class="dim" id="prefCount">0 people 人</span>
+      </div>
+      <input type="file" id="prefFile" accept=".xlsx,.xls,.csv" hidden>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
+      <div id="prefList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
+    </div>
+    <div class="card">
       <h3>Student List<span>學生名單</span></h3>
       <div class="toolbar">
         <input type="text" id="sFilter" placeholder="Search 搜尋（編號 / 姓名 / 英文 / 卡號 / 班別）" style="min-width:260px">
@@ -185,21 +201,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
     </div>
   </section>
 
-    <div class="card">
-      <h3>Prefect List<span>風紀名單（視同工作人員・自由進出）</span></h3>
-      <div class="toolbar">
-        <select id="prefCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
-        <select id="prefStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
-        <button class="btn green" id="btnAddPref">Add 加入風紀</button>
-      </div>
-      <div class="toolbar">
-        <button class="btn ghost" id="btnPrefFile">Import Excel 匯入（取代）</button>
-        <input type="file" id="filePref" accept=".xlsx,.xls,.csv" hidden>
-        <button class="btn green" id="btnExpPref">Export 匯出</button>
-        <span class="dim" id="prefCount"></span>
-      </div>
-      <div style="overflow-x:auto"><table id="prefTable"></table></div>
-    </div>
+  <section class="pane" id="pane-rec">
 
   <section class="pane" id="pane-rec">
     <div class="card">
@@ -295,7 +297,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
 <script src="config.js"></script>
 <script src="shared.js"></script>
 <script>
-let students={},live={},todayStart=0,pendList=null,booted=false,compMap={},helperMap={};
+let students={},live={},todayStart=0,pendList=null,booted=false,compMap={},helperMap={},prefectMap={};
 const $=id=>document.getElementById(id);
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
@@ -306,7 +308,7 @@ requireAuth(function init(){
   $('dFrom').value=$('dTo').value=fmtDate(Date.now());
 
   db.ref('students').on('value',s=>{students=s.val()||{};updateStats();renderStudents();
-    renderListPreview('compList',compMap);renderListPreview('helperList',helperMap);});
+    renderListPreview('compList',compMap);renderListPreview('helperList',helperMap);renderListPreview('prefList',prefectMap);});
   db.ref('live').on('value',s=>{live=s.val()||{};updateStats();});
   watchThreshold(v=>$('thIn').value=v);
   db.ref('config/normalLimit').on('value',s=>{$('limIn').value=parseInt(s.val(),10)||0;});
@@ -686,6 +688,7 @@ requireAuth(function init(){
   db.ref('students').on('value',refreshListSelectors);
   $('compCls').onchange=()=>populateStu($('compCls'),$('compStu'));
   $('helperCls').onchange=()=>populateStu($('helperCls'),$('helperStu'));
+  $('prefCls').onchange=()=>populateStu($('prefCls'),$('prefStu'));
   $('btnAddComp').onclick=()=>{
     const sid=$('compStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}
     db.ref('participantList/'+sid).set(true).then(()=>toast('Added to Competition 已加入參賽名單'));
@@ -694,61 +697,12 @@ requireAuth(function init(){
     const sid=$('helperStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}
     db.ref('helperList/'+sid).set(true).then(()=>toast('Added to Helper 已加入工作人員名單'));
   };
-
-  /* ---------- 風紀名單 ---------- */
-  let prefectList={};
-  db.ref('prefectList').on('value',s=>{prefectList=s.val()||{};renderPref();});
-  function renderPref(){
-    const rows=Object.keys(prefectList).map(sid=>students[sid]||{sid}).sort(byClsNo);
-    $('prefTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th></th></tr>'+
-      rows.map(s=>`<tr><td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name||'—')}</b></td><td>${esc(s.cls||'')}</td><td>${esc(s.no||'')}</td><td>${esc(s.house||'')}</td><td><button class="op del" data-prefdel="${esc(s.sid)}">Delete 刪除</button></td></tr>`).join('')||'<tr><td colspan="6" class="dim">Empty 空</td></tr>';
-    $('prefCount').textContent=`${rows.length} prefects 風紀`;
-  }
-  $('prefTable').addEventListener('click',e=>{
-    const d=e.target.closest('[data-prefdel]');if(!d)return;
-    if(confirm('Remove prefect 刪除風紀？'))db.ref('prefectList/'+d.dataset.prefdel).remove();
-  });
-  $('prefCls').onchange=()=>populateStu($('prefCls'),$('prefStu'));
   $('btnAddPref').onclick=()=>{
     const sid=$('prefStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}
     db.ref('prefectList/'+sid).set(true).then(()=>toast('Added to Prefect 已加入風紀名單'));
   };
-  $('btnPrefFile').onclick=()=>$('filePref').click();
-  const nzP=v=>String(v??'').trim().toUpperCase().replace(/^0+/,'');
-  function prefBySid(q){const Q=nzP(q);for(const k in students){if(nzP(students[k].sid)===Q||nzP(students[k].card)===Q)return students[k];}return null;}
-  function prefByClsNo(cls,no){const c=String(cls).toUpperCase(),n=String(parseInt(no,10)||no);
-    return Object.values(students).find(s=>String(s.cls||'').toUpperCase()===c&&String(parseInt(s.no,10)||s.no)===n)||null;}
-  function resolvePrefRow(row){
-    const cells=(row||[]).map(c=>String(c||'').trim()).filter(Boolean);
-    if(!cells.length)return null;
-    for(const c of cells){const s=prefBySid(c);if(s)return s.sid;}                       // 學生編號/卡號
-    for(const c of cells){const m=c.toUpperCase().match(/^([0-9]+[A-Z]+)[\s\-]?([0-9]+)$/);   // 連寫 3B12
-      if(m){const s=prefByClsNo(m[1],m[2]);if(s)return s.sid;}}
-    for(let i=0;i<cells.length;i++){const cm=cells[i].toUpperCase().match(/^([0-9]+[A-Z]+)$/); // 分欄 3B + 12
-      if(cm){for(let j=0;j<cells.length;j++){if(j===i)continue;
-        const s=prefByClsNo(cm[1],cells[j]);if(s)return s.sid;}}}
-    return null;
-  }
-  $('filePref').onchange=e=>{const f=e.target.files[0];if(!f)return;
-    const r=new FileReader();r.onload=()=>{
-      const wb=XLSX.read(r.result,{type:'array'});
-      const arr=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
-      const map={},miss=[];
-      arr.forEach((row,idx)=>{
-        if(!(row||[]).some(c=>String(c||'').trim()!==''))return;
-        const joined=String((row||[]).join(' ')).toLowerCase();
-        if(idx<3&&/class|班|student|編號|name|姓名|no/.test(joined))return;   // 跳過表頭
-        const sid=resolvePrefRow(row);
-        if(sid)map[sid]=true;else miss.push(idx+1);
-      });
-      db.ref('prefectList').set(map).then(()=>toast(`Replaced 已取代名單：${Object.keys(map).length} prefects${miss.length?` · ${miss.length} 行未匹配`:''}`));
-    };
-    r.readAsArrayBuffer(f);e.target.value='';};
-  $('btnExpPref').onclick=()=>{
-    const rows=Object.keys(prefectList).map(sid=>students[sid]||{sid}).sort(byClsNo).map(s=>({'Student ID 學生編號':s.sid,'Name 姓名':s.name||'','Class 班別':s.cls||'','No. 學號':s.no||'','House 社':s.house||''}));
-    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Prefect');
-    XLSX.writeFile(wb,`prefect_${fmtDate(Date.now())}.xlsx`);
-  };
+  db.ref('prefectList').on('value',s=>{prefectMap=s.val()||{};$('prefCount').textContent=Object.keys(prefectMap).length+' people 人';renderListPreview('prefList',prefectMap);});
+  wireList('btnPrefUp','prefFile','btnPrefClear','prefectList','風紀名單 ');
 
   /* ---------- 設定 ---------- */
   $('btnTh').onclick=()=>{const v=parseInt($('thIn').value);if(v>0&&v<=120)db.ref('config/overlongMin').set(v).then(()=>toast('Saved 已儲存'));};
