@@ -447,7 +447,7 @@ function initGate(){
   function houseLabel(){ const hs=gateHouses(); return hs.length?hs.join(' '):'ALL 全社'; }
   function refreshHousePill(){ const p=$('pillHouse'); if(p)p.textContent=houseLabel(); }
   function refreshChanPill(){ const p=$('pillChan'); if(p)p.textContent=channelType()==='special'?'SPECIAL 專用':'NORMAL 普通'; }
-  function houseAllowed(st){ const hs=gateHouses(); if(!hs.length)return true; return hs.includes(String(st.house||'').toUpperCase()); }
+  function houseAllowed(st){ if(topList[st.sid])return true; const hs=gateHouses(); if(!hs.length)return true; return hs.includes(String(st.house||'').toUpperCase()); }
 
   /* ---- QR scanner ---- */
   function startScanner(){
