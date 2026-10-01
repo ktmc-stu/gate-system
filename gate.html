@@ -297,7 +297,7 @@ const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false,cam:true};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
-let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, prefectList={}, topList={}, state='boot', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null, slotsPerHouse=6;
+let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, prefectList={}, topList={}, state='boot', lastSrc='cam', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null, slotsPerHouse=6;
 const $=id=>document.getElementById(id), board=$('board');
 const slotName=(h,i)=>String(h||'?')+'-'+String(i).padStart(2,'0');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
@@ -455,7 +455,7 @@ function initGate(){
     if(!window.Html5Qrcode){const c=$('camErr');if(c)c.innerHTML='Scanner library not loaded 掃描庫未載入';return;}
     stopScanner();
     const camOpts={fps:10,qrbox:{width:240,height:240}};
-    const onQr=txt=>{ if(state!=='ready')return; stopScanner(); handleScan(txt,false); };
+    const onQr=txt=>{ if(state!=='ready')return; stopScanner(); handleScan(txt,'cam'); };
     try{
       qr=new Html5Qrcode('reader');
       qr.start({facingMode:'environment'},camOpts,onQr,()=>{})
@@ -617,7 +617,7 @@ function initGate(){
     padBuf='';updPad();
     closePad();
     stopScanner();
-    if(q)handleScan(q,true); else toReady();
+    if(q)handleScan(q,'manual'); else toReady();
   };
   document.addEventListener('keydown',e=>{ if(!$('padOv').classList.contains('open'))return;
     if(/^[0-9a-zA-Z]$/.test(e.key)&&padBuf.length<24){padBuf+=e.key.toUpperCase();updPad();}
@@ -635,7 +635,7 @@ function initGate(){
     if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable))return;
     const now=Date.now();
     if(e.key==='Enter'){
-      if(hidBuf.length>=3&&(now-hidLast)<200){ handleScan(hidBuf,true); }
+      if(hidBuf.length>=3&&(now-hidLast)<200){ handleScan(hidBuf,'hid'); }
       hidBuf='';hidLast=0;return;
     }
     if(e.key.length===1){
@@ -707,10 +707,12 @@ function initGate(){
       doIn(st); return;
     }
     if(cfg.mode==='in'){ showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null); return; }
-    if(topList[st.sid]){ doOut(st,'helper'); return; }   // TOP 全通行：自動放行・免原因・免限制
+    if(topList[st.sid]&&lastSrc==='hid'){ doOut(st,'helper'); return; }   // TOP 全通行：只限刷卡自動放行
     showPurpose(st);
   }
-  function handleScan(raw,manual){
+  function handleScan(raw,src){
+    src=src||'cam'; lastSrc=src;
+    const manual=(src!=='cam');
     raw=String(raw||'').trim(); if(!raw)return;
     pendingCode=raw;
     if(manual){
@@ -795,8 +797,8 @@ function initGate(){
     return `<div class="sigwrap"><div class="signal ${s.cls}">${s.svg}</div><div class="siglabel ${s.cls}">${s.label}</div>${sub?`<div class="sigsub">${sub}</div>`:''}</div>`;}
   function houseBlock(st){const m=houseMeta(st.house);
     return `<div class="house" style="background:${m.color};color:${m.text}"><span class="hl">${esc(st.house||'?')}</span><span class="hs">HOUSE 社</span></div>`;}
-  function rows(st){return `
-    <div class="row"><span class="k">Student ID<i>學生編號</i></span><span class="v mono">${esc(st.sid||'—')}</span></div>
+  function rows(st,hideSid){return `
+    ${hideSid?'':`<div class="row"><span class="k">Student ID<i>學生編號</i></span><span class="v mono">${esc(st.sid||'—')}</span></div>`}
     <div class="row"><span class="k">Class<i>班別</i></span><span class="v">${esc(st.cls||'—')} · No.${esc(st.no||'—')}</span></div>`;}
   function flagBadge(st){return st.overlongFlag?`<div class="flagline">⚠ PREVIOUSLY OVERLONG 曾外出時間過長</div>`:'';}
   function slotsStrip(){
@@ -870,7 +872,7 @@ function initGate(){
       <div class="micro">GOING ${sc.out.en} ${sc.out.zh} · RECORDED 已記錄</div>
       ${signal(flag?'caution':'go', flag?'⚠ 曾外出時間過長 PREVIOUSLY OVERLONG — 請留意返回時間':'手續完成 · 請放行 PROCEED')}
       ${midHtml}
-      <div class="grid2">${houseBlock(st)}<div class="info">${nameBlock(st)}${rows(st)}</div></div>
+      <div class="grid2">${houseBlock(st)}<div class="info">${nameBlock(st)}${rows(st,!!topList[st.sid])}</div></div>
       <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span>${topList[st.sid]?'<span class="pill">⭐ TOP 全通行</span>':''}${purpose==='other'&&lastReason?`<span class="pill">📌 ${esc(lastReason)}</span>`:''}${noLimit?'<span class="pill">♾️ NO LIMIT 無限時</span>':''}<span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
     sound(flag?'warn':'out');schedule(flag?11000:9000);
@@ -889,7 +891,7 @@ function initGate(){
       <div class="micro">BACK ${sc.in.en} ${sc.in.zh} · RECORDED 已記錄</div>
       ${signal(sig,sub)}
       ${phoneHtml}
-      <div class="grid2">${houseBlock(st)}<div class="info">${nameBlock(st)}${rows(st)}
+      <div class="grid2">${houseBlock(st)}<div class="info">${nameBlock(st)}${rows(st,!!topList[st.sid])}
         <div class="dur-line">${fmtDur(durMs)}<span>TIME OUTSIDE 在外時間</span></div></div></div>
       <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span></div>
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
