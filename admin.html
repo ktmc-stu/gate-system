@@ -190,6 +190,22 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       <div id="prefList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
     <div class="card">
+    <div class="card">
+      <h3>TOP List<span>TOP 全通行（任何閘口・免原因・免限制）</span></h3>
+      <div class="toolbar">
+        <select id="topCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
+        <select id="topStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
+        <button class="btn green" id="btnAddTop">Add 加入 TOP</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" id="btnTopUp">Upload 上載</button>
+        <button class="btn ghost" id="btnTopClear">Clear 清空</button>
+        <span class="dim" id="topCount">0 people 人</span>
+      </div>
+      <input type="file" id="topFile" accept=".xlsx,.xls,.csv" hidden>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
+      <div id="topList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
+    </div>
       <h3>Student List<span>學生名單</span></h3>
       <div class="toolbar">
         <input type="text" id="sFilter" placeholder="Search 搜尋（編號 / 姓名 / 英文 / 卡號 / 班別）" style="min-width:260px">
@@ -295,7 +311,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
 <script src="config.js"></script>
 <script src="shared.js"></script>
 <script>
-let students={},live={},todayStart=0,pendList=null,booted=false,compMap={},helperMap={},prefectMap={};
+let students={},live={},todayStart=0,pendList=null,booted=false,compMap={},helperMap={},prefectMap={},topMap={};
 const $=id=>document.getElementById(id);
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
 
@@ -307,7 +323,7 @@ requireAuth(function init(){
   $('dFrom').value=$('dTo').value=iso(Date.now());
 
   db.ref('students').on('value',s=>{students=s.val()||{};updateStats();renderStudents();
-    renderListPreview('compList',compMap);renderListPreview('helperList',helperMap);renderListPreview('prefList',prefectMap);});
+    renderListPreview('compList',compMap);renderListPreview('helperList',helperMap);renderListPreview('prefList',prefectMap);renderListPreview('topList',topMap);});
   db.ref('live').on('value',s=>{live=s.val()||{};updateStats();});
   watchThreshold(v=>$('thIn').value=v);
   db.ref('config/normalLimit').on('value',s=>{$('limIn').value=parseInt(s.val(),10)||0;});
@@ -501,9 +517,11 @@ requireAuth(function init(){
   db.ref('participantList').on('value',s=>{compMap=s.val()||{};$('compCount').textContent=Object.keys(compMap).length+' people 人';renderListPreview('compList',compMap);});
   db.ref('helperList').on('value',s=>{helperMap=s.val()||{};$('helperCount').textContent=Object.keys(helperMap).length+' people 人';renderListPreview('helperList',helperMap);});
   db.ref('prefectList').on('value',s=>{prefectMap=s.val()||{};$('prefCount').textContent=Object.keys(prefectMap).length+' people 人';renderListPreview('prefList',prefectMap);});
+  db.ref('topList').on('value',s=>{topMap=s.val()||{};$('topCount').textContent=Object.keys(topMap).length+' people 人';renderListPreview('topList',topMap);});
   wireList('btnCompUp','compFile','btnCompClear','participantList','參賽者名單 ');
   wireList('btnHelperUp','helperFile','btnHelperClear','helperList','工作人員名單 ');
   wireList('btnPrefUp','prefFile','btnPrefClear','prefectList','風紀名單 ');
+  wireList('btnTopUp','topFile','btnTopClear','topList','TOP 名單 ');
 
   function listClasses(){return [...new Set(Object.values(students).map(s=>String(s.cls||'').toUpperCase()).filter(Boolean))].sort();}
   function studentsIn(c){return Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===c).sort(byClsNo);}
@@ -517,16 +535,18 @@ requireAuth(function init(){
     stuSel.innerHTML='<option value="">Student 學生</option>'+(c?studentsIn(c).map(s=>`<option value="${esc(s.sid)}">${esc(s.no)} ${esc(s.name)}（${esc(s.sid)}）</option>`).join(''):'');
   }
   function refreshListSelectors(){
-    populateCls($('compCls'));populateCls($('helperCls'));populateCls($('prefCls'));
-    populateStu($('compCls'),$('compStu'));populateStu($('helperCls'),$('helperStu'));populateStu($('prefCls'),$('prefStu'));
+    populateCls($('compCls'));populateCls($('helperCls'));populateCls($('prefCls'));populateCls($('topCls'));
+    populateStu($('compCls'),$('compStu'));populateStu($('helperCls'),$('helperStu'));populateStu($('prefCls'),$('prefStu'));populateStu($('topCls'),$('topStu'));
   }
   db.ref('students').on('value',refreshListSelectors);
   $('compCls').onchange=()=>populateStu($('compCls'),$('compStu'));
   $('helperCls').onchange=()=>populateStu($('helperCls'),$('helperStu'));
   $('prefCls').onchange=()=>populateStu($('prefCls'),$('prefStu'));
+  $('topCls').onchange=()=>populateStu($('topCls'),$('topStu'));
   $('btnAddComp').onclick=()=>{const sid=$('compStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}db.ref('participantList/'+sid).set(true).then(()=>toast('Added to Competition 已加入參賽名單'));};
   $('btnAddHelper').onclick=()=>{const sid=$('helperStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}db.ref('helperList/'+sid).set(true).then(()=>toast('Added to Helper 已加入工作人員名單'));};
   $('btnAddPref').onclick=()=>{const sid=$('prefStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}db.ref('prefectList/'+sid).set(true).then(()=>toast('Added to Prefect 已加入風紀名單'));};
+  $('btnAddTop').onclick=()=>{const sid=$('topStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}db.ref('topList/'+sid).set(true).then(()=>toast('Added to TOP 已加入 TOP 名單'));};
 
   /* ---------- 學生表 ---------- */
   const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
