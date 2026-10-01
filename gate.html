@@ -624,10 +624,11 @@ function initGate(){
     else if(e.key==='Enter'){$('padGo').click();}
     else if(e.key==='Escape'){closePad();if(state==='ready')startScanner();}});
 
-  /* ---- 刷卡（HID）---- */
+  /* ---- 刷卡（HID・結果畫面期間仍可連續刷卡）---- */
   let hidBuf='',hidLast=0;
+  const SWIPE_STATES=['ready','out','in','warn','choice'];
   document.addEventListener('keydown',e=>{
-    if(state!=='ready')return;
+    if(!SWIPE_STATES.includes(state))return;
     if($('padOv').classList.contains('open')||$('setOv').classList.contains('open')||$('othOv').classList.contains('open')||$('slotOv').classList.contains('open'))return;
     const t=e.target;
     if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable))return;
