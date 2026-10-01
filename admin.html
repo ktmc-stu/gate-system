@@ -126,6 +126,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
         <span class="dim" id="stuFormMsg"></span>
       </div>
     </div>
+
     <div class="card">
       <h3>Import Students<span>匯入學生名單（Excel / CSV）</span></h3>
       <div class="radios">
@@ -141,6 +142,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
         <div style="overflow-x:auto"><table id="pvTable"></table></div>
       </div>
     </div>
+
     <div class="card">
       <h3>Competition List<span>參賽者名單（核對・無限時・免交手機）</span></h3>
       <div class="toolbar">
@@ -157,6 +159,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
       <div id="compList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
+
     <div class="card">
       <h3>Student Helper List<span>工作人員名單（核對・無限時・免交手機）</span></h3>
       <div class="toolbar">
@@ -173,6 +176,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
       <div id="helperList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
+
     <div class="card">
       <h3>Prefect List<span>風紀名單（視同工作人員・自由進出）</span></h3>
       <div class="toolbar">
@@ -189,7 +193,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
       <div id="prefList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
-    <div class="card">
+
     <div class="card">
       <h3>TOP List<span>TOP 全通行（任何閘口・免原因・免限制）</span></h3>
       <div class="toolbar">
@@ -203,9 +207,11 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
         <span class="dim" id="topCount">0 people 人</span>
       </div>
       <input type="file" id="topFile" accept=".xlsx,.xls,.csv" hidden>
-      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單。TOP 只限<b>刷卡</b>自動放行，QR/手動需密碼授權（見 gate）。</p>
       <div id="topList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
     </div>
+
+    <div class="card">
       <h3>Student List<span>學生名單</span></h3>
       <div class="toolbar">
         <input type="text" id="sFilter" placeholder="Search 搜尋（編號 / 姓名 / 英文 / 卡號 / 班別）" style="min-width:260px">
@@ -274,6 +280,15 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       <p class="dim" style="font-size:12.5px;margin-top:10px">Not Started：閘口不計超時、不計次數/上限。「所有人視為在外」將全部學生設為當前在外（不建個別記錄）；「Start Event Day」（場景卡）則清空並設為已開始、所有人視為在內。</p>
     </div>
     <div class="card">
+      <h3>Exit Lock<span>暫停外出（禁止所有離開）</span></h3>
+      <p class="dim" style="font-size:13.5px;margin-top:6px" id="lockTx">—</p>
+      <div class="setrow">
+        <button class="btn danger" id="btnLockOn">Lock 禁止所有外出</button>
+        <button class="btn green" id="btnLockOff">Unlock 恢復正常外出</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">Lock 時所有閘口拒絕外出並顯示「暫時不可離開看台範圍」；如確有需要，職員可於閘口輸入管理員密碼授權單次離開。返回（入場）不受影響。</p>
+    </div>
+    <div class="card">
       <h3>Daily Normal Limit<span>每日普通外出總次數（廁所＋小食共用）</span></h3>
       <p class="dim" style="font-size:13.5px;margin-top:6px">Per student per day, Toilet + Food combined. Competition / Helper / Prefect / Other unlimited. 0 = unlimited.<span class="zh"> 每個學生每日廁所＋小食合計上限；參賽／工作人員／風紀／其他不限；0＝不限。</span></p>
       <div class="setrow"><input type="number" class="num" id="limIn" min="0" max="99" style="width:90px"> <span class="dim">trips / day 次／日</span>
@@ -285,15 +300,6 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
         <input type="number" class="num" id="spHouse" min="1" max="99" style="width:90px">
         <button class="btn primary" id="btnSpHouse">Save 儲存</button></div>
       <div id="slotsOverview" class="dim" style="font-size:13.5px;line-height:2">—</div>
-    </div>
-    <div class="card">
-      <h3>Exit Lock<span>暫停外出（禁止所有離開）</span></h3>
-      <p class="dim" style="font-size:13.5px;margin-top:6px" id="lockTx">—</p>
-      <div class="setrow">
-        <button class="btn danger" id="btnLockOn">Lock 禁止所有外出</button>
-        <button class="btn green" id="btnLockOff">Unlock 恢復正常外出</button>
-      </div>
-      <p class="dim" style="font-size:12.5px;margin-top:10px">Lock 時所有閘口拒絕外出並顯示「暫時不可離開看台範圍」；如確有需要，職員可於閘口輸入管理員密碼授權單次離開。返回（入場）不受影響。</p>
     </div>
     <div class="card">
       <h3>Overlong Threshold<span>超時時限</span></h3>
@@ -352,6 +358,13 @@ requireAuth(function init(){
     Object.keys(students).forEach(sid=>{ upd['live/'+sid]={recordId:null,outAt:now,gate:'ADMIN',purpose:'other',reason:'All outside 所有人視為在外',slot:null,slotGate:null}; });
     db.ref().update(upd).then(()=>toast('All marked outside 所有人已視為在外'));
   };
+  db.ref('config/exitLocked').on('value',s=>{const on=!!s.val();
+    $('lockTx').innerHTML= on
+      ? '<b style="color:var(--red)">EXIT LOCKED 暫停外出</b> — 所有閘口禁止離開。'
+      : '<b style="color:var(--green)">NORMAL 正常</b> — 可正常外出。';});
+  $('btnLockOn').onclick=()=>{if(confirm('禁止所有外出？\nLock all exits?'))db.ref('config/exitLocked').set(true).then(()=>toast('Locked 已禁止外出'));};
+  $('btnLockOff').onclick=()=>db.ref('config/exitLocked').set(false).then(()=>toast('Unlocked 已恢復正常外出'));
+
   let slotsAll={},slotsPerHouse=6;
   function renderSlotsOverview(){
     const el=$('slotsOverview');if(!el)return;
@@ -466,7 +479,7 @@ requireAuth(function init(){
     XLSX.writeFile(wb,`students_${fmtDate(Date.now())}.xlsx`);
   };
 
-  /* ---------- 名單管理（參賽/工作人員/風紀）---------- */
+  /* ---------- 名單管理 ---------- */
   function parseListFile(data){
     const wb=XLSX.read(data,{type:'array'});
     const arr=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
@@ -667,7 +680,6 @@ requireAuth(function init(){
         'In Time 返回時間':r.inAt?fmtClock(r.inAt):'STILL OUTSIDE 仍未返回','Duration 在外時間':r.durationSec!=null?fmtDur(r.durationSec*1000):'',
         'Overlong 超時':r.overlong?'YES 是':''};});
       const ws=XLSX.utils.json_to_sheet(data);
-      ws['!cols']=[{wch:22},{wch:11},{wch:12},{wch:14},{wch:16},{wch:8},{wch:8},{wch:6},{wch:12},{wch:18},{wch:12},{wch:14},{wch:10},{wch:14},{wch:10},{wch:12},{wch:10}];
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');
       XLSX.writeFile(wb,`gate-records_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
     }).finally(()=>{btn.disabled=false;btn.textContent='Export Excel 匯出記錄';});
@@ -726,13 +738,7 @@ requireAuth(function init(){
   };
 
   /* ---------- 設定 ---------- */
-  db.ref('config/exitLocked').on('value',s=>{const on=!!s.val();
-    $('lockTx').innerHTML= on
-      ? '<b style="color:var(--red)">EXIT LOCKED 暫停外出</b> — 所有閘口禁止離開。'
-      : '<b style="color:var(--green)">NORMAL 正常</b> — 可正常外出。';});
-  $('btnLockOn').onclick=()=>{if(confirm('禁止所有外出？\nLock all exits?'))db.ref('config/exitLocked').set(true).then(()=>toast('Locked 已禁止外出'));};
-  $('btnLockOff').onclick=()=>db.ref('config/exitLocked').set(false).then(()=>toast('Unlocked 已恢復正常外出'));
-  $('btnTh').onclick=()=>{
+  $('btnTh').onclick=()=>{const v=parseInt($('thIn').value);if(v>0&&v<=120)db.ref('config/overlongMin').set(v).then(()=>toast('Saved 已儲存'));};
   function arm(btn,fn,label){btn.onclick=()=>{
     if(btn.classList.contains('armed')){fn();btn.classList.remove('armed');btn.textContent=label;}
     else{btn.classList.add('armed');btn.textContent='Confirm? 確定執行？再按一次';setTimeout(()=>{btn.classList.remove('armed');btn.textContent=label;},3500);}};}
