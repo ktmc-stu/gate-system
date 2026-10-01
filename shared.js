@@ -1,3 +1,12 @@
+if(document.documentMode){ // 只有 IE 有 documentMode
+  window.addEventListener('DOMContentLoaded',()=>{
+    const d=document.createElement('div');
+    d.style.cssText='position:fixed;inset:0;z-index:99999;background:#081120;color:#f2f6ff;display:flex;align-items:center;justify-content:center;text-align:center;font:600 22px/1.6 sans-serif;padding:30px';
+    d.innerHTML='⚠ 本系統不支援 Internet Explorer<br>請改用 <b style="color:#ffb224">Chrome / Edge / Safari</b><br><span style="font-size:14px;color:#a5b4d4">This system does not support Internet Explorer. Please use Chrome, Edge or Safari.</span>';
+    document.body.appendChild(d);
+  });
+}
+
 /* shared.js — 共享初始化／工具／鎖／螢幕鍵盤／音效 */
 firebase.initializeApp(FIREBASE_CONFIG);
 let db   = firebase.database();
