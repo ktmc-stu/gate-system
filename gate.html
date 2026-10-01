@@ -702,14 +702,20 @@ function initGate(){
   function proceed(st){
     const live=liveMap[st.sid];
     const isOut=!!live;
+    
+    // 【最高優先】如果系統禁止外出，且學生當前在裡面（想出去），直接顯示禁止外出，不判斷社別/閘口
+    if(!isOut && exitLocked){ showLocked(st); return; }
+
+    // 如果學生在外面（想返回），正常處理返回（若走錯閘口則提示錯閘口，因為要拿回手機）
     if(isOut){
       if(!NO_LIMIT(live.purpose)&&!houseAllowed(st)){ wrongGate(st); return; }
       if(cfg.mode==='out'){ showWarn(st,'ALREADY OUT','該學生已登記外出，尚未返回',live); return; }
       doIn(st); return;
     }
+    
+    // 學生在裡面，且系統沒有 Lock
     if(cfg.mode==='in'){ showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null); return; }
-    if(exitLocked){ showLocked(st); return; }   // 暫停外出：總鎖優先（含 TOP）
-    if(topList[st.sid]&&lastSrc==='hid'){ doOut(st,'helper'); return; }   // TOP 全通行：只限刷卡自動放行
+    if(topList[st.sid]&&lastSrc==='hid'){ doOut(st,'helper'); return; }
     showPurpose(st);
   }
   function handleScan(raw,src){
@@ -729,6 +735,7 @@ function initGate(){
   }
 
   function doOut(st,purpose,reason){
+    if(exitLocked){ showLocked(st); return; }   // 防止選目的期間 Admin 突然開啟 Lock
     if(!NO_LIMIT(purpose)&&!houseAllowed(st)){ wrongGate(st); return; }
     const sid=st.sid, now=Date.now();
     const recKey=db.ref('records').push().key;
