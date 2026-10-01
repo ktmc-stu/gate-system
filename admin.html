@@ -287,6 +287,15 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       <div id="slotsOverview" class="dim" style="font-size:13.5px;line-height:2">—</div>
     </div>
     <div class="card">
+      <h3>Exit Lock<span>暫停外出（禁止所有離開）</span></h3>
+      <p class="dim" style="font-size:13.5px;margin-top:6px" id="lockTx">—</p>
+      <div class="setrow">
+        <button class="btn danger" id="btnLockOn">Lock 禁止所有外出</button>
+        <button class="btn green" id="btnLockOff">Unlock 恢復正常外出</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">Lock 時所有閘口拒絕外出並顯示「暫時不可離開看台範圍」；如確有需要，職員可於閘口輸入管理員密碼授權單次離開。返回（入場）不受影響。</p>
+    </div>
+    <div class="card">
       <h3>Overlong Threshold<span>超時時限</span></h3>
       <p class="dim" style="font-size:13.5px;margin-top:6px">If a student is out longer than this, the return is flagged. 外出超過此時限，返回時會被標記。</p>
       <div class="setrow"><input type="number" class="num" id="thIn" min="1" max="120" style="width:90px"> <span class="dim">min 分鐘</span>
@@ -717,7 +726,13 @@ requireAuth(function init(){
   };
 
   /* ---------- 設定 ---------- */
-  $('btnTh').onclick=()=>{const v=parseInt($('thIn').value);if(v>0&&v<=120)db.ref('config/overlongMin').set(v).then(()=>toast('Saved 已儲存'));};
+  db.ref('config/exitLocked').on('value',s=>{const on=!!s.val();
+    $('lockTx').innerHTML= on
+      ? '<b style="color:var(--red)">EXIT LOCKED 暫停外出</b> — 所有閘口禁止離開。'
+      : '<b style="color:var(--green)">NORMAL 正常</b> — 可正常外出。';});
+  $('btnLockOn').onclick=()=>{if(confirm('禁止所有外出？\nLock all exits?'))db.ref('config/exitLocked').set(true).then(()=>toast('Locked 已禁止外出'));};
+  $('btnLockOff').onclick=()=>db.ref('config/exitLocked').set(false).then(()=>toast('Unlocked 已恢復正常外出'));
+  $('btnTh').onclick=()=>{
   function arm(btn,fn,label){btn.onclick=()=>{
     if(btn.classList.contains('armed')){fn();btn.classList.remove('armed');btn.textContent=label;}
     else{btn.classList.add('armed');btn.textContent='Confirm? 確定執行？再按一次';setTimeout(()=>{btn.classList.remove('armed');btn.textContent=label;},3500);}};}
