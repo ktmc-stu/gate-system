@@ -297,7 +297,7 @@ const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false,cam:true};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
-let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, prefectList={}, topList={}, state='boot', lastSrc='cam', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null, slotsPerHouse=6;
+let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, prefectList={}, topList={}, state='boot', lastSrc='cam', exitLocked=false, pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null, slotsPerHouse=6;
 const $=id=>document.getElementById(id), board=$('board');
 const slotName=(h,i)=>String(h||'?')+'-'+String(i).padStart(2,'0');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
@@ -321,6 +321,7 @@ function initGate(){
   db.ref('topList').on('value',s=>{topList=s.val()||{};});
   db.ref('config/normalLimit').on('value',s=>{normalLimit=parseInt(s.val(),10)||0;});
   db.ref('config/eventStarted').on('value',s=>{eventStarted=s.val()!==false;if(state==='ready')toReady();});
+  db.ref('config/exitLocked').on('value',s=>{exitLocked=!!s.val();});
   db.ref('config/slotsPerHouse').on('value',s=>{slotsPerHouse=parseInt(s.val(),10)||6;refreshSlots();if(state==='ready')toReady();});
   db.ref('.info/connected').on('value',s=>{const on=!!s.val();$('conn').className='conn '+(on?'on':'off');$('connTx').textContent=on?'LIVE 連線':'OFFLINE 離線';});
   watchThreshold(v=>{threshold=v;const p=$('pillThB');if(p)p.textContent=v+' min';refreshSlots();});
@@ -707,6 +708,7 @@ function initGate(){
       doIn(st); return;
     }
     if(cfg.mode==='in'){ showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null); return; }
+    if(exitLocked){ showLocked(st); return; }   // 暫停外出：總鎖優先（含 TOP）
     if(topList[st.sid]&&lastSrc==='hid'){ doOut(st,'helper'); return; }   // TOP 全通行：只限刷卡自動放行
     showPurpose(st);
   }
@@ -922,6 +924,17 @@ function initGate(){
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
     sound(type==='stop'?'err':'warn');schedule(10000);
   }
+  function showLocked(st){
+    state='warn';pendingSt=st;clearTimeout(resetT);resetT=setTimeout(toReady,15000);
+    board.innerHTML=`
+      <div class="micro">LOCKDOWN · 暫停外出</div>
+      ${signal('stop')}
+      <div class="warn-title" style="text-align:center">暫時不可離開看台範圍<span>Temporarily no leaving the stand area. 如確有需要，請職員輸入密碼授權離開。</span></div>
+      <div class="grid2">${houseBlock(st)}<div class="info">${nameBlock(st)}${rows(st)}</div></div>
+      <div class="center"><button class="ghostbtn" data-act="authout">🔓 管理員授權離開 Admin Authorize</button></div>
+      <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
+    sound('err');
+  }
   function showNotFound(raw){
     state='warn';pendingSt=null;
     board.innerHTML=`
@@ -953,6 +966,8 @@ function initGate(){
     const b=e.target.closest('[data-act]');
     if(b){const a=b.dataset.act;
       if(a==='manual')openPad();
+      else if(a==='authout'){const st=pendingSt;
+        askPassword('輸入管理員密碼授權離開 Enter admin password to authorize exit',()=>{ if(st)showPurpose(st); });}
       else if(a==='cancel')toReady();
       else if(a==='camon'){cfg.cam=true;localStorage.setItem(CFG_KEY,JSON.stringify(cfg));refreshCamBtn();toReady();}
       return;}
