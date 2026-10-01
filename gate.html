@@ -703,8 +703,8 @@ function initGate(){
     const live=liveMap[st.sid];
     const isOut=!!live;
     
-    // 【最高優先】如果系統禁止外出，且學生當前在裡面（想出去），直接顯示禁止外出，不判斷社別/閘口
-    if(!isOut && exitLocked){ showLocked(st); return; }
+    // 【最高優先】如果系統禁止外出，且學生當前在裡面（想出去），直接顯示禁止外出，不判斷社別/閘口（TOP 豁免）
+    if(!isOut && exitLocked && !topList[st.sid]){ showLocked(st); return; }
 
     // 如果學生在外面（想返回），正常處理返回（若走錯閘口則提示錯閘口，因為要拿回手機）
     if(isOut){
@@ -735,7 +735,7 @@ function initGate(){
   }
 
   function doOut(st,purpose,reason){
-    if(exitLocked){ showLocked(st); return; }   // 防止選目的期間 Admin 突然開啟 Lock
+    if(exitLocked && !topList[st.sid]){ showLocked(st); return; }   // 防止選目的期間 Admin 突然開啟 Lock（TOP 豁免）
     if(!NO_LIMIT(purpose)&&!houseAllowed(st)){ wrongGate(st); return; }
     const sid=st.sid, now=Date.now();
     const recKey=db.ref('records').push().key;
