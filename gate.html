@@ -297,7 +297,7 @@ const CFG_KEY='gate.cfg.v1';
 let cfg={name:'Gate A',mode:'auto',muted:false,cam:true};
 try{Object.assign(cfg,JSON.parse(localStorage.getItem(CFG_KEY)||'{}'))}catch(e){}
 window.MUTED=cfg.muted;
-let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, prefectList={}, state='boot', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null, slotsPerHouse=6;
+let threshold=15, normalLimit=0, eventStarted=true, scenario='track', students={}, liveMap={}, slotsMap={}, gateCfg={}, countersMap={}, compList={}, helperList={}, prefectList={}, topList={}, state='boot', pendingSt=null, pendingCode='', lastReason='', resetT=null, booted=false, qr=null, slotsRef=null, gateCfgRef=null, slotsPerHouse=6;
 const $=id=>document.getElementById(id), board=$('board');
 const slotName=(h,i)=>String(h||'?')+'-'+String(i).padStart(2,'0');
 const gateKey=()=>cfg.name.replace(/[.#$\[\]\/]/g,'-');
@@ -318,6 +318,7 @@ function initGate(){
   db.ref('participantList').on('value',s=>{compList=s.val()||{};});
   db.ref('helperList').on('value',s=>{helperList=s.val()||{};});
   db.ref('prefectList').on('value',s=>{prefectList=s.val()||{};});
+  db.ref('topList').on('value',s=>{topList=s.val()||{};});
   db.ref('config/normalLimit').on('value',s=>{normalLimit=parseInt(s.val(),10)||0;});
   db.ref('config/eventStarted').on('value',s=>{eventStarted=s.val()!==false;if(state==='ready')toReady();});
   db.ref('config/slotsPerHouse').on('value',s=>{slotsPerHouse=parseInt(s.val(),10)||6;refreshSlots();if(state==='ready')toReady();});
@@ -706,6 +707,7 @@ function initGate(){
       doIn(st); return;
     }
     if(cfg.mode==='in'){ showWarn(st,'NO OUT RECORD','沒有外出記錄 — 該學生未有登記離開',null); return; }
+    if(topList[st.sid]){ doOut(st,'helper'); return; }   // TOP 全通行：自動放行・免原因・免限制
     showPurpose(st);
   }
   function handleScan(raw,manual){
@@ -869,7 +871,7 @@ function initGate(){
       ${signal(flag?'caution':'go', flag?'⚠ 曾外出時間過長 PREVIOUSLY OVERLONG — 請留意返回時間':'手續完成 · 請放行 PROCEED')}
       ${midHtml}
       <div class="grid2">${houseBlock(st)}<div class="info">${nameBlock(st)}${rows(st)}</div></div>
-      <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span>${purpose==='other'&&lastReason?`<span class="pill">📌 ${esc(lastReason)}</span>`:''}${noLimit?'<span class="pill">♾️ NO LIMIT 無限時</span>':''}<span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
+      <div class="ready-foot"><span class="pill">${pm.icon} ${pm.en} ${pm.zh}</span>${topList[st.sid]?'<span class="pill">⭐ TOP 全通行</span>':''}${purpose==='other'&&lastReason?`<span class="pill">📌 ${esc(lastReason)}</span>`:''}${noLimit?'<span class="pill">♾️ NO LIMIT 無限時</span>':''}<span class="pill">TRIP <b>#${count}</b></span><span class="pill mono">${fmtClock(Date.now())} · ${esc(cfg.name)}</span></div>
       <div class="foot-hint">Tap anywhere to return 點一下返回</div>`;
     sound(flag?'warn':'out');schedule(flag?11000:9000);
   }
