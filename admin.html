@@ -352,44 +352,54 @@ function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');cle
 requireAuth(function init(){
   if(booted)return;booted=true;
   bindSignOut();
-  const d=new Date();d.setHours(0,0,0,0);todayStart=d.getTime();
+
+  /* ---- 通用助手 ---- */
+  const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
+  const clean=v=>String(v==null?'':v).trim().replace(/\.0$/,'');
+  const norm=h=>String(h).toLowerCase().replace(/[\s.\-_()（）:：]/g,'');
+  const nz=v=>String(v==null?'':v).trim().toUpperCase().replace(/^0+/,'');
   const iso=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+  const fmtCD=ms=>{const s=Math.max(0,Math.floor(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+  const SEL='background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:8px 10px';
+
+  const d0=new Date();d0.setHours(0,0,0,0);todayStart=d0.getTime();
   $('dFrom').value=$('dTo').value=iso(Date.now());
 
+  /* ---- 即時監聽 ---- */
   db.ref('students').on('value',s=>{students=s.val()||{};updateStats();renderStudents();
     renderListPreview('compList',compMap);renderListPreview('helperList',helperMap);renderListPreview('prefList',prefectMap);renderListPreview('topList',topMap);});
   db.ref('live').on('value',s=>{live=s.val()||{};updateStats();});
+
   let thMin=15;
   watchThreshold(v=>{thMin=v;$('thIn').value=v;});
   db.ref('config/normalLimit').on('value',s=>{$('limIn').value=parseInt(s.val(),10)||0;});
   db.ref('config/cooldownMin').on('value',s=>{$('cdIn').value=parseInt(s.val(),10)||0;});
   $('btnCd').onclick=()=>{const v=parseInt($('cdIn').value,10);db.ref('config/cooldownMin').set(isFinite(v)&&v>=0?v:0).then(()=>toast('Cooldown saved 已儲存冷卻'));};
-  watchScenario(v=>{const el=document.querySelector(`input[name=scen][value=${v}]`);if(el)el.checked=true;});
+  watchScenario(v=>{const el=document.querySelector('input[name=scen][value='+v+']');if(el)el.checked=true;});
   $('btnScen').onclick=()=>db.ref('config/scenario').set(document.querySelector('input[name=scen]:checked').value).then(()=>toast('Scenario saved 已儲存場景'));
   $('btnLim').onclick=()=>{const v=parseInt($('limIn').value,10);db.ref('config/normalLimit').set(isFinite(v)&&v>=0?v:0).then(()=>toast('Limit saved 已儲存上限'));};
   db.ref('config/eventStarted').on('value',s=>{
     const on=s.val()!==false;
-    $('evStateTx').innerHTML = on
-      ? '<b style="color:var(--green)">Event STARTED 活動已開始</b> — normal timing & counting 正常計時/計次。'
-      : '<b style="color:var(--amber)">Event NOT STARTED 活動未開始</b> — no overlong timing, no trip/limit counting 不計超時/不計次數。';
+    $('evStateTx').innerHTML=on
+      ?'<b style="color:var(--green)">Event STARTED 活動已開始</b> — normal timing & counting 正常計時/計次。'
+      :'<b style="color:var(--amber)">Event NOT STARTED 活動未開始</b> — no overlong timing, no trip/limit counting 不計超時/不計次數。';
   });
-  $('btnNotStart').onclick=()=>{ if(confirm('Set event to NOT STARTED?\n設為活動未開始（不計時/不計次）？')) db.ref('config/eventStarted').set(false).then(()=>toast('Set Not Started 已設為未開始')); };
+  $('btnNotStart').onclick=()=>{if(confirm('Set event to NOT STARTED?\n設為活動未開始（不計時/不計次）？'))db.ref('config/eventStarted').set(false).then(()=>toast('Set Not Started 已設為未開始'));};
   $('btnAllOut').onclick=()=>{
     if(!confirm('Mark ALL students as currently OUTSIDE?\n將全部學生設為當前在外？'))return;
     const now=Date.now(),upd={};
-    Object.keys(students).forEach(sid=>{ upd['live/'+sid]={recordId:null,outAt:now,gate:'ADMIN',purpose:'other',reason:'All outside 所有人視為在外',slot:null,slotGate:null}; });
+    Object.keys(students).forEach(sid=>{upd['live/'+sid]={recordId:null,outAt:now,gate:'ADMIN',purpose:'other',reason:'All outside 所有人視為在外',slot:null,slotGate:null};});
     db.ref().update(upd).then(()=>toast('All marked outside 所有人已視為在外'));
-  });
+  };
   db.ref('config/exitLocked').on('value',s=>{const on=!!s.val();
-    $('lockTx').innerHTML= on
-      ? '<b style="color:var(--red)">EXIT LOCKED 暫停外出</b> — 所有閘口禁止離開（TOP 豁免）。'
-      : '<b style="color:var(--green)">NORMAL 正常</b> — 可正常外出。';});
+    $('lockTx').innerHTML=on
+      ?'<b style="color:var(--red)">EXIT LOCKED 暫停外出</b> — 所有閘口禁止離開（TOP 豁免）。'
+      :'<b style="color:var(--green)">NORMAL 正常</b> — 可正常外出。';});
   $('btnLockOn').onclick=()=>{if(confirm('禁止所有外出？\nLock all exits?'))db.ref('config/exitLocked').set(true).then(()=>toast('Locked 已禁止外出'));};
   $('btnLockOff').onclick=()=>db.ref('config/exitLocked').set(false).then(()=>toast('Unlocked 已恢復正常外出'));
 
-  /* ---- 手機格總覽（含倒計時）---- */
+  /* ---- 手機格總覽（倒計時）---- */
   let slotsAll={},slotsPerHouse=6;
-  const fmtCD=ms=>{const s=Math.max(0,Math.floor(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
   function slotCountdown(o){
     if(!o||!o.outAt)return '';
     const pur=(live[o.sid]&&live[o.sid].purpose)||null;
@@ -400,14 +410,24 @@ requireAuth(function init(){
   function renderSlotsOverview(){
     const el=$('slotsOverview');if(!el)return;
     const gates=Object.keys(slotsAll);
-    el.innerHTML=gates.length?gates.map(g=>{
+    if(!gates.length){el.textContent='（無占用 No occupancy）';return;}
+    let out='';
+    gates.forEach(g=>{
       const gd=slotsAll[g]||{};const houses=Object.keys(gd);
-      const parts=houses.map(h=>{
+      let parts='';
+      houses.forEach(h=>{
         const occ=Object.values(gd[h]||{}).filter(Boolean);
-        return `<b style="color:${houseMeta(h).color}">${esc(h)}</b> ${occ.length}/${slotsPerHouse}`+(occ.length?`（${occ.map(o=>{const st=students[o.sid];return esc(st?st.name||st.sid:o.sid)+slotCountdown(o);}).join(', ')}）`:'');
+        let seg='<b style="color:'+houseMeta(h).color+'">'+esc(h)+'</b> '+occ.length+'/'+slotsPerHouse;
+        if(occ.length){
+          let names='';
+          occ.forEach(o=>{const st=students[o.sid];names+=(names?', ':'')+esc(st?st.name||st.sid:o.sid)+slotCountdown(o);});
+          seg+='（'+names+'）';
+        }
+        parts+=(parts?' · ':'')+seg;
       });
-      return `<div><b class="mono">${esc(g)}</b> — ${parts.join(' · ')||'（全空）'}</div>`;
-    }).join(''):'（無占用 No occupancy）';
+      out+='<div><b class="mono">'+esc(g)+'</b> — '+(parts||'（全空）')+'</div>';
+    });
+    el.innerHTML=out;
   }
   db.ref('slots').on('value',s=>{slotsAll=s.val()||{};renderSlotsOverview();});
   setInterval(renderSlotsOverview,1000);
@@ -421,27 +441,41 @@ requireAuth(function init(){
   /* ---- Gates 管理 ---- */
   let gatesAll={};
   function updateGateHouses(g){
-    const hs=[...$('gateRows').querySelectorAll(`[data-g="${g}"][data-h]:checked`)].map(c=>c.dataset.h).join(',');
+    const cbs=$('gateRows').querySelectorAll('[data-g="'+g+'"][data-h]:checked');
+    let hs='';cbs.forEach(c=>{hs+=(hs?',':'')+c.getAttribute('data-h');});
     db.ref('config/gates/'+g+'/houses').set(hs);
   }
   function renderGateRows(){
     const keys=Object.keys(gatesAll);
-    $('gateRows').innerHTML=keys.length?keys.map(g=>{
+    const wrap=$('gateRows');if(!wrap)return;
+    if(!keys.length){wrap.innerHTML='<span class="dim">（無閘口，裝置將用預設 Gate A）</span>';return;}
+    let html='';
+    keys.forEach(g=>{
       const gd=gatesAll[g]||{};
       const hs=String(gd.houses||'').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);
-      return `<div style="border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0">
-        <div style="display:flex;justify-content:space-between;align-items:center"><b class="mono">${esc(g)}</b><button class="op del" data-gdel="${esc(g)}">Delete 刪除</button></div>
-        <div class="houses" style="margin:8px 0">${['K','T','M','C'].map(h=>`<label class="hsel"><input type="checkbox" data-g="${esc(g)}" data-h="${h}" ${hs.includes(h)?'checked':''}>${h}</label>`).join('')}</div>
-        <div class="setrow">
-          <label class="dim">Channel 通道<select data-gchan="${esc(g)}" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:8px 10px"><option value="normal" ${gd.channel!=='special'?'selected':''}>Normal 普通</option><option value="special" ${gd.channel==='special'?'selected':''}>Special 專用</option></select></label>
-          <label class="dim">Mode 模式<select data-gmode="${esc(g)}" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:8px 10px"><option value="auto" ${(gd.mode||'auto')==='auto'?'selected':''}>Auto 自動</option><option value="out" ${gd.mode==='out'?'selected':''}>Out 只出</option><option value="in" ${gd.mode==='in'?'selected':''}>In 只入</option></select></label>
-        </div>
-      </div>`;
-    }).join(''):'<span class="dim">（無閘口，裝置將用預設 Gate A）</span>';
-    $('gateRows').querySelectorAll('[data-h]').forEach(cb=>cb.onchange=()=>updateGateHouses(cb.dataset.g));
-    $('gateRows').querySelectorAll('[data-gchan]').forEach(s=>s.onchange=()=>db.ref('config/gates/'+s.dataset.gchan+'/channel').set(s.value));
-    $('gateRows').querySelectorAll('[data-gmode]').forEach(s=>s.onchange=()=>db.ref('config/gates/'+s.dataset.gmode+'/mode').set(s.value));
-    $('gateRows').querySelectorAll('[data-gdel]').forEach(b=>b.onclick=()=>{if(confirm('Delete gate '+b.dataset.gdel+'?\n刪除閘口？'))db.ref('config/gates/'+b.dataset.gdel).remove();});
+      let houseChk='';
+      ['K','T','M','C'].forEach(h=>{
+        houseChk+='<label class="hsel"><input type="checkbox" data-g="'+esc(g)+'" data-h="'+h+'"'+(hs.indexOf(h)>=0?' checked':'')+'>'+h+'</label>';
+      });
+      const mode=gd.mode||'auto';
+      const chanSel='<select data-gchan="'+esc(g)+'" style="'+SEL+'">'
+        +'<option value="normal"'+(gd.channel!=='special'?' selected':'')+'>Normal 普通</option>'
+        +'<option value="special"'+(gd.channel==='special'?' selected':'')+'>Special 專用</option></select>';
+      const modeSel='<select data-gmode="'+esc(g)+'" style="'+SEL+'">'
+        +'<option value="auto"'+(mode==='auto'?' selected':'')+'>Auto 自動</option>'
+        +'<option value="out"'+(mode==='out'?' selected':'')+'>Out 只出</option>'
+        +'<option value="in"'+(mode==='in'?' selected':'')+'>In 只入</option></select>';
+      html+='<div style="border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center"><b class="mono">'+esc(g)+'</b><button class="op del" data-gdel="'+esc(g)+'">Delete 刪除</button></div>'
+        +'<div class="houses" style="margin:8px 0">'+houseChk+'</div>'
+        +'<div class="setrow"><label class="dim">Channel 通道 '+chanSel+'</label><label class="dim">Mode 模式 '+modeSel+'</label></div>'
+        +'</div>';
+    });
+    wrap.innerHTML=html;
+    wrap.querySelectorAll('[data-h]').forEach(cb=>{cb.onchange=()=>updateGateHouses(cb.getAttribute('data-g'));});
+    wrap.querySelectorAll('[data-gchan]').forEach(s=>{s.onchange=()=>db.ref('config/gates/'+s.getAttribute('data-gchan')+'/channel').set(s.value);});
+    wrap.querySelectorAll('[data-gmode]').forEach(s=>{s.onchange=()=>db.ref('config/gates/'+s.getAttribute('data-gmode')+'/mode').set(s.value);});
+    wrap.querySelectorAll('[data-gdel]').forEach(b=>{b.onclick=()=>{if(confirm('Delete gate '+b.getAttribute('data-gdel')+'?\n刪除閘口？'))db.ref('config/gates/'+b.getAttribute('data-gdel')).remove();};});
   }
   db.ref('config/gates').on('value',s=>{gatesAll=s.val()||{};renderGateRows();});
   $('btnAddGate').onclick=()=>{
@@ -473,8 +507,6 @@ requireAuth(function init(){
   });
 
   /* ---------- 匯入學生 ---------- */
-  const clean=v=>String(v??'').trim().replace(/\.0$/,'');
-  const norm=h=>String(h).toLowerCase().replace(/[\s.\-_()（）:：]/g,'');
   function colIdx(hdrs,preds,skip){return hdrs.findIndex((h,i)=>!skip.includes(i)&&preds.some(p=>norm(h).includes(p)));}
   function parseSheet(data){
     const wb=XLSX.read(data,{type:'array'});
@@ -482,7 +514,7 @@ requireAuth(function init(){
     let hi=-1,cols=null;
     for(let r=0;r<Math.min(5,arr.length);r++){
       const hdr=arr[r].map(norm),sk=[];
-      const iS=colIdx(hdr,['studentid','學生編號'],sk); if(iS<0)continue; sk.push(iS);
+      const iS=colIdx(hdr,['studentid','學生編號'],sk);if(iS<0)continue;sk.push(iS);
       const iCl=colIdx(hdr,['class','班'],sk);sk.push(iCl);
       const iN=colIdx(hdr,['classnum','學號','no'],sk);sk.push(iN);
       const iCd=colIdx(hdr,['cardid','cardno','card','卡號'],sk);if(iCd>=0)sk.push(iCd);
@@ -498,8 +530,8 @@ requireAuth(function init(){
       const sid=clean(row[cols[0]]),cls=clean(row[cols[1]]),no=clean(row[cols[2]]),name=clean(row[cols[3]]),
             ename=cols[4]>=0?clean(row[cols[4]]):'',card=cols[5]>=0?clean(row[cols[5]]):'',house=clean(row[cols[6]]).toUpperCase();
       if(!sid&&!name)continue;
-      if(!sid){issues.push(`Row ${r+1}: missing Student ID 缺學生編號`);continue;}
-      if(seen.has(sid))issues.push(`Row ${r+1}: duplicate 重複（以最後為準）`);
+      if(!sid){issues.push('Row '+(r+1)+': missing Student ID 缺學生編號');continue;}
+      if(seen.has(sid))issues.push('Row '+(r+1)+': duplicate 重複（以最後為準）');
       seen.add(sid);list.push({sid,cls,no,name,ename,card,house});
     }
     return {list,issues};
@@ -512,9 +544,11 @@ requireAuth(function init(){
   async function readFile(f){
     const {list,issues}=parseSheet(await f.arrayBuffer());
     pendList=list;
-    $('pvInfo').textContent=`Ready to import 準備匯入 ${list.length} students${issues.length?` · ${issues.length} warnings 警告`:''}`;
+    $('pvInfo').textContent='Ready to import 準備匯入 '+list.length+' students'+(issues.length?' · '+issues.length+' warnings 警告':'');
     const head='<tr><th>Student ID</th><th>Name 姓名</th><th>English 英文</th><th>Card ID</th><th>Class</th><th>No.</th><th>House</th></tr>';
-    $('pvTable').innerHTML=head+list.slice(0,8).map(s=>`<tr><td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name)}</b></td><td>${esc(s.ename||'')}</td><td class="mono">${esc(s.card||'')}</td><td>${esc(s.cls)}</td><td>${esc(s.no)}</td><td>${esc(s.house)}</td></tr>`).join('');
+    let rows='';
+    list.slice(0,8).forEach(s=>{rows+='<tr><td class="mono">'+esc(s.sid)+'</td><td><b>'+esc(s.name)+'</b></td><td>'+esc(s.ename||'')+'</td><td class="mono">'+esc(s.card||'')+'</td><td>'+esc(s.cls)+'</td><td>'+esc(s.no)+'</td><td>'+esc(s.house)+'</td></tr>';});
+    $('pvTable').innerHTML=head+rows;
     $('previewWrap').style.display='block';
   }
   $('btnPvCancel').onclick=()=>{pendList=null;$('previewWrap').style.display='none';};
@@ -526,7 +560,7 @@ requireAuth(function init(){
       upd['students/'+s.sid]={sid:s.sid,cls:s.cls,no:s.no,name:s.name,ename:s.ename||'',card:s.card||'',house:s.house,overlongFlag:ex?!!ex.overlongFlag:false};});
     if(replace)Object.keys(students).forEach(c=>{if(!inList.has(c))upd['students/'+c]=null;});
     db.ref().update(upd).then(()=>{
-      toast(`Imported ${pendList.length} students 已匯入`);
+      toast('Imported '+pendList.length+' students 已匯入');
       pendList=null;$('previewWrap').style.display='none';$('file').value='';
     });
   };
@@ -540,7 +574,7 @@ requireAuth(function init(){
   $('btnExpStu').onclick=()=>{
     const data=Object.values(students).sort(byClsNo).map(s=>({'Student ID 學生編號':s.sid,'Name 姓名':s.name||'','English Name 英文名':s.ename||'','Card ID 卡號':s.card||'','Class 班別':s.cls,'Class Num 學號':s.no,'House 社':s.house,'Overlong 超時標記':s.overlongFlag?'YES':''}));
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Students');
-    XLSX.writeFile(wb,`students_${fmtDate(Date.now())}.xlsx`);
+    XLSX.writeFile(wb,'students_'+fmtDate(Date.now())+'.xlsx');
   };
 
   /* ---------- 名單管理 ---------- */
@@ -548,8 +582,7 @@ requireAuth(function init(){
     const wb=XLSX.read(data,{type:'array'});
     const arr=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
     const out={};let issues=0;
-    const clsRe=/^\d{1,2}[A-Za-z]$/, noRe=/^\d{1,2}$/, comboRe=/^(\d{1,2}[A-Za-z])[\s\-]?(\d{1,2})$/;
-    const nz=v=>String(v??'').trim().toUpperCase().replace(/^0+/,'');
+    const clsRe=/^\d{1,2}[A-Za-z]$/,noRe=/^\d{1,2}$/,comboRe=/^(\d{1,2}[A-Za-z])[\s\-]?(\d{1,2})$/;
     for(let r=0;r<arr.length;r++){
       const row=arr[r];if(!row||!row.some(c=>c!==null&&c!==undefined&&c!==''))continue;
       const joined=String(row.join(' ')).toLowerCase();
@@ -585,8 +618,10 @@ requireAuth(function init(){
     const keys=Object.keys(map||{});
     if(!keys.length){el.innerHTML='<span class="dim">（空 Empty）</span>';return;}
     const arr=keys.map(k=>students[k]||Object.assign({sid:k},map[k])).sort(byClsNo);
-    el.innerHTML=`<table><tr><th>House</th><th>Name 姓名</th><th>Student ID</th><th>Class</th><th>No.</th></tr>`+
-      arr.map(s=>{const sid=s.sid||'';return `<tr><td><span class="hchip" style="--hc:${houseMeta(s.house).color}">${esc(s.house||'?')}</span></td><td><b>${esc(s.name||'—')}</b>${s.ename?`<div class="dim" style="font-size:11px">${esc(s.ename)}</div>`:''}</td><td class="mono">${esc(sid)}</td><td>${esc(s.cls||'—')}</td><td>${esc(s.no||'—')}</td></tr>`;}).join('')+`</table>`;
+    let rows='';
+    arr.forEach(s=>{const sid=s.sid||'';
+      rows+='<tr><td><span class="hchip" style="--hc:'+houseMeta(s.house).color+'">'+esc(s.house||'?')+'</span></td><td><b>'+esc(s.name||'—')+'</b>'+(s.ename?'<div class="dim" style="font-size:11px">'+esc(s.ename)+'</div>':'')+'</td><td class="mono">'+esc(sid)+'</td><td>'+esc(s.cls||'—')+'</td><td>'+esc(s.no||'—')+'</td></tr>';});
+    el.innerHTML='<table><tr><th>House</th><th>Name 姓名</th><th>Student ID</th><th>Class</th><th>No.</th></tr>'+rows+'</table>';
   }
   function wireList(upBtn,fileBtn,clearBtn,path,label){
     $(upBtn).onclick=()=>$(fileBtn).click();
@@ -594,11 +629,11 @@ requireAuth(function init(){
       f.arrayBuffer().then(data=>{
         const {out,issues}=parseListFile(data);
         const n=Object.keys(out).length;
-        if(!confirm(`匯入 ${n} 人並取代現有${label}？${issues?`（${issues} 行無法識別）`:''}`))return;
-        db.ref(path).set(n?out:null).then(()=>toast(`${label}已更新 Updated`));
+        if(!confirm('匯入 '+n+' 人並取代現有'+label+'？'+(issues?'（'+issues+' 行無法識別）':'')))return;
+        db.ref(path).set(n?out:null).then(()=>toast(label+'已更新 Updated'));
         e.target.value='';
       });};
-    $(clearBtn).onclick=()=>{if(confirm(`清空${label}？`))db.ref(path).set(null).then(()=>toast(`${label}已清空 Cleared`));};
+    $(clearBtn).onclick=()=>{if(confirm('清空'+label+'？'))db.ref(path).set(null).then(()=>toast(label+'已清空 Cleared'));};
   }
   db.ref('participantList').on('value',s=>{compMap=s.val()||{};$('compCount').textContent=Object.keys(compMap).length+' people 人';renderListPreview('compList',compMap);});
   db.ref('helperList').on('value',s=>{helperMap=s.val()||{};$('helperCount').textContent=Object.keys(helperMap).length+' people 人';renderListPreview('helperList',helperMap);});
@@ -613,12 +648,15 @@ requireAuth(function init(){
   function studentsIn(c){return Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===c).sort(byClsNo);}
   function populateCls(sel){
     const cur=sel.value;
-    sel.innerHTML='<option value="">Class 班別</option>'+listClasses().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
-    sel.value=cur;
+    let html='<option value="">Class 班別</option>';
+    listClasses().forEach(c=>{html+='<option value="'+esc(c)+'">'+esc(c)+'</option>';});
+    sel.innerHTML=html;sel.value=cur;
   }
   function populateStu(clsSel,stuSel){
     const c=clsSel.value;
-    stuSel.innerHTML='<option value="">Student 學生</option>'+(c?studentsIn(c).map(s=>`<option value="${esc(s.sid)}">${esc(s.no)} ${esc(s.name)}（${esc(s.sid)}）</option>`).join(''):'');
+    let html='<option value="">Student 學生</option>';
+    if(c)studentsIn(c).forEach(s=>{html+='<option value="'+esc(s.sid)+'">'+esc(s.no)+' '+esc(s.name)+'（'+esc(s.sid)+'）</option>';});
+    stuSel.innerHTML=html;
   }
   function refreshListSelectors(){
     populateCls($('compCls'));populateCls($('helperCls'));populateCls($('prefCls'));populateCls($('topCls'));
@@ -635,18 +673,23 @@ requireAuth(function init(){
   $('btnAddTop').onclick=()=>{const sid=$('topStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}db.ref('topList/'+sid).set(true).then(()=>toast('Added to TOP 已加入 TOP 名單'));};
 
   /* ---------- 學生表 ---------- */
-  const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
   function renderStudents(){
     const q=$('sFilter').value.trim().toUpperCase();
     const list=Object.values(students).filter(s=>!q||[s.sid,s.cls,s.no,s.name,s.ename,s.card].some(v=>String(v||'').toUpperCase().includes(q))).sort(byClsNo);
-    const show=list;
-    $('stuTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Card ID</th><th>Class</th><th>No.</th><th>House</th><th>Flag 標記</th><th></th></tr>'+
-      show.map(s=>{const m=houseMeta(s.house);return `<tr>
-        <td class="mono">${esc(s.sid)}</td><td><b>${esc(s.name||'—')}</b>${s.ename?`<div class="dim" style="font-size:11px">${esc(s.ename)}</div>`:''}</td><td class="mono">${esc(s.card||'—')}</td><td>${esc(s.cls)}</td><td>${esc(s.no)}</td>
-        <td><span class="hchip" style="--hc:${m.color}">${esc(s.house||'?')}</span></td>
-        <td>${s.overlongFlag?`<span class="flagchip">⚠ OVERLONG 超時</span>`:'<span class="dim">—</span>'}</td>
-        <td style="white-space:nowrap">${s.overlongFlag?`<button class="op" data-flag="${esc(s.sid)}">Reset 重設</button>`:''}<button class="op" data-edit="${esc(s.sid)}">Edit 編輯</button><button class="op del" data-del="${esc(s.sid)}">Delete 刪除</button></td></tr>`;}).join('');
-    $('stuCount').textContent=`Showing ${show.length} of ${list.length} 顯示 ${show.length} / ${list.length}`;
+    let rows='';
+    list.forEach(s=>{const m=houseMeta(s.house);
+      rows+='<tr>'
+        +'<td class="mono">'+esc(s.sid)+'</td>'
+        +'<td><b>'+esc(s.name||'—')+'</b>'+(s.ename?'<div class="dim" style="font-size:11px">'+esc(s.ename)+'</div>':'')+'</td>'
+        +'<td class="mono">'+esc(s.card||'—')+'</td><td>'+esc(s.cls)+'</td><td>'+esc(s.no)+'</td>'
+        +'<td><span class="hchip" style="--hc:'+m.color+'">'+esc(s.house||'?')+'</span></td>'
+        +'<td>'+(s.overlongFlag?'<span class="flagchip">⚠ OVERLONG 超時</span>':'<span class="dim">—</span>')+'</td>'
+        +'<td style="white-space:nowrap">'
+        +(s.overlongFlag?'<button class="op" data-flag="'+esc(s.sid)+'">Reset 重設</button>':'')
+        +'<button class="op" data-edit="'+esc(s.sid)+'">Edit 編輯</button>'
+        +'<button class="op del" data-del="'+esc(s.sid)+'">Delete 刪除</button></td></tr>';});
+    $('stuTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Card ID</th><th>Class</th><th>No.</th><th>House</th><th>Flag 標記</th><th></th></tr>'+rows;
+    $('stuCount').textContent='Showing '+list.length+' of '+list.length+' 顯示 '+list.length+' / '+list.length;
   }
   $('sFilter').oninput=renderStudents;
   let editingSid=null;
@@ -678,10 +721,10 @@ requireAuth(function init(){
   };
   $('stuTable').addEventListener('click',e=>{
     const f=e.target.closest('[data-flag]'),dd=e.target.closest('[data-del]'),ed=e.target.closest('[data-edit]');
-    if(f)db.ref('students/'+f.dataset.flag+'/overlongFlag').set(false).then(()=>toast('Flag cleared 已重設標記'));
-    if(ed){editStu(ed.dataset.edit);return;}
-    if(dd){const c=dd.dataset.del,s=students[c];
-      if(confirm(`Delete ${s?.name||s?.sid||c} (${s?.cls||''}) ? 確定刪除？`)){
+    if(f)db.ref('students/'+f.getAttribute('data-flag')+'/overlongFlag').set(false).then(()=>toast('Flag cleared 已重設標記'));
+    if(ed){editStu(ed.getAttribute('data-edit'));return;}
+    if(dd){const c=dd.getAttribute('data-del'),s=students[c];
+      if(confirm('Delete '+(s&&s.name?s.name:c)+' ('+(s&&s.cls?s.cls:'')+') ? 確定刪除？')){
         const upd={};upd['students/'+c]=null;upd['live/'+c]=null;db.ref().update(upd);}}
   });
   bindKeypadInput($('sFilter'),{title:'Search<span>搜尋</span>'});
@@ -708,24 +751,28 @@ requireAuth(function init(){
         if(v>=f&&v<=t)rows.push(r);});
       rows.sort((a,b)=>(b.outAt||0)-(a.outAt||0));return rows;});}
   function renderRecTable(rows){
-    $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th>目的</th><th>Reason 原因</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+
-      rows.slice(0,300).map(r=>{const m=houseMeta(r.house);return `<tr>
-        <td class="mono">${fmtDate(r.outAt)}</td><td class="mono">${esc(r.sid)}</td><td><b>${esc(r.name||'—')}</b>${r.ename?`<div class="dim" style="font-size:11px">${esc(r.ename)}</div>`:''}</td><td>${esc(r.cls)}</td><td>${esc(r.no)}</td>
-        <td><span class="hchip" style="--hc:${m.color}">${esc(r.house||'?')}</span></td>
-        <td>${r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—'}</td>
-        <td>${r.reason?esc(r.reason):'<span class="dim">—</span>'}</td>
-        <td class="mono">${fmtHM(r.outAt)} <span class="dim">${esc(r.gateOut||'')}</span></td>
-        <td class="mono">${r.inAt?fmtHM(r.inAt)+' ':''}<span class="dim">${esc(r.gateIn||'')}${r.inAt?'':' · STILL OUTSIDE 未返'}</span></td>
-        <td>${r.durationSec!=null?fmtDur(r.durationSec*1000):'—'}</td>
-        <td>${r.overlong?'<span class="flagchip">⚠</span>':''}</td></tr>`;}).join('');
-    $('recCount').textContent=`${rows.length} records in range 範圍內記錄（顯示首 ${Math.min(rows.length,300)} 條）`;
+    let html='';
+    rows.slice(0,300).forEach(r=>{const m=houseMeta(r.house);
+      html+='<tr>'
+        +'<td class="mono">'+fmtDate(r.outAt)+'</td><td class="mono">'+esc(r.sid)+'</td>'
+        +'<td><b>'+esc(r.name||'—')+'</b>'+(r.ename?'<div class="dim" style="font-size:11px">'+esc(r.ename)+'</div>':'')+'</td>'
+        +'<td>'+esc(r.cls)+'</td><td>'+esc(r.no)+'</td>'
+        +'<td><span class="hchip" style="--hc:'+m.color+'">'+esc(r.house||'?')+'</span></td>'
+        +'<td>'+(r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—')+'</td>'
+        +'<td>'+(r.reason?esc(r.reason):'<span class="dim">—</span>')+'</td>'
+        +'<td class="mono">'+fmtHM(r.outAt)+' <span class="dim">'+esc(r.gateOut||'')+'</span></td>'
+        +'<td class="mono">'+(r.inAt?fmtHM(r.inAt)+' ':'')+'<span class="dim">'+esc(r.gateIn||'')+(r.inAt?'':' · STILL OUTSIDE 未返')+'</span></td>'
+        +'<td>'+(r.durationSec!=null?fmtDur(r.durationSec*1000):'—')+'</td>'
+        +'<td>'+(r.overlong?'<span class="flagchip">⚠</span>':'')+'</td></tr>';});
+    $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th>目的</th><th>Reason 原因</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+html;
+    $('recCount').textContent=rows.length+' records in range 範圍內記錄（顯示首 '+Math.min(rows.length,300)+' 條）';
   }
   function loadRecords(){
     $('btnLoad').disabled=true;
     $('recCount').textContent='Loading 載入中…';
     fetchRecords().then(renderRecTable)
-      .catch(err=>{ $('recTable').innerHTML=''; $('recCount').textContent='載入失敗 Load failed: '+((err&&err.message)||err); })
-      .finally(()=>{ $('btnLoad').disabled=false; loadToday(); });
+      .catch(err=>{$('recTable').innerHTML='';$('recCount').textContent='載入失敗 Load failed: '+((err&&err.message)||err);})
+      .finally(()=>{$('btnLoad').disabled=false;loadToday();});
   }
   $('btnLoad').onclick=loadRecords;
   $('dFrom').addEventListener('change',loadRecords);
@@ -738,15 +785,15 @@ requireAuth(function init(){
     fetchRecords().then(rows=>{
       rows.sort((a,b)=>(a.outAt||0)-(b.outAt||0));
       const data=rows.map(r=>{const sm=scenarioMeta(r.scenario),pm=purposeMeta(r.purpose);return {
-        'Event 活動':`${sm.zh} ${sm.en}`,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Name 姓名':r.name||'','English Name 英文名':r.ename||'','Class 班別':r.cls,'Class Num 學號':r.no,'House 社':r.house,
-        'Purpose 目的':r.purpose?`${pm.zh} ${pm.en}`:'','Reason 原因':r.reason||'',
-        'Phone Slot 手機格':r.slot?`${r.slotGate||''} ${r.slotHouse?r.slotHouse+'-':''}${String(r.slot).padStart(2,'0')}`:'',
+        'Event 活動':sm.zh+' '+sm.en,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Name 姓名':r.name||'','English Name 英文名':r.ename||'','Class 班別':r.cls,'Class Num 學號':r.no,'House 社':r.house,
+        'Purpose 目的':r.purpose?pm.zh+' '+pm.en:'','Reason 原因':r.reason||'',
+        'Phone Slot 手機格':r.slot?((r.slotGate||'')+' '+(r.slotHouse?r.slotHouse+'-':'')+String(r.slot).padStart(2,'0')):'',
         'Gate Out 離開閘口':r.gateOut||'','Out Time 離開時間':r.outAt?fmtClock(r.outAt):'','Gate In 返回閘口':r.gateIn||'',
         'In Time 返回時間':r.inAt?fmtClock(r.inAt):'STILL OUTSIDE 仍未返回','Duration 在外時間':r.durationSec!=null?fmtDur(r.durationSec*1000):'',
         'Overlong 超時':r.overlong?'YES 是':''};});
       const ws=XLSX.utils.json_to_sheet(data);
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');
-      XLSX.writeFile(wb,`gate-records_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
+      XLSX.writeFile(wb,'gate-records_'+$('dFrom').value+'_to_'+$('dTo').value+'.xlsx');
     }).finally(()=>{btn.disabled=false;btn.textContent='Export Excel 匯出記錄';});
   };
   $('btnExpSum').onclick=()=>{
@@ -758,7 +805,7 @@ requireAuth(function init(){
       const data=Object.values(map).sort((a,b)=>b.n-a.n).map(e=>({'Student ID 學生編號':e.sid,'Name 姓名':e.name,'English Name 英文名':e.ename||'','Class 班別':e.cls,'No. 學號':e.no,'House 社':e.house,
         'Total Exits 外出次數':e.n,'Toilet 廁所':e.t,'Food 小食':e.f,'Competition 參賽':e.c,'Student Helper 工作人員':e.h,'Prefect 風紀':e.p,'Other 其他':e.o,'Total Time Outside 總在外時間':fmtDur(e.sec*1000),'Overlong 超時次數':e.over}));
       const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Summary');
-      XLSX.writeFile(wb,`gate-summary_${$('dFrom').value}_to_${$('dTo').value}.xlsx`);
+      XLSX.writeFile(wb,'gate-summary_'+$('dFrom').value+'_to_'+$('dTo').value+'.xlsx');
     });
   };
 
@@ -781,25 +828,28 @@ requireAuth(function init(){
       const st=students[L.sid]||{};
       return [L.sid,st.name,st.ename,L.issuer,st.cls].some(v=>String(v||'').toUpperCase().includes(q));
     });
-    $('passTable').innerHTML='<tr><th>Date</th><th>Time</th><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th>Nth 第幾次</th><th>Issuer 發行人</th></tr>'+
-      logs.slice(0,300).map(L=>{const st=students[L.sid]||{};const d=L.at?new Date(L.at):null;
-        return `<tr><td class="mono">${d?fmtDate(d.getTime()):'—'}</td><td class="mono">${d?fmtClock(d.getTime()):'—'}</td><td class="mono">${esc(L.sid)}</td><td><b>${esc(L.name||st.name||'—')}</b></td><td>${esc(L.cls||st.cls||'')}</td><td>${esc(L.no||st.no||'')}</td><td>${esc(L.house||st.house||'')}</td><td>#${esc(L.nth||'')}</td><td>${esc(L.issuer||'')}</td></tr>`;}).join('')||'<tr><td colspan="9" class="dim">No issuance records 無發行記錄</td></tr>';
-    $('passCount').textContent=`${logs.length} records 記錄（顯示首 ${Math.min(logs.length,300)} 條）`;
+    let html='';
+    logs.slice(0,300).forEach(L=>{const st=students[L.sid]||{};const d=L.at?new Date(L.at):null;
+      html+='<tr><td class="mono">'+(d?fmtDate(d.getTime()):'—')+'</td><td class="mono">'+(d?fmtClock(d.getTime()):'—')+'</td><td class="mono">'+esc(L.sid)+'</td><td><b>'+esc(L.name||st.name||'—')+'</b></td><td>'+esc(L.cls||st.cls||'')+'</td><td>'+esc(L.no||st.no||'')+'</td><td>'+esc(L.house||st.house||'')+'</td><td>#'+esc(L.nth||'')+'</td><td>'+esc(L.issuer||'')+'</td></tr>';});
+    $('passTable').innerHTML='<tr><th>Date</th><th>Time</th><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th>Nth 第幾次</th><th>Issuer 發行人</th></tr>'+(html||'<tr><td colspan="9" class="dim">No issuance records 無發行記錄</td></tr>');
+    $('passCount').textContent=logs.length+' records 記錄（顯示首 '+Math.min(logs.length,300)+' 條）';
     const sums=Object.keys(passData).map(sid=>({sid,count:(passData[sid]&&passData[sid].count)||0})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
-    $('passSumTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>Count 次數</th><th></th></tr>'+
-      sums.map(x=>{const st=students[x.sid]||{};return `<tr><td class="mono">${esc(x.sid)}</td><td><b>${esc(st.name||'—')}</b></td><td>${esc(st.cls||'')}</td><td>#${x.count}</td><td><button class="op" data-preset="${esc(x.sid)}">Reset 重設</button></td></tr>`;}).join('')||'<tr><td colspan="5" class="dim">—</td></tr>';
+    let shtml='';
+    sums.forEach(x=>{const st=students[x.sid]||{};
+      shtml+='<tr><td class="mono">'+esc(x.sid)+'</td><td><b>'+esc(st.name||'—')+'</b></td><td>'+esc(st.cls||'')+'</td><td>#'+x.count+'</td><td><button class="op" data-preset="'+esc(x.sid)+'">Reset 重設</button></td></tr>';});
+    $('passSumTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>Count 次數</th><th></th></tr>'+(shtml||'<tr><td colspan="5" class="dim">—</td></tr>');
   }
   $('passFilter').oninput=renderPass;
   $('passSumTable').addEventListener('click',e=>{
     const b=e.target.closest('[data-preset]');if(!b)return;
-    const sid=b.dataset.preset;
-    if(confirm(`Reset issuance count for ${sid}?\n重設此學生嘅發行次數同記錄？`))db.ref('passIssues/'+sid).remove().then(()=>toast('Reset 已重設'));
+    const sid=b.getAttribute('data-preset');
+    if(confirm('Reset issuance count for '+sid+'?\n重設此學生嘅發行次數同記錄？'))db.ref('passIssues/'+sid).remove().then(()=>toast('Reset 已重設'));
   });
   $('btnExpPass').onclick=()=>{
     const rows=passLogs().slice().reverse().map(L=>{const st=students[L.sid]||{};const d=L.at?new Date(L.at):null;
       return {'Date 日期':d?fmtDate(d.getTime()):'','Time 時間':d?fmtClock(d.getTime()):'','Student ID 學生編號':L.sid,'Name 姓名':L.name||st.name||'','English Name 英文名':st.ename||'','Class 班別':L.cls||st.cls||'','No. 學號':L.no||st.no||'','House 社':L.house||st.house||'','Nth 第幾次':L.nth||'','Issuer 發行人':L.issuer||''};});
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'PassIssues');
-    XLSX.writeFile(wb,`pass-issues_${fmtDate(Date.now())}.xlsx`);
+    XLSX.writeFile(wb,'pass-issues_'+fmtDate(Date.now())+'.xlsx');
   };
 
   /* ---------- 設定 ---------- */
