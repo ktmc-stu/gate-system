@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Admin · 管理</title>
 <link rel="icon" href="logo.png">
-<link rel="apple-touch-icon" href="admin-logo.png">
+<link rel="apple-touch-icon" href="admin-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -83,6 +83,10 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
 #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:rgba(23,37,66,.96);border:1px solid var(--amber);color:var(--text);padding:13px 24px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99;box-shadow:0 16px 40px rgba(0,0,0,.5)}
 #toast.show{opacity:1;transform:translateX(-50%)}
 .setrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.houses{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.hsel{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer;font:900 15px 'Archivo';color:var(--dim);background:rgba(255,255,255,.03);margin:0}
+.hsel input{accent-color:var(--amber)}
+.hsel:has(input:checked){border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.12)}
 @media(max-width:800px){.tabs{order:3;width:100%;overflow-x:auto}}
 </style>
 </head>
@@ -144,7 +148,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
     </div>
 
     <div class="card">
-      <h3>Competition List<span>參賽者名單（核對・無限時・免交手機）</span></h3>
+      <h3>Competition List<span>參賽者名單（核對・無限時）</span></h3>
       <div class="toolbar">
         <select id="compCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
         <select id="compStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
@@ -286,7 +290,7 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
         <button class="btn danger" id="btnLockOn">Lock 禁止所有外出</button>
         <button class="btn green" id="btnLockOff">Unlock 恢復正常外出</button>
       </div>
-      <p class="dim" style="font-size:12.5px;margin-top:10px">Lock 時所有閘口拒絕外出並顯示「暫時不可離開看台範圍」；如確有需要，職員可於閘口輸入管理員密碼授權單次離開。返回（入場）不受影響。</p>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">Lock 時所有閘口拒絕外出並顯示「暫時不可離開看台範圍」；如確有需要，職員可於閘口輸入管理員密碼授權單次離開。返回（入場）不受影響。TOP 豁免。</p>
     </div>
     <div class="card">
       <h3>Daily Normal Limit<span>每日普通外出總次數（廁所＋小食共用）</span></h3>
@@ -295,7 +299,22 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
         <button class="btn primary" id="btnLim">Save 儲存</button></div>
     </div>
     <div class="card">
-      <h3>Phone Slots<span>手機格占用（即時・所有閘口）</span></h3>
+      <h3>Re-Exit Cooldown<span>返回後再外出冷卻（防無限延長）</span></h3>
+      <p class="dim" style="font-size:13.5px;margin-top:6px">After returning, a student must wait this many minutes before going out again (normal purposes). 0 = no cooldown.<span class="zh"> 學生返回後需等此分鐘數先可再外出（普通目的）；0＝無冷卻。</span></p>
+      <div class="setrow"><input type="number" class="num" id="cdIn" min="0" max="120" style="width:90px"> <span class="dim">min 分鐘</span>
+        <button class="btn primary" id="btnCd">Save 儲存</button></div>
+    </div>
+    <div class="card">
+      <h3>Gates<span>閘口管理（名稱／服務社／通道／模式）</span></h3>
+      <div id="gateRows" class="dim">—</div>
+      <div class="setrow">
+        <input type="text" id="newGateName" placeholder="New gate name 新閘口名稱" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:180px">
+        <button class="btn green" id="btnAddGate">Add Gate 加閘口</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">閘口裝置（gate.html）只可「選擇」屬於哪個閘，不可改名；所有閘口屬性在此編輯。</p>
+    </div>
+    <div class="card">
+      <h3>Phone Slots<span>手機格占用（即時・所有閘口・倒計時）</span></h3>
       <div class="setrow"><span class="dim">每社分配格數 Slots per House（所有社相同・不同社不可共用）</span>
         <input type="number" class="num" id="spHouse" min="1" max="99" style="width:90px">
         <button class="btn primary" id="btnSpHouse">Save 儲存</button></div>
@@ -340,8 +359,11 @@ requireAuth(function init(){
   db.ref('students').on('value',s=>{students=s.val()||{};updateStats();renderStudents();
     renderListPreview('compList',compMap);renderListPreview('helperList',helperMap);renderListPreview('prefList',prefectMap);renderListPreview('topList',topMap);});
   db.ref('live').on('value',s=>{live=s.val()||{};updateStats();});
-  watchThreshold(v=>$('thIn').value=v);
+  let thMin=15;
+  watchThreshold(v=>{thMin=v;$('thIn').value=v;});
   db.ref('config/normalLimit').on('value',s=>{$('limIn').value=parseInt(s.val(),10)||0;});
+  db.ref('config/cooldownMin').on('value',s=>{$('cdIn').value=parseInt(s.val(),10)||0;});
+  $('btnCd').onclick=()=>{const v=parseInt($('cdIn').value,10);db.ref('config/cooldownMin').set(isFinite(v)&&v>=0?v:0).then(()=>toast('Cooldown saved 已儲存冷卻'));};
   watchScenario(v=>{const el=document.querySelector(`input[name=scen][value=${v}]`);if(el)el.checked=true;});
   $('btnScen').onclick=()=>db.ref('config/scenario').set(document.querySelector('input[name=scen]:checked').value).then(()=>toast('Scenario saved 已儲存場景'));
   $('btnLim').onclick=()=>{const v=parseInt($('limIn').value,10);db.ref('config/normalLimit').set(isFinite(v)&&v>=0?v:0).then(()=>toast('Limit saved 已儲存上限'));};
@@ -357,15 +379,24 @@ requireAuth(function init(){
     const now=Date.now(),upd={};
     Object.keys(students).forEach(sid=>{ upd['live/'+sid]={recordId:null,outAt:now,gate:'ADMIN',purpose:'other',reason:'All outside 所有人視為在外',slot:null,slotGate:null}; });
     db.ref().update(upd).then(()=>toast('All marked outside 所有人已視為在外'));
-  };
+  });
   db.ref('config/exitLocked').on('value',s=>{const on=!!s.val();
     $('lockTx').innerHTML= on
-      ? '<b style="color:var(--red)">EXIT LOCKED 暫停外出</b> — 所有閘口禁止離開。'
+      ? '<b style="color:var(--red)">EXIT LOCKED 暫停外出</b> — 所有閘口禁止離開（TOP 豁免）。'
       : '<b style="color:var(--green)">NORMAL 正常</b> — 可正常外出。';});
   $('btnLockOn').onclick=()=>{if(confirm('禁止所有外出？\nLock all exits?'))db.ref('config/exitLocked').set(true).then(()=>toast('Locked 已禁止外出'));};
   $('btnLockOff').onclick=()=>db.ref('config/exitLocked').set(false).then(()=>toast('Unlocked 已恢復正常外出'));
 
+  /* ---- 手機格總覽（含倒計時）---- */
   let slotsAll={},slotsPerHouse=6;
+  const fmtCD=ms=>{const s=Math.max(0,Math.floor(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+  function slotCountdown(o){
+    if(!o||!o.outAt)return '';
+    const pur=(live[o.sid]&&live[o.sid].purpose)||null;
+    if(pur==='competition'||pur==='helper')return ' ∞';
+    const remain=thMin*60000-(Date.now()-o.outAt);
+    return ' '+(remain<=0?'OVER':fmtCD(remain));
+  }
   function renderSlotsOverview(){
     const el=$('slotsOverview');if(!el)return;
     const gates=Object.keys(slotsAll);
@@ -373,18 +404,51 @@ requireAuth(function init(){
       const gd=slotsAll[g]||{};const houses=Object.keys(gd);
       const parts=houses.map(h=>{
         const occ=Object.values(gd[h]||{}).filter(Boolean);
-        return `<b style="color:${houseMeta(h).color}">${esc(h)}</b> ${occ.length}/${slotsPerHouse}`+(occ.length?`（${occ.map(o=>{const st=students[o.sid];return esc(st?st.name||st.sid:o.sid);}).join(', ')}）`:'');
+        return `<b style="color:${houseMeta(h).color}">${esc(h)}</b> ${occ.length}/${slotsPerHouse}`+(occ.length?`（${occ.map(o=>{const st=students[o.sid];return esc(st?st.name||st.sid:o.sid)+slotCountdown(o);}).join(', ')}）`:'');
       });
       return `<div><b class="mono">${esc(g)}</b> — ${parts.join(' · ')||'（全空）'}</div>`;
     }).join(''):'（無占用 No occupancy）';
   }
   db.ref('slots').on('value',s=>{slotsAll=s.val()||{};renderSlotsOverview();});
+  setInterval(renderSlotsOverview,1000);
   db.ref('config/slotsPerHouse').on('value',s=>{slotsPerHouse=parseInt(s.val(),10)||6;$('spHouse').value=slotsPerHouse;renderSlotsOverview();});
   $('btnSpHouse').onclick=()=>{const v=parseInt($('spHouse').value,10);if(v>=1&&v<=99)db.ref('config/slotsPerHouse').set(v).then(()=>toast('Slots per house saved 已儲存每社格數'));};
   $('btnStartDay').onclick=()=>{
     if(confirm('Start event day? All OUTSIDE states and phone slots will be cleared.\n開始活動？所有外出狀態及手機格將清空（全部學生視為在內）。'))
       Promise.all([db.ref('live').remove(),db.ref('slots').remove(),db.ref('config/eventStarted').set(true)]).then(()=>toast('Event day started 活動已開始（手機格已清空）'));
   };
+
+  /* ---- Gates 管理 ---- */
+  let gatesAll={};
+  function updateGateHouses(g){
+    const hs=[...$('gateRows').querySelectorAll(`[data-g="${g}"][data-h]:checked`)].map(c=>c.dataset.h).join(',');
+    db.ref('config/gates/'+g+'/houses').set(hs);
+  }
+  function renderGateRows(){
+    const keys=Object.keys(gatesAll);
+    $('gateRows').innerHTML=keys.length?keys.map(g=>{
+      const gd=gatesAll[g]||{};
+      const hs=String(gd.houses||'').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);
+      return `<div style="border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0">
+        <div style="display:flex;justify-content:space-between;align-items:center"><b class="mono">${esc(g)}</b><button class="op del" data-gdel="${esc(g)}">Delete 刪除</button></div>
+        <div class="houses" style="margin:8px 0">${['K','T','M','C'].map(h=>`<label class="hsel"><input type="checkbox" data-g="${esc(g)}" data-h="${h}" ${hs.includes(h)?'checked':''}>${h}</label>`).join('')}</div>
+        <div class="setrow">
+          <label class="dim">Channel 通道<select data-gchan="${esc(g)}" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:8px 10px"><option value="normal" ${gd.channel!=='special'?'selected':''}>Normal 普通</option><option value="special" ${gd.channel==='special'?'selected':''}>Special 專用</option></select></label>
+          <label class="dim">Mode 模式<select data-gmode="${esc(g)}" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:8px 10px"><option value="auto" ${(gd.mode||'auto')==='auto'?'selected':''}>Auto 自動</option><option value="out" ${gd.mode==='out'?'selected':''}>Out 只出</option><option value="in" ${gd.mode==='in'?'selected':''}>In 只入</option></select></label>
+        </div>
+      </div>`;
+    }).join(''):'<span class="dim">（無閘口，裝置將用預設 Gate A）</span>';
+    $('gateRows').querySelectorAll('[data-h]').forEach(cb=>cb.onchange=()=>updateGateHouses(cb.dataset.g));
+    $('gateRows').querySelectorAll('[data-gchan]').forEach(s=>s.onchange=()=>db.ref('config/gates/'+s.dataset.gchan+'/channel').set(s.value));
+    $('gateRows').querySelectorAll('[data-gmode]').forEach(s=>s.onchange=()=>db.ref('config/gates/'+s.dataset.gmode+'/mode').set(s.value));
+    $('gateRows').querySelectorAll('[data-gdel]').forEach(b=>b.onclick=()=>{if(confirm('Delete gate '+b.dataset.gdel+'?\n刪除閘口？'))db.ref('config/gates/'+b.dataset.gdel).remove();});
+  }
+  db.ref('config/gates').on('value',s=>{gatesAll=s.val()||{};renderGateRows();});
+  $('btnAddGate').onclick=()=>{
+    const n=$('newGateName').value.trim();if(!n){toast('Enter gate name 請輸入閘口名稱');return;}
+    db.ref('config/gates/'+n.replace(/[.#$\[\]\/]/g,'-')).update({houses:'',channel:'normal',mode:'auto'}).then(()=>{$('newGateName').value='';toast('Gate added 已加閘口');});
+  };
+
   loadToday();
 
   function updateStats(){
@@ -625,6 +689,7 @@ requireAuth(function init(){
   bindKeypadInput($('thIn'),{title:'Threshold (min)<span>超時時限</span>',max:3,numeric:true});
   bindKeypadInput($('limIn'),{title:'Daily Limit<span>每日上限</span>',max:3,numeric:true});
   bindKeypadInput($('spHouse'),{title:'Slots per House<span>每社格數</span>',max:2,numeric:true});
+  bindKeypadInput($('cdIn'),{title:'Cooldown (min)<span>冷卻</span>',max:3,numeric:true});
 
   /* ---------- 記錄 ---------- */
   function range(){
