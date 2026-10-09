@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Admin · 管理</title>
 <link rel="icon" href="logo.png">
-<link rel="apple-touch-icon" href="admin-icon.png">
+<link rel="apple-touch-icon" href="admin-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -284,6 +284,15 @@ tbody tr:hover td{background:rgba(255,178,36,.06)}
       <p class="dim" style="font-size:12.5px;margin-top:10px">Not Started：閘口不計超時、不計次數/上限。「所有人視為在外」將全部學生設為當前在外（不建個別記錄）；「Start Event Day」（場景卡）則清空並設為已開始、所有人視為在內。</p>
     </div>
     <div class="card">
+      <h3>Announcement<span>即時廣播（所有閘口即時顯示）</span></h3>
+      <textarea id="annIn" rows="3" placeholder="輸入廣播內容 e.g. 請所有同學於 12:00 前返回看台集合…" style="width:100%;background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:12px 14px;font-size:16px;outline:none;font-family:inherit;resize:vertical"></textarea>
+      <div class="setrow">
+        <button class="btn primary" id="btnAnn">Announce 廣播</button>
+        <button class="btn danger" id="btnAnnClear">Clear 清除廣播</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px" id="annNow">—</p>
+    </div>
+    <div class="card">
       <h3>Exit Lock<span>暫停外出（禁止所有離開）</span></h3>
       <p class="dim" style="font-size:13.5px;margin-top:6px" id="lockTx">—</p>
       <div class="setrow">
@@ -391,6 +400,14 @@ requireAuth(function init(){
     Object.keys(students).forEach(sid=>{upd['live/'+sid]={recordId:null,outAt:now,gate:'ADMIN',purpose:'other',reason:'All outside 所有人視為在外',slot:null,slotGate:null};});
     db.ref().update(upd).then(()=>toast('All marked outside 所有人已視為在外'));
   };
+  db.ref('config/announce').on('value',s=>{
+    const v=s.val();const t=v?(typeof v==='string'?v:(v.text||'')):'';
+    $('annNow').textContent=t?('當前 Current：'+t):'（無廣播 No announcement）';
+    if(document.activeElement!==$('annIn'))$('annIn').value=t;
+  });
+  $('btnAnn').onclick=()=>{const t=$('annIn').value.trim();if(!t){toast('Enter message 請輸入廣播內容');return;}
+    db.ref('config/announce').set({text:t,at:Date.now(),by:(auth.currentUser&&auth.currentUser.email)||''}).then(()=>toast('Announced 已廣播到所有閘口'));};
+  $('btnAnnClear').onclick=()=>db.ref('config/announce').set(null).then(()=>toast('Cleared 已清除廣播'));
   db.ref('config/exitLocked').on('value',s=>{const on=!!s.val();
     $('lockTx').innerHTML=on
       ?'<b style="color:var(--red)">EXIT LOCKED 暫停外出</b> — 所有閘口禁止離開（TOP 豁免）。'
