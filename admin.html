@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Admin · 管理</title>
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="admin-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#081120;--panel:rgba(17,29,54,.88);--panel2:rgba(10,19,36,.92);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.3);
+ --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--amber-d:#ff8a3d;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;
+ --shadow:0 24px 70px rgba(2,8,20,.6);--grad:linear-gradient(135deg,#ffc95e,#ff8a3d)}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
+html{color-scheme:dark}
+body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;
+ background:radial-gradient(1300px 640px at 92% -12%,rgba(75,139,255,.2),transparent 62%),radial-gradient(1000px 620px at -8% 112%,rgba(255,178,36,.15),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}::-webkit-scrollbar-track{background:transparent}
+.mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
+::selection{background:rgba(255,178,36,.35)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--line2);
+ background:rgba(8,14,26,.82);backdrop-filter:blur(18px);position:sticky;top:0;z-index:20;box-shadow:0 10px 34px rgba(0,0,0,.35)}
+.brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:20px;letter-spacing:.06em}
+.logo{width:36px;height:36px;object-fit:contain;border-radius:11px;flex:none;filter:drop-shadow(0 4px 12px rgba(255,138,61,.35))}
+.brand b{color:var(--amber)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:99px;padding:4px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.tab{border:0;background:none;color:var(--dim);padding:9px 20px;border-radius:99px;font-weight:700;font-size:13.5px;cursor:pointer;transition:.2s}
+.tab span{font-weight:500;font-size:.85em;margin-left:4px;opacity:.8}
+.tab:not(.on):hover{color:var(--text)}
+.tab.on{background:var(--grad);color:#2a1800;box-shadow:0 6px 18px rgba(255,150,40,.35)}
+.btn{border:0;border-radius:12px;padding:12px 20px;font-weight:800;font-size:13.5px;cursor:pointer;transition:.2s}
+.btn.primary{background:var(--grad);color:#2a1800;box-shadow:0 10px 26px rgba(255,150,40,.3)}
+.btn.green{background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f;box-shadow:0 10px 26px rgba(47,211,127,.25)}
+.btn.primary:hover,.btn.green:hover{filter:brightness(1.07)}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--dim);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.btn.ghost:hover{color:var(--text);border-color:var(--line2)}
+.btn.danger{background:none;border:1px solid rgba(255,93,85,.5);color:var(--red)}
+.btn.danger.armed{background:var(--red);color:#fff;border-color:var(--red)}
+.btn:disabled{opacity:.5;cursor:wait}
+main{max-width:1220px;margin:0 auto;padding:28px 20px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:26px}
+.tile{position:relative;overflow:hidden;border-radius:20px;border:1px solid var(--line2);padding:20px 22px;background:linear-gradient(180deg,var(--panel),var(--panel2));animation:up .45s ease both;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.tile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--green)}
+.tile::after{content:'';position:absolute;top:0;left:12%;right:12%;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent)}
+.tile.a::before{background:var(--amber)}.tile.b::before{background:var(--blue)}.tile.r::before{background:var(--red)}
+@keyframes up{from{opacity:0;transform:translateY(12px)}}
+.tnum{font-family:'Archivo';font-weight:900;font-size:40px;line-height:1.15;display:block}
+.tile.a .tnum{color:var(--amber)}.tile.b .tnum{color:var(--blue)}.tile.r .tnum{color:var(--red)}
+.tlab{font-size:11px;color:var(--faint);letter-spacing:.14em;font-weight:600}
+section.pane{display:none;animation:up .3s ease}
+section.pane.on{display:block}
+.card{position:relative;border-radius:22px;border:1px solid var(--line2);padding:24px;margin-bottom:18px;background:linear-gradient(180deg,var(--panel),var(--panel2));box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.6}
+.card h3{font-family:'Archivo';font-size:17px;font-weight:800;display:flex;align-items:center;gap:10px}
+.card h3::before{content:'';width:8px;height:8px;border-radius:3px;background:var(--amber);box-shadow:0 0 10px rgba(255,178,36,.6)}
+.card h3 span{color:var(--faint);font-weight:500;font-size:.78em}
+.drop{border:2px dashed var(--line2);border-radius:20px;padding:34px 20px;text-align:center;color:var(--dim);cursor:pointer;transition:.2s;margin-top:16px;background:rgba(255,255,255,.02)}
+.drop::before{content:'⬆';display:block;font-size:26px;color:var(--faint);margin-bottom:8px;transition:.2s}
+.drop:hover,.drop.over{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.06)}
+.drop:hover::before,.drop.over::before{color:var(--amber);transform:translateY(-3px)}
+.drop b{display:block;font-size:16px;color:var(--text);margin-bottom:4px}
+.radios{display:flex;gap:18px;margin-top:14px;font-size:13.5px;color:var(--dim);flex-wrap:wrap}
+.radios label{display:flex;gap:7px;align-items:center;cursor:pointer}.radios input{accent-color:var(--amber)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0}
+.toolbar input[type=text],.toolbar input[type=date],input.num{background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;outline:none;transition:.2s}
+.toolbar input:focus{border-color:var(--amber);box-shadow:0 0 0 4px rgba(255,178,36,.12)}
+.toolbar input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.8);cursor:pointer;opacity:.85;transition:.15s}
+.toolbar input[type=date]::-webkit-calendar-picker-indicator:hover{filter:invert(1);opacity:1}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font:600 10.5px 'IBM Plex Mono';letter-spacing:.14em;color:var(--faint);text-align:left;padding:10px;border-bottom:1px solid var(--line2);text-transform:uppercase;white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr{transition:.12s}
+tbody tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+tbody tr:hover td{background:rgba(255,178,36,.06)}
+.hchip{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:8px;font-weight:900;font-family:'Archivo';background:var(--hc,#7e8aa2);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.flagchip{color:var(--amber);border:1px solid rgba(255,178,36,.5);border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:800;background:rgba(255,178,36,.1)}
+.op{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:5px 11px;font-size:12px;cursor:pointer;margin-right:6px;transition:.15s}
+.op:hover{color:var(--amber);border-color:var(--amber)}
+.op.del:hover{color:var(--red);border-color:var(--red)}
+.count-line{font-size:12.5px;color:var(--faint);margin-top:12px}
+#toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:rgba(23,37,66,.96);border:1px solid var(--amber);color:var(--text);padding:13px 24px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.setrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.houses{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.hsel{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer;font:900 15px 'Archivo';color:var(--dim);background:rgba(255,255,255,.03);margin:0}
+.hsel input{accent-color:var(--amber)}
+.hsel:has(input:checked){border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.12)}
+@media(max-width:800px){.tabs{order:3;width:100%;overflow-x:auto}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img class="logo" src="logo.png" onerror="this.style.display='none'" alt="">G<b>A</b>TE ADMIN<span>管理</span></div>
+  <nav class="tabs">
+    <button class="tab on" data-tab="stu">Students<span>學生</span></button>
+    <button class="tab" data-tab="rec">Records<span>記錄</span></button>
+    <button class="tab" data-tab="pass">Passes<span>發行記錄</span></button>
+    <button class="tab" data-tab="set">Settings<span>設定</span></button>
+  </nav>
+  <button class="btn ghost" data-signout>Sign Out 登出</button>
+</header>
+
+<main>
+  <div class="stats">
+    <div class="tile"><span class="tnum" id="stTotal">0</span><span class="tlab">STUDENTS 學生總數</span></div>
+    <div class="tile a"><span class="tnum" id="stOut">0</span><span class="tlab">CURRENTLY OUTSIDE 正在外面</span></div>
+    <div class="tile b"><span class="tnum" id="stToday">0</span><span class="tlab">TODAY'S EXITS 今日外出</span></div>
+    <div class="tile r"><span class="tnum" id="stFlag">0</span><span class="tlab">OVERLONG FLAGS 超時標記</span></div>
+  </div>
+
+  <section class="pane on" id="pane-stu">
+    <div class="card" id="stuFormCard">
+      <h3>Add / Edit Student<span>單獨新增／編輯學生</span></h3>
+      <div class="toolbar">
+        <input type="text" id="fSid" placeholder="Student ID 學生編號 *" style="min-width:140px">
+        <input type="text" id="fCls" placeholder="Class 班別" style="width:90px">
+        <input type="text" id="fNo" placeholder="No. 學號" style="width:80px">
+        <input type="text" id="fName" placeholder="Name 中文名" style="min-width:120px">
+        <input type="text" id="fEname" placeholder="English Name 英文名" style="min-width:140px">
+        <input type="text" id="fCard" placeholder="Card ID 卡號" style="min-width:130px">
+        <select id="fHouse" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px">
+          <option value="">House 社</option><option>K</option><option>T</option><option>M</option><option>C</option>
+        </select>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" id="btnSaveStu">Save 儲存</button>
+        <button class="btn ghost" id="btnClearStu">Clear 清空</button>
+        <span class="dim" id="stuFormMsg"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Import Students<span>匯入學生名單（Excel / CSV）</span></h3>
+      <div class="radios">
+        <label><input type="radio" name="impMode" value="merge" checked> Merge / Update 合併更新</label>
+        <label><input type="radio" name="impMode" value="replace"> Replace All 全部取代（危險）</label>
+      </div>
+      <div class="drop" id="drop"><b>Click or drop file here 點擊或拖放檔案</b>.xlsx / .csv — Columns 欄目：Student ID 學生編號 · Class 班別 · Class Num 學號 · Name 姓名 · English Name 英文名 · Card ID 卡號 · House 社</div>
+      <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
+      <div id="previewWrap" style="display:none">
+        <div class="toolbar"><span id="pvInfo" class="dim"></span>
+          <button class="btn primary" id="btnImport">Import 匯入</button>
+          <button class="btn ghost" id="btnPvCancel">Cancel 取消</button></div>
+        <div style="overflow-x:auto"><table id="pvTable"></table></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Competition List<span>參賽者名單（核對・無限時）</span></h3>
+      <div class="toolbar">
+        <select id="compCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
+        <select id="compStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
+        <button class="btn green" id="btnAddComp">Add 加入參賽</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" id="btnCompUp">Upload 上載</button>
+        <button class="btn ghost" id="btnCompClear">Clear 清空</button>
+        <span class="dim" id="compCount">0 people 人</span>
+      </div>
+      <input type="file" id="compFile" accept=".xlsx,.xls,.csv" hidden>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
+      <div id="compList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
+    </div>
+
+    <div class="card">
+      <h3>Student Helper List<span>工作人員名單（核對・無限時・免交手機）</span></h3>
+      <div class="toolbar">
+        <select id="helperCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
+        <select id="helperStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
+        <button class="btn green" id="btnAddHelper">Add 加入工作人員</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" id="btnHelperUp">Upload 上載</button>
+        <button class="btn ghost" id="btnHelperClear">Clear 清空</button>
+        <span class="dim" id="helperCount">0 people 人</span>
+      </div>
+      <input type="file" id="helperFile" accept=".xlsx,.xls,.csv" hidden>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
+      <div id="helperList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
+    </div>
+
+    <div class="card">
+      <h3>Prefect List<span>風紀名單（視同工作人員・自由進出）</span></h3>
+      <div class="toolbar">
+        <select id="prefCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
+        <select id="prefStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
+        <button class="btn green" id="btnAddPref">Add 加入風紀</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" id="btnPrefUp">Upload 上載</button>
+        <button class="btn ghost" id="btnPrefClear">Clear 清空</button>
+        <span class="dim" id="prefCount">0 people 人</span>
+      </div>
+      <input type="file" id="prefFile" accept=".xlsx,.xls,.csv" hidden>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單</p>
+      <div id="prefList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
+    </div>
+
+    <div class="card">
+      <h3>TOP List<span>TOP 全通行（任何閘口・免原因・免限制）</span></h3>
+      <div class="toolbar">
+        <select id="topCls" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:110px"></select>
+        <select id="topStu" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:220px"></select>
+        <button class="btn green" id="btnAddTop">Add 加入 TOP</button>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" id="btnTopUp">Upload 上載</button>
+        <button class="btn ghost" id="btnTopClear">Clear 清空</button>
+        <span class="dim" id="topCount">0 people 人</span>
+      </div>
+      <input type="file" id="topFile" accept=".xlsx,.xls,.csv" hidden>
+      <p class="dim" style="font-size:12.5px">可只含<b>班別＋學號</b>（分開兩欄如 3B 和 12，或連寫 3B12），亦可用學生編號；上載＝取代整份名單。TOP 只限<b>刷卡</b>自動放行，QR/手動需密碼授權（見 gate）。</p>
+      <div id="topList" style="margin-top:12px;max-height:280px;overflow:auto"></div>
+    </div>
+
+    <div class="card">
+      <h3>Student List<span>學生名單</span></h3>
+      <div class="toolbar">
+        <input type="text" id="sFilter" placeholder="Search 搜尋（編號 / 姓名 / 英文 / 卡號 / 班別）" style="min-width:260px">
+        <button class="btn ghost" id="btnTemplate">Template 下載範本</button>
+        <button class="btn ghost" id="btnExpStu">Export Students 匯出名單</button>
+      </div>
+      <div style="overflow-x:auto"><table id="stuTable"></table></div>
+      <div class="count-line" id="stuCount"></div>
+    </div>
+  </section>
+
+  <section class="pane" id="pane-rec">
+    <div class="card">
+      <h3>Entry / Exit Records<span>進出記錄</span></h3>
+      <div class="toolbar">
+        <label class="dim">From 由 <input type="date" id="dFrom"></label>
+        <label class="dim">To 至 <input type="date" id="dTo"></label>
+        <button class="btn ghost" id="btnLoad">Load 載入</button>
+        <button class="btn ghost" id="qToday">Today 今天</button>
+        <button class="btn ghost" id="q7">Last 7 Days 近7日</button>
+        <button class="btn ghost" id="qAll">All 全部</button>
+        <button class="btn primary" id="btnExpRec">Export Excel 匯出記錄</button>
+        <button class="btn green" id="btnExpSum">Summary 匯出統計</button>
+      </div>
+      <div style="overflow-x:auto"><table id="recTable"></table></div>
+      <div class="count-line" id="recCount"></div>
+    </div>
+  </section>
+
+  <section class="pane" id="pane-pass">
+    <div class="card">
+      <h3>Pass Issuance Log<span>臨時憑證發行記錄</span></h3>
+      <div class="toolbar">
+        <input type="text" id="passFilter" placeholder="Search 搜尋（編號/姓名/發行人）" style="min-width:240px">
+        <button class="btn primary" id="btnExpPass">Export Excel 匯出</button>
+      </div>
+      <div style="overflow-x:auto"><table id="passTable"></table></div>
+      <div class="count-line" id="passCount"></div>
+    </div>
+    <div class="card">
+      <h3>Per-Student Count<span>每位學生發行次數（可重設）</span></h3>
+      <div style="overflow-x:auto"><table id="passSumTable"></table></div>
+    </div>
+  </section>
+
+  <section class="pane" id="pane-set">
+    <div class="card">
+      <h3>Event Scenario<span>活動場景</span></h3>
+      <div class="radios" style="flex-direction:column;align-items:flex-start;gap:10px">
+        <label><input type="radio" name="scen" value="track" checked> Sports Day 陸運會 — Inside / Outside Stand 看台內／看台外</label>
+        <label><input type="radio" name="scen" value="swim"> Swimming Gala 水運會 — Inside / Outside Venue 場館內／場館外</label>
+      </div>
+      <div class="setrow">
+        <button class="btn primary" id="btnScen">Save Scenario 儲存場景</button>
+        <button class="btn green" id="btnStartDay">Start Event Day 開始活動（所有人視為在內・清空手機格）</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">Switching scenario updates all gate devices instantly. 轉換場景後所有閘口裝置即時同步。每筆記錄會蓋上當時場景。</p>
+    </div>
+    <div class="card">
+      <h3>Event Status<span>活動狀態</span></h3>
+      <p class="dim" style="font-size:13.5px;margin-top:6px" id="evStateTx">—</p>
+      <div class="setrow">
+        <button class="btn ghost" id="btnNotStart">Set Not Started 設為未開始（不計時/不計次）</button>
+        <button class="btn primary" id="btnAllOut">Mark All Outside 所有人視為在外</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">Not Started：閘口不計超時、不計次數/上限。「所有人視為在外」將全部學生設為當前在外（不建個別記錄）；「Start Event Day」（場景卡）則清空並設為已開始、所有人視為在內。</p>
+    </div>
+    <div class="card">
+      <h3>Announcement<span>即時廣播（所有閘口即時顯示）</span></h3>
+      <textarea id="annIn" rows="3" placeholder="輸入廣播內容 e.g. 請所有同學於 12:00 前返回看台集合…" style="width:100%;background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:12px 14px;font-size:16px;outline:none;font-family:inherit;resize:vertical"></textarea>
+      <div class="setrow">
+        <button class="btn primary" id="btnAnn">Announce 廣播</button>
+        <button class="btn danger" id="btnAnnClear">Clear 清除廣播</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px" id="annNow">—</p>
+    </div>
+    <div class="card">
+      <h3>Exit Lock<span>暫停外出（禁止所有離開）</span></h3>
+      <p class="dim" style="font-size:13.5px;margin-top:6px" id="lockTx">—</p>
+      <div class="setrow">
+        <button class="btn danger" id="btnLockOn">Lock 禁止所有外出</button>
+        <button class="btn green" id="btnLockOff">Unlock 恢復正常外出</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">Lock 時所有閘口拒絕外出並顯示「暫時不可離開看台範圍」；如確有需要，職員可於閘口輸入管理員密碼授權單次離開。返回（入場）不受影響。TOP 豁免。</p>
+    </div>
+    <div class="card">
+      <h3>Daily Normal Limit<span>每日普通外出總次數（廁所＋小食共用）</span></h3>
+      <p class="dim" style="font-size:13.5px;margin-top:6px">Per student per day, Toilet + Food combined. Competition / Helper / Prefect / Other unlimited. 0 = unlimited.<span class="zh"> 每個學生每日廁所＋小食合計上限；參賽／工作人員／風紀／其他不限；0＝不限。</span></p>
+      <div class="setrow"><input type="number" class="num" id="limIn" min="0" max="99" style="width:90px"> <span class="dim">trips / day 次／日</span>
+        <button class="btn primary" id="btnLim">Save 儲存</button></div>
+    </div>
+    <div class="card">
+      <h3>Re-Exit Cooldown<span>返回後再外出冷卻（防無限延長）</span></h3>
+      <p class="dim" style="font-size:13.5px;margin-top:6px">After returning, a student must wait this many minutes before going out again (normal purposes). 0 = no cooldown.<span class="zh"> 學生返回後需等此分鐘數先可再外出（普通目的）；0＝無冷卻。</span></p>
+      <div class="setrow"><input type="number" class="num" id="cdIn" min="0" max="120" style="width:90px"> <span class="dim">min 分鐘</span>
+        <button class="btn primary" id="btnCd">Save 儲存</button></div>
+    </div>
+    <div class="card">
+      <h3>Gates<span>閘口管理（名稱／服務社／通道／模式）</span></h3>
+      <div id="gateRows" class="dim">—</div>
+      <div class="setrow">
+        <input type="text" id="newGateName" placeholder="New gate name 新閘口名稱" style="background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;min-width:180px">
+        <button class="btn green" id="btnAddGate">Add Gate 加閘口</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">閘口裝置（gate.html）只可「選擇」屬於哪個閘，不可改名；所有閘口屬性在此編輯。</p>
+    </div>
+    <div class="card">
+      <h3>Phone Slots<span>手機格占用（即時・所有閘口・倒計時）</span></h3>
+      <div class="setrow"><span class="dim">每社分配格數 Slots per House（所有社相同・不同社不可共用）</span>
+        <input type="number" class="num" id="spHouse" min="1" max="99" style="width:90px">
+        <button class="btn primary" id="btnSpHouse">Save 儲存</button></div>
+      <div id="slotsOverview" class="dim" style="font-size:13.5px;line-height:2">—</div>
+    </div>
+    <div class="card">
+      <h3>Overlong Threshold<span>超時時限</span></h3>
+      <p class="dim" style="font-size:13.5px;margin-top:6px">If a student is out longer than this, the return is flagged. 外出超過此時限，返回時會被標記。</p>
+      <div class="setrow"><input type="number" class="num" id="thIn" min="1" max="120" style="width:90px"> <span class="dim">min 分鐘</span>
+        <button class="btn primary" id="btnTh">Save 儲存</button></div>
+    </div>
+    <div class="card" style="border-color:#5c2724">
+      <h3 style="color:var(--red)">Danger Zone<span>危險區域</span></h3>
+      <div class="setrow">
+        <button class="btn danger" id="btnWipeRec">Clear All Records 清除所有記錄</button>
+        <button class="btn danger" id="btnWipeStu">Clear All Students 清除所有學生</button>
+      </div>
+      <p class="dim" style="font-size:12.5px;margin-top:10px">Press once to arm, press again to confirm. 按一次進入待確認，再按一次執行。</p>
+    </div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+let students={},live={},todayStart=0,pendList=null,booted=false,compMap={},helperMap={},prefectMap={},topMap={};
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
+
+requireAuth(function init(){
+  if(booted)return;booted=true;
+  bindSignOut();
+
+  /* ---- 通用助手 ---- */
+  const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
+  const clean=v=>String(v==null?'':v).trim().replace(/\.0$/,'');
+  const norm=h=>String(h).toLowerCase().replace(/[\s.\-_()（）:：]/g,'');
+  const nz=v=>String(v==null?'':v).trim().toUpperCase().replace(/^0+/,'');
+  const iso=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+  const fmtCD=ms=>{const s=Math.max(0,Math.floor(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+  const SEL='background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:10px;padding:8px 10px';
+
+  const d0=new Date();d0.setHours(0,0,0,0);todayStart=d0.getTime();
+  $('dFrom').value=$('dTo').value=iso(Date.now());
+
+  /* ---- 即時監聽 ---- */
+  db.ref('students').on('value',s=>{students=s.val()||{};updateStats();renderStudents();
+    renderListPreview('compList',compMap);renderListPreview('helperList',helperMap);renderListPreview('prefList',prefectMap);renderListPreview('topList',topMap);});
+  db.ref('live').on('value',s=>{live=s.val()||{};updateStats();});
+
+  let thMin=15;
+  watchThreshold(v=>{thMin=v;$('thIn').value=v;});
+  db.ref('config/normalLimit').on('value',s=>{$('limIn').value=parseInt(s.val(),10)||0;});
+  db.ref('config/cooldownMin').on('value',s=>{$('cdIn').value=parseInt(s.val(),10)||0;});
+  $('btnCd').onclick=()=>{const v=parseInt($('cdIn').value,10);db.ref('config/cooldownMin').set(isFinite(v)&&v>=0?v:0).then(()=>toast('Cooldown saved 已儲存冷卻'));};
+  watchScenario(v=>{const el=document.querySelector('input[name=scen][value='+v+']');if(el)el.checked=true;});
+  $('btnScen').onclick=()=>db.ref('config/scenario').set(document.querySelector('input[name=scen]:checked').value).then(()=>toast('Scenario saved 已儲存場景'));
+  $('btnLim').onclick=()=>{const v=parseInt($('limIn').value,10);db.ref('config/normalLimit').set(isFinite(v)&&v>=0?v:0).then(()=>toast('Limit saved 已儲存上限'));};
+  db.ref('config/eventStarted').on('value',s=>{
+    const on=s.val()!==false;
+    $('evStateTx').innerHTML=on
+      ?'<b style="color:var(--green)">Event STARTED 活動已開始</b> — normal timing & counting 正常計時/計次。'
+      :'<b style="color:var(--amber)">Event NOT STARTED 活動未開始</b> — no overlong timing, no trip/limit counting 不計超時/不計次數。';
+  });
+  $('btnNotStart').onclick=()=>{if(confirm('Set event to NOT STARTED?\n設為活動未開始（不計時/不計次）？'))db.ref('config/eventStarted').set(false).then(()=>toast('Set Not Started 已設為未開始'));};
+  $('btnAllOut').onclick=()=>{
+    if(!confirm('Mark ALL students as currently OUTSIDE?\n將全部學生設為當前在外？'))return;
+    const now=Date.now(),upd={};
+    Object.keys(students).forEach(sid=>{upd['live/'+sid]={recordId:null,outAt:now,gate:'ADMIN',purpose:'other',reason:'All outside 所有人視為在外',slot:null,slotGate:null};});
+    db.ref().update(upd).then(()=>toast('All marked outside 所有人已視為在外'));
+  };
+  db.ref('config/announce').on('value',s=>{
+    const v=s.val();const t=v?(typeof v==='string'?v:(v.text||'')):'';
+    $('annNow').textContent=t?('當前 Current：'+t):'（無廣播 No announcement）';
+    if(document.activeElement!==$('annIn'))$('annIn').value=t;
+  });
+  $('btnAnn').onclick=()=>{const t=$('annIn').value.trim();if(!t){toast('Enter message 請輸入廣播內容');return;}
+    db.ref('config/announce').set({text:t,at:Date.now(),by:(auth.currentUser&&auth.currentUser.email)||''}).then(()=>toast('Announced 已廣播到所有閘口'));};
+  $('btnAnnClear').onclick=()=>db.ref('config/announce').set(null).then(()=>toast('Cleared 已清除廣播'));
+  db.ref('config/exitLocked').on('value',s=>{const on=!!s.val();
+    $('lockTx').innerHTML=on
+      ?'<b style="color:var(--red)">EXIT LOCKED 暫停外出</b> — 所有閘口禁止離開（TOP 豁免）。'
+      :'<b style="color:var(--green)">NORMAL 正常</b> — 可正常外出。';});
+  $('btnLockOn').onclick=()=>{if(confirm('禁止所有外出？\nLock all exits?'))db.ref('config/exitLocked').set(true).then(()=>toast('Locked 已禁止外出'));};
+  $('btnLockOff').onclick=()=>db.ref('config/exitLocked').set(false).then(()=>toast('Unlocked 已恢復正常外出'));
+
+  /* ---- 手機格總覽（倒計時）---- */
+  let slotsAll={},slotsPerHouse=6;
+  function slotCountdown(o){
+    if(!o||!o.outAt)return '';
+    const pur=(live[o.sid]&&live[o.sid].purpose)||null;
+    if(pur==='competition'||pur==='helper')return ' ∞';
+    const remain=thMin*60000-(Date.now()-o.outAt);
+    return ' '+(remain<=0?'OVER':fmtCD(remain));
+  }
+  function renderSlotsOverview(){
+    const el=$('slotsOverview');if(!el)return;
+    const gates=Object.keys(slotsAll);
+    if(!gates.length){el.textContent='（無占用 No occupancy）';return;}
+    let out='';
+    gates.forEach(g=>{
+      const gd=slotsAll[g]||{};const houses=Object.keys(gd);
+      let parts='';
+      houses.forEach(h=>{
+        const occ=Object.values(gd[h]||{}).filter(Boolean);
+        let seg='<b style="color:'+houseMeta(h).color+'">'+esc(h)+'</b> '+occ.length+'/'+slotsPerHouse;
+        if(occ.length){
+          let names='';
+          occ.forEach(o=>{const st=students[o.sid];names+=(names?', ':'')+esc(st?st.name||st.sid:o.sid)+slotCountdown(o);});
+          seg+='（'+names+'）';
+        }
+        parts+=(parts?' · ':'')+seg;
+      });
+      out+='<div><b class="mono">'+esc(g)+'</b> — '+(parts||'（全空）')+'</div>';
+    });
+    el.innerHTML=out;
+  }
+  db.ref('slots').on('value',s=>{slotsAll=s.val()||{};renderSlotsOverview();});
+  setInterval(renderSlotsOverview,1000);
+  db.ref('config/slotsPerHouse').on('value',s=>{slotsPerHouse=parseInt(s.val(),10)||6;$('spHouse').value=slotsPerHouse;renderSlotsOverview();});
+  $('btnSpHouse').onclick=()=>{const v=parseInt($('spHouse').value,10);if(v>=1&&v<=99)db.ref('config/slotsPerHouse').set(v).then(()=>toast('Slots per house saved 已儲存每社格數'));};
+  $('btnStartDay').onclick=()=>{
+    if(confirm('Start event day? All OUTSIDE states and phone slots will be cleared.\n開始活動？所有外出狀態及手機格將清空（全部學生視為在內）。'))
+      Promise.all([db.ref('live').remove(),db.ref('slots').remove(),db.ref('config/eventStarted').set(true)]).then(()=>toast('Event day started 活動已開始（手機格已清空）'));
+  };
+
+  /* ---- Gates 管理 ---- */
+  let gatesAll={};
+  function updateGateHouses(g){
+    const cbs=$('gateRows').querySelectorAll('[data-g="'+g+'"][data-h]:checked');
+    let hs='';cbs.forEach(c=>{hs+=(hs?',':'')+c.getAttribute('data-h');});
+    db.ref('config/gates/'+g+'/houses').set(hs);
+  }
+  function renderGateRows(){
+    const keys=Object.keys(gatesAll);
+    const wrap=$('gateRows');if(!wrap)return;
+    if(!keys.length){wrap.innerHTML='<span class="dim">（無閘口，裝置將用預設 Gate A）</span>';return;}
+    let html='';
+    keys.forEach(g=>{
+      const gd=gatesAll[g]||{};
+      const hs=String(gd.houses||'').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);
+      let houseChk='';
+      ['K','T','M','C'].forEach(h=>{
+        houseChk+='<label class="hsel"><input type="checkbox" data-g="'+esc(g)+'" data-h="'+h+'"'+(hs.indexOf(h)>=0?' checked':'')+'>'+h+'</label>';
+      });
+      const mode=gd.mode||'auto';
+      const chanSel='<select data-gchan="'+esc(g)+'" style="'+SEL+'">'
+        +'<option value="normal"'+(gd.channel!=='special'?' selected':'')+'>Normal 普通</option>'
+        +'<option value="special"'+(gd.channel==='special'?' selected':'')+'>Special 專用</option></select>';
+      const modeSel='<select data-gmode="'+esc(g)+'" style="'+SEL+'">'
+        +'<option value="auto"'+(mode==='auto'?' selected':'')+'>Auto 自動</option>'
+        +'<option value="out"'+(mode==='out'?' selected':'')+'>Out 只出</option>'
+        +'<option value="in"'+(mode==='in'?' selected':'')+'>In 只入</option></select>';
+      html+='<div style="border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center"><b class="mono">'+esc(g)+'</b><button class="op del" data-gdel="'+esc(g)+'">Delete 刪除</button></div>'
+        +'<div class="houses" style="margin:8px 0">'+houseChk+'</div>'
+        +'<div class="setrow"><label class="dim">Channel 通道 '+chanSel+'</label><label class="dim">Mode 模式 '+modeSel+'</label></div>'
+        +'</div>';
+    });
+    wrap.innerHTML=html;
+    wrap.querySelectorAll('[data-h]').forEach(cb=>{cb.onchange=()=>updateGateHouses(cb.getAttribute('data-g'));});
+    wrap.querySelectorAll('[data-gchan]').forEach(s=>{s.onchange=()=>db.ref('config/gates/'+s.getAttribute('data-gchan')+'/channel').set(s.value);});
+    wrap.querySelectorAll('[data-gmode]').forEach(s=>{s.onchange=()=>db.ref('config/gates/'+s.getAttribute('data-gmode')+'/mode').set(s.value);});
+    wrap.querySelectorAll('[data-gdel]').forEach(b=>{b.onclick=()=>{if(confirm('Delete gate '+b.getAttribute('data-gdel')+'?\n刪除閘口？'))db.ref('config/gates/'+b.getAttribute('data-gdel')).remove();};});
+  }
+  db.ref('config/gates').on('value',s=>{gatesAll=s.val()||{};renderGateRows();});
+  $('btnAddGate').onclick=()=>{
+    const n=$('newGateName').value.trim();if(!n){toast('Enter gate name 請輸入閘口名稱');return;}
+    db.ref('config/gates/'+n.replace(/[.#$\[\]\/]/g,'-')).update({houses:'',channel:'normal',mode:'auto'}).then(()=>{$('newGateName').value='';toast('Gate added 已加閘口');});
+  };
+
+  loadToday();
+
+  function updateStats(){
+    const arr=Object.values(students);
+    $('stTotal').textContent=arr.length;
+    $('stOut').textContent=Object.keys(live).length;
+    $('stFlag').textContent=arr.filter(s=>s.overlongFlag).length;
+  }
+  function recTime(r){let v=Number(r.outAt);if(!isFinite(v))v=Date.parse(String(r.outAt||''));return isFinite(v)?v:NaN;}
+  function loadToday(){const f=todayStart,t=todayStart+86400000-1;
+    db.ref('records').once('value').then(s=>{let n=0;
+      s.forEach(c=>{const r=c.val();if(!r)return;const v=recTime(r);if(isFinite(v)&&v>=f&&v<=t)n++;});
+      $('stToday').textContent=n;});}
+  let ltT=null;
+  db.ref('records').on('child_added',()=>{clearTimeout(ltT);ltT=setTimeout(loadToday,600);});
+
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+    document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+t.dataset.tab));
+    if(t.dataset.tab==='rec')loadRecords();
+    if(t.dataset.tab==='pass')renderPass();
+  });
+
+  /* ---------- 匯入學生 ---------- */
+  function colIdx(hdrs,preds,skip){return hdrs.findIndex((h,i)=>!skip.includes(i)&&preds.some(p=>norm(h).includes(p)));}
+  function parseSheet(data){
+    const wb=XLSX.read(data,{type:'array'});
+    const arr=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
+    let hi=-1,cols=null;
+    for(let r=0;r<Math.min(5,arr.length);r++){
+      const hdr=arr[r].map(norm),sk=[];
+      const iS=colIdx(hdr,['studentid','學生編號'],sk);if(iS<0)continue;sk.push(iS);
+      const iCl=colIdx(hdr,['class','班'],sk);sk.push(iCl);
+      const iN=colIdx(hdr,['classnum','學號','no'],sk);sk.push(iN);
+      const iCd=colIdx(hdr,['cardid','cardno','card','卡號'],sk);if(iCd>=0)sk.push(iCd);
+      const iEn=colIdx(hdr,['englishname','ename','英文名','英文姓','engname'],sk);if(iEn>=0)sk.push(iEn);
+      const iNm=colIdx(hdr,['name','姓名'],sk);sk.push(iNm);
+      const iH=colIdx(hdr,['house','社'],sk);
+      cols=[iS,iCl,iN,iNm,iEn,iCd,iH];hi=r;break;
+    }
+    if(hi<0){hi=0;cols=[0,1,2,3,-1,-1,4];}
+    const seen=new Set(),list=[],issues=[];
+    for(let r=hi+1;r<arr.length;r++){
+      const row=arr[r]||[];
+      const sid=clean(row[cols[0]]),cls=clean(row[cols[1]]),no=clean(row[cols[2]]),name=clean(row[cols[3]]),
+            ename=cols[4]>=0?clean(row[cols[4]]):'',card=cols[5]>=0?clean(row[cols[5]]):'',house=clean(row[cols[6]]).toUpperCase();
+      if(!sid&&!name)continue;
+      if(!sid){issues.push('Row '+(r+1)+': missing Student ID 缺學生編號');continue;}
+      if(seen.has(sid))issues.push('Row '+(r+1)+': duplicate 重複（以最後為準）');
+      seen.add(sid);list.push({sid,cls,no,name,ename,card,house});
+    }
+    return {list,issues};
+  }
+  $('drop').onclick=()=>$('file').click();
+  ['dragover','dragleave','drop'].forEach(ev=>$('drop').addEventListener(ev,e=>{
+    e.preventDefault();$('drop').classList.toggle('over',ev==='dragover');
+    if(ev==='drop'&&e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);}));
+  $('file').onchange=e=>e.target.files[0]&&readFile(e.target.files[0]);
+  async function readFile(f){
+    const {list,issues}=parseSheet(await f.arrayBuffer());
+    pendList=list;
+    $('pvInfo').textContent='Ready to import 準備匯入 '+list.length+' students'+(issues.length?' · '+issues.length+' warnings 警告':'');
+    const head='<tr><th>Student ID</th><th>Name 姓名</th><th>English 英文</th><th>Card ID</th><th>Class</th><th>No.</th><th>House</th></tr>';
+    let rows='';
+    list.slice(0,8).forEach(s=>{rows+='<tr><td class="mono">'+esc(s.sid)+'</td><td><b>'+esc(s.name)+'</b></td><td>'+esc(s.ename||'')+'</td><td class="mono">'+esc(s.card||'')+'</td><td>'+esc(s.cls)+'</td><td>'+esc(s.no)+'</td><td>'+esc(s.house)+'</td></tr>';});
+    $('pvTable').innerHTML=head+rows;
+    $('previewWrap').style.display='block';
+  }
+  $('btnPvCancel').onclick=()=>{pendList=null;$('previewWrap').style.display='none';};
+  $('btnImport').onclick=()=>{
+    if(!pendList)return;
+    const replace=document.querySelector('input[name=impMode]:checked').value==='replace';
+    const inList=new Set(pendList.map(s=>s.sid)),upd={};
+    pendList.forEach(s=>{const ex=students[s.sid];
+      upd['students/'+s.sid]={sid:s.sid,cls:s.cls,no:s.no,name:s.name,ename:s.ename||'',card:s.card||'',house:s.house,overlongFlag:ex?!!ex.overlongFlag:false};});
+    if(replace)Object.keys(students).forEach(c=>{if(!inList.has(c))upd['students/'+c]=null;});
+    db.ref().update(upd).then(()=>{
+      toast('Imported '+pendList.length+' students 已匯入');
+      pendList=null;$('previewWrap').style.display='none';$('file').value='';
+    });
+  };
+  $('btnTemplate').onclick=()=>{
+    const ws=XLSX.utils.aoa_to_sheet([
+      ['Student ID 學生編號','Class 班別','Class Num 學號','Name 姓名','English Name 英文名','Card ID 卡號','House 社'],
+      ['25001','1A','01','陳大文','Chan Tai Man','A123456','K'],['25002','1B','02','李小明','Lee Siu Ming','A123457','T']]);
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Students');
+    XLSX.writeFile(wb,'student_import_template.xlsx');
+  };
+  $('btnExpStu').onclick=()=>{
+    const data=Object.values(students).sort(byClsNo).map(s=>({'Student ID 學生編號':s.sid,'Name 姓名':s.name||'','English Name 英文名':s.ename||'','Card ID 卡號':s.card||'','Class 班別':s.cls,'Class Num 學號':s.no,'House 社':s.house,'Overlong 超時標記':s.overlongFlag?'YES':''}));
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Students');
+    XLSX.writeFile(wb,'students_'+fmtDate(Date.now())+'.xlsx');
+  };
+
+  /* ---------- 名單管理 ---------- */
+  function parseListFile(data){
+    const wb=XLSX.read(data,{type:'array'});
+    const arr=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
+    const out={};let issues=0;
+    const clsRe=/^\d{1,2}[A-Za-z]$/,noRe=/^\d{1,2}$/,comboRe=/^(\d{1,2}[A-Za-z])[\s\-]?(\d{1,2})$/;
+    for(let r=0;r<arr.length;r++){
+      const row=arr[r];if(!row||!row.some(c=>c!==null&&c!==undefined&&c!==''))continue;
+      const joined=String(row.join(' ')).toLowerCase();
+      if(joined.includes('student')||joined.includes('class')||joined.includes('no')||joined.includes('學生')||joined.includes('班')||joined.includes('學號'))continue;
+      let hit=null;
+      for(let c=0;c<row.length&&!hit;c++){
+        const v=clean(row[c]);if(!v)continue;const Q=nz(v);
+        hit=Object.values(students).find(s=>nz(s.sid)===Q||nz(s.card)===Q);
+      }
+      if(!hit){for(let c=0;c<row.length&&!hit;c++){
+        const v=clean(row[c]);if(!v)continue;const m=v.match(comboRe);
+        if(m){const cls=m[1].toUpperCase(),no=String(parseInt(m[2],10));
+          hit=Object.values(students).find(s=>String(s.cls||'').toUpperCase()===cls&&String(parseInt(s.no,10)||s.no)===no);}
+      }}
+      if(!hit){
+        let foundCls=null,foundNo=null;
+        for(let c=0;c<row.length;c++){
+          const v=clean(row[c]);if(!v)continue;
+          if(!foundCls&&clsRe.test(v))foundCls=v.toUpperCase();
+          else if(!foundNo&&noRe.test(v))foundNo=String(parseInt(v,10));
+        }
+        if(foundCls&&foundNo){
+          hit=Object.values(students).find(s=>String(s.cls||'').toUpperCase()===foundCls&&String(parseInt(s.no,10)||s.no)===foundNo);
+        }
+      }
+      if(hit)out[hit.sid]={sid:hit.sid,cls:hit.cls,no:hit.no,name:hit.name||'',ename:hit.ename||'',house:hit.house||''};
+      else if(joined.trim())issues++;
+    }
+    return {out,issues};
+  }
+  function renderListPreview(elId,map){
+    const el=$(elId);if(!el)return;
+    const keys=Object.keys(map||{});
+    if(!keys.length){el.innerHTML='<span class="dim">（空 Empty）</span>';return;}
+    const arr=keys.map(k=>students[k]||Object.assign({sid:k},map[k])).sort(byClsNo);
+    let rows='';
+    arr.forEach(s=>{const sid=s.sid||'';
+      rows+='<tr><td><span class="hchip" style="--hc:'+houseMeta(s.house).color+'">'+esc(s.house||'?')+'</span></td><td><b>'+esc(s.name||'—')+'</b>'+(s.ename?'<div class="dim" style="font-size:11px">'+esc(s.ename)+'</div>':'')+'</td><td class="mono">'+esc(sid)+'</td><td>'+esc(s.cls||'—')+'</td><td>'+esc(s.no||'—')+'</td></tr>';});
+    el.innerHTML='<table><tr><th>House</th><th>Name 姓名</th><th>Student ID</th><th>Class</th><th>No.</th></tr>'+rows+'</table>';
+  }
+  function wireList(upBtn,fileBtn,clearBtn,path,label){
+    $(upBtn).onclick=()=>$(fileBtn).click();
+    $(fileBtn).onchange=e=>{const f=e.target.files[0];if(!f)return;
+      f.arrayBuffer().then(data=>{
+        const {out,issues}=parseListFile(data);
+        const n=Object.keys(out).length;
+        if(!confirm('匯入 '+n+' 人並取代現有'+label+'？'+(issues?'（'+issues+' 行無法識別）':'')))return;
+        db.ref(path).set(n?out:null).then(()=>toast(label+'已更新 Updated'));
+        e.target.value='';
+      });};
+    $(clearBtn).onclick=()=>{if(confirm('清空'+label+'？'))db.ref(path).set(null).then(()=>toast(label+'已清空 Cleared'));};
+  }
+  db.ref('participantList').on('value',s=>{compMap=s.val()||{};$('compCount').textContent=Object.keys(compMap).length+' people 人';renderListPreview('compList',compMap);});
+  db.ref('helperList').on('value',s=>{helperMap=s.val()||{};$('helperCount').textContent=Object.keys(helperMap).length+' people 人';renderListPreview('helperList',helperMap);});
+  db.ref('prefectList').on('value',s=>{prefectMap=s.val()||{};$('prefCount').textContent=Object.keys(prefectMap).length+' people 人';renderListPreview('prefList',prefectMap);});
+  db.ref('topList').on('value',s=>{topMap=s.val()||{};$('topCount').textContent=Object.keys(topMap).length+' people 人';renderListPreview('topList',topMap);});
+  wireList('btnCompUp','compFile','btnCompClear','participantList','參賽者名單 ');
+  wireList('btnHelperUp','helperFile','btnHelperClear','helperList','工作人員名單 ');
+  wireList('btnPrefUp','prefFile','btnPrefClear','prefectList','風紀名單 ');
+  wireList('btnTopUp','topFile','btnTopClear','topList','TOP 名單 ');
+
+  function listClasses(){return [...new Set(Object.values(students).map(s=>String(s.cls||'').toUpperCase()).filter(Boolean))].sort();}
+  function studentsIn(c){return Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===c).sort(byClsNo);}
+  function populateCls(sel){
+    const cur=sel.value;
+    let html='<option value="">Class 班別</option>';
+    listClasses().forEach(c=>{html+='<option value="'+esc(c)+'">'+esc(c)+'</option>';});
+    sel.innerHTML=html;sel.value=cur;
+  }
+  function populateStu(clsSel,stuSel){
+    const c=clsSel.value;
+    let html='<option value="">Student 學生</option>';
+    if(c)studentsIn(c).forEach(s=>{html+='<option value="'+esc(s.sid)+'">'+esc(s.no)+' '+esc(s.name)+'（'+esc(s.sid)+'）</option>';});
+    stuSel.innerHTML=html;
+  }
+  function refreshListSelectors(){
+    populateCls($('compCls'));populateCls($('helperCls'));populateCls($('prefCls'));populateCls($('topCls'));
+    populateStu($('compCls'),$('compStu'));populateStu($('helperCls'),$('helperStu'));populateStu($('prefCls'),$('prefStu'));populateStu($('topCls'),$('topStu'));
+  }
+  db.ref('students').on('value',refreshListSelectors);
+  $('compCls').onchange=()=>populateStu($('compCls'),$('compStu'));
+  $('helperCls').onchange=()=>populateStu($('helperCls'),$('helperStu'));
+  $('prefCls').onchange=()=>populateStu($('prefCls'),$('prefStu'));
+  $('topCls').onchange=()=>populateStu($('topCls'),$('topStu'));
+  $('btnAddComp').onclick=()=>{const sid=$('compStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}db.ref('participantList/'+sid).set(true).then(()=>toast('Added to Competition 已加入參賽名單'));};
+  $('btnAddHelper').onclick=()=>{const sid=$('helperStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}db.ref('helperList/'+sid).set(true).then(()=>toast('Added to Helper 已加入工作人員名單'));};
+  $('btnAddPref').onclick=()=>{const sid=$('prefStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}db.ref('prefectList/'+sid).set(true).then(()=>toast('Added to Prefect 已加入風紀名單'));};
+  $('btnAddTop').onclick=()=>{const sid=$('topStu').value;if(!sid){toast('Please choose a student 請選擇學生');return;}db.ref('topList/'+sid).set(true).then(()=>toast('Added to TOP 已加入 TOP 名單'));};
+
+  /* ---------- 學生表 ---------- */
+  function renderStudents(){
+    const q=$('sFilter').value.trim().toUpperCase();
+    const list=Object.values(students).filter(s=>!q||[s.sid,s.cls,s.no,s.name,s.ename,s.card].some(v=>String(v||'').toUpperCase().includes(q))).sort(byClsNo);
+    let rows='';
+    list.forEach(s=>{const m=houseMeta(s.house);
+      rows+='<tr>'
+        +'<td class="mono">'+esc(s.sid)+'</td>'
+        +'<td><b>'+esc(s.name||'—')+'</b>'+(s.ename?'<div class="dim" style="font-size:11px">'+esc(s.ename)+'</div>':'')+'</td>'
+        +'<td class="mono">'+esc(s.card||'—')+'</td><td>'+esc(s.cls)+'</td><td>'+esc(s.no)+'</td>'
+        +'<td><span class="hchip" style="--hc:'+m.color+'">'+esc(s.house||'?')+'</span></td>'
+        +'<td>'+(s.overlongFlag?'<span class="flagchip">⚠ OVERLONG 超時</span>':'<span class="dim">—</span>')+'</td>'
+        +'<td style="white-space:nowrap">'
+        +(s.overlongFlag?'<button class="op" data-flag="'+esc(s.sid)+'">Reset 重設</button>':'')
+        +'<button class="op" data-edit="'+esc(s.sid)+'">Edit 編輯</button>'
+        +'<button class="op del" data-del="'+esc(s.sid)+'">Delete 刪除</button></td></tr>';});
+    $('stuTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Card ID</th><th>Class</th><th>No.</th><th>House</th><th>Flag 標記</th><th></th></tr>'+rows;
+    $('stuCount').textContent='Showing '+list.length+' of '+list.length+' 顯示 '+list.length+' / '+list.length;
+  }
+  $('sFilter').oninput=renderStudents;
+  let editingSid=null;
+  function clearStuForm(){
+    editingSid=null;
+    ['fSid','fCls','fNo','fName','fEname','fCard'].forEach(id=>{const el=$(id);el.value='';el.readOnly=false;});
+    $('fHouse').value='';
+    $('btnSaveStu').textContent='Save 儲存';
+    $('stuFormMsg').textContent='';
+  }
+  function editStu(sid){
+    const s=students[sid];if(!s)return;
+    editingSid=sid;
+    $('fSid').value=s.sid||'';$('fSid').readOnly=true;
+    $('fCls').value=s.cls||'';$('fNo').value=s.no||'';$('fName').value=s.name||'';$('fEname').value=s.ename||'';$('fCard').value=s.card||'';
+    $('fHouse').value=s.house||'';
+    $('btnSaveStu').textContent='Update 更新';
+    $('stuFormMsg').textContent='Editing 編輯中: '+sid;
+    $('stuFormCard').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  $('btnClearStu').onclick=clearStuForm;
+  $('btnSaveStu').onclick=()=>{
+    const sid=$('fSid').value.trim();
+    if(!sid){toast('Student ID required 請輸入學生編號');$('fSid').focus();return;}
+    if(!editingSid&&students[sid]&&!confirm('Student ID already exists. Overwrite? 編號已存在，覆寫？'))return;
+    const keep=editingSid&&students[editingSid]?!!students[editingSid].overlongFlag:false;
+    db.ref('students/'+sid).set({sid,cls:$('fCls').value.trim(),no:$('fNo').value.trim(),name:$('fName').value.trim(),ename:$('fEname').value.trim(),card:$('fCard').value.trim(),house:$('fHouse').value,overlongFlag:keep})
+      .then(()=>{toast(editingSid?'Updated 已更新':'Added 已新增');clearStuForm();});
+  };
+  $('stuTable').addEventListener('click',e=>{
+    const f=e.target.closest('[data-flag]'),dd=e.target.closest('[data-del]'),ed=e.target.closest('[data-edit]');
+    if(f)db.ref('students/'+f.getAttribute('data-flag')+'/overlongFlag').set(false).then(()=>toast('Flag cleared 已重設標記'));
+    if(ed){editStu(ed.getAttribute('data-edit'));return;}
+    if(dd){const c=dd.getAttribute('data-del'),s=students[c];
+      if(confirm('Delete '+(s&&s.name?s.name:c)+' ('+(s&&s.cls?s.cls:'')+') ? 確定刪除？')){
+        const upd={};upd['students/'+c]=null;upd['live/'+c]=null;db.ref().update(upd);}}
+  });
+  bindKeypadInput($('sFilter'),{title:'Search<span>搜尋</span>'});
+  bindKeypadInput($('passFilter'),{title:'Search<span>搜尋</span>'});
+  bindKeypadInput($('thIn'),{title:'Threshold (min)<span>超時時限</span>',max:3,numeric:true});
+  bindKeypadInput($('limIn'),{title:'Daily Limit<span>每日上限</span>',max:3,numeric:true});
+  bindKeypadInput($('spHouse'),{title:'Slots per House<span>每社格數</span>',max:2,numeric:true});
+  bindKeypadInput($('cdIn'),{title:'Cooldown (min)<span>冷卻</span>',max:3,numeric:true});
+
+  /* ---------- 記錄 ---------- */
+  function range(){
+    let f=new Date(($('dFrom').value||iso(Date.now()))+'T00:00:00').getTime();
+    let t=new Date(($('dTo').value||iso(Date.now()))+'T23:59:59.999').getTime();
+    if(!isFinite(f))f=0;
+    if(!isFinite(t))t=Date.now()+86400000;
+    if(f>t){const x=f;f=t;t=x;}
+    return[f,t];
+  }
+  function fetchRecords(){const[f,t]=range();
+    return db.ref('records').once('value').then(s=>{
+      const rows=[];s.forEach(c=>{const r=c.val();if(!r)return;
+        const v=recTime(r);if(!isFinite(v))return;
+        r.outAt=v;
+        if(v>=f&&v<=t)rows.push(r);});
+      rows.sort((a,b)=>(b.outAt||0)-(a.outAt||0));return rows;});}
+  function renderRecTable(rows){
+    let html='';
+    rows.slice(0,300).forEach(r=>{const m=houseMeta(r.house);
+      html+='<tr>'
+        +'<td class="mono">'+fmtDate(r.outAt)+'</td><td class="mono">'+esc(r.sid)+'</td>'
+        +'<td><b>'+esc(r.name||'—')+'</b>'+(r.ename?'<div class="dim" style="font-size:11px">'+esc(r.ename)+'</div>':'')+'</td>'
+        +'<td>'+esc(r.cls)+'</td><td>'+esc(r.no)+'</td>'
+        +'<td><span class="hchip" style="--hc:'+m.color+'">'+esc(r.house||'?')+'</span></td>'
+        +'<td>'+(r.purpose?purposeMeta(r.purpose).icon+' '+purposeMeta(r.purpose).zh:'—')+'</td>'
+        +'<td>'+(r.reason?esc(r.reason):'<span class="dim">—</span>')+'</td>'
+        +'<td class="mono">'+fmtHM(r.outAt)+' <span class="dim">'+esc(r.gateOut||'')+'</span></td>'
+        +'<td class="mono">'+(r.inAt?fmtHM(r.inAt)+' ':'')+'<span class="dim">'+esc(r.gateIn||'')+(r.inAt?'':' · STILL OUTSIDE 未返')+'</span></td>'
+        +'<td>'+(r.durationSec!=null?fmtDur(r.durationSec*1000):'—')+'</td>'
+        +'<td>'+(r.overlong?'<span class="flagchip">⚠</span>':'')+'</td></tr>';});
+    $('recTable').innerHTML='<tr><th>Date</th><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th>目的</th><th>Reason 原因</th><th>離開 Out</th><th>返回 In</th><th>在外時間</th><th>Flag</th></tr>'+html;
+    $('recCount').textContent=rows.length+' records in range 範圍內記錄（顯示首 '+Math.min(rows.length,300)+' 條）';
+  }
+  function loadRecords(){
+    $('btnLoad').disabled=true;
+    $('recCount').textContent='Loading 載入中…';
+    fetchRecords().then(renderRecTable)
+      .catch(err=>{$('recTable').innerHTML='';$('recCount').textContent='載入失敗 Load failed: '+((err&&err.message)||err);})
+      .finally(()=>{$('btnLoad').disabled=false;loadToday();});
+  }
+  $('btnLoad').onclick=loadRecords;
+  $('dFrom').addEventListener('change',loadRecords);
+  $('dTo').addEventListener('change',loadRecords);
+  $('qToday').onclick=()=>{const t=iso(Date.now());$('dFrom').value=t;$('dTo').value=t;loadRecords();};
+  $('q7').onclick=()=>{const d=new Date();d.setDate(d.getDate()-6);$('dFrom').value=iso(d.getTime());$('dTo').value=iso(Date.now());loadRecords();};
+  $('qAll').onclick=()=>{$('dFrom').value='2000-01-01';$('dTo').value=iso(Date.now()+86400000);loadRecords();};
+  $('btnExpRec').onclick=()=>{
+    const btn=$('btnExpRec');btn.disabled=true;btn.textContent='Loading…';
+    fetchRecords().then(rows=>{
+      rows.sort((a,b)=>(a.outAt||0)-(b.outAt||0));
+      const data=rows.map(r=>{const sm=scenarioMeta(r.scenario),pm=purposeMeta(r.purpose);return {
+        'Event 活動':sm.zh+' '+sm.en,'Date 日期':fmtDate(r.outAt),'Student ID 學生編號':r.sid,'Name 姓名':r.name||'','English Name 英文名':r.ename||'','Class 班別':r.cls,'Class Num 學號':r.no,'House 社':r.house,
+        'Purpose 目的':r.purpose?pm.zh+' '+pm.en:'','Reason 原因':r.reason||'',
+        'Phone Slot 手機格':r.slot?((r.slotGate||'')+' '+(r.slotHouse?r.slotHouse+'-':'')+String(r.slot).padStart(2,'0')):'',
+        'Gate Out 離開閘口':r.gateOut||'','Out Time 離開時間':r.outAt?fmtClock(r.outAt):'','Gate In 返回閘口':r.gateIn||'',
+        'In Time 返回時間':r.inAt?fmtClock(r.inAt):'STILL OUTSIDE 仍未返回','Duration 在外時間':r.durationSec!=null?fmtDur(r.durationSec*1000):'',
+        'Overlong 超時':r.overlong?'YES 是':''};});
+      const ws=XLSX.utils.json_to_sheet(data);
+      const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');
+      XLSX.writeFile(wb,'gate-records_'+$('dFrom').value+'_to_'+$('dTo').value+'.xlsx');
+    }).finally(()=>{btn.disabled=false;btn.textContent='Export Excel 匯出記錄';});
+  };
+  $('btnExpSum').onclick=()=>{
+    fetchRecords().then(rows=>{
+      const map={};
+      rows.forEach(r=>{const k=r.sid;const e=map[k]||(map[k]={sid:r.sid,name:r.name||'',ename:r.ename||'',cls:r.cls,no:r.no,house:r.house,n:0,sec:0,over:0,t:0,f:0,o:0,c:0,h:0,p:0});
+        e.n++;e.sec+=r.durationSec||0;if(r.overlong)e.over++;
+        if(r.purpose==='toilet')e.t++;else if(r.purpose==='food')e.f++;else if(r.purpose==='competition')e.c++;else if(r.purpose==='helper')e.h++;else if(r.purpose==='prefect')e.p++;else e.o++;});
+      const data=Object.values(map).sort((a,b)=>b.n-a.n).map(e=>({'Student ID 學生編號':e.sid,'Name 姓名':e.name,'English Name 英文名':e.ename||'','Class 班別':e.cls,'No. 學號':e.no,'House 社':e.house,
+        'Total Exits 外出次數':e.n,'Toilet 廁所':e.t,'Food 小食':e.f,'Competition 參賽':e.c,'Student Helper 工作人員':e.h,'Prefect 風紀':e.p,'Other 其他':e.o,'Total Time Outside 總在外時間':fmtDur(e.sec*1000),'Overlong 超時次數':e.over}));
+      const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Summary');
+      XLSX.writeFile(wb,'gate-summary_'+$('dFrom').value+'_to_'+$('dTo').value+'.xlsx');
+    });
+  };
+
+  /* ---------- 發行記錄 ---------- */
+  let passData={};
+  db.ref('passIssues').on('value',s=>{passData=s.val()||{};renderPass();});
+  function passLogs(){
+    const out=[];
+    Object.keys(passData).forEach(sid=>{
+      const rec=passData[sid]||{};const logs=rec.log||{};
+      Object.keys(logs).forEach(k=>{out.push(Object.assign({sid,key:k,count:rec.count||0},logs[k]||{}));});
+    });
+    out.sort((a,b)=>(b.at||0)-(a.at||0));
+    return out;
+  }
+  function renderPass(){
+    const q=String($('passFilter').value||'').trim().toUpperCase();
+    const logs=passLogs().filter(L=>{
+      if(!q)return true;
+      const st=students[L.sid]||{};
+      return [L.sid,st.name,st.ename,L.issuer,st.cls].some(v=>String(v||'').toUpperCase().includes(q));
+    });
+    let html='';
+    logs.slice(0,300).forEach(L=>{const st=students[L.sid]||{};const d=L.at?new Date(L.at):null;
+      html+='<tr><td class="mono">'+(d?fmtDate(d.getTime()):'—')+'</td><td class="mono">'+(d?fmtClock(d.getTime()):'—')+'</td><td class="mono">'+esc(L.sid)+'</td><td><b>'+esc(L.name||st.name||'—')+'</b></td><td>'+esc(L.cls||st.cls||'')+'</td><td>'+esc(L.no||st.no||'')+'</td><td>'+esc(L.house||st.house||'')+'</td><td>#'+esc(L.nth||'')+'</td><td>'+esc(L.issuer||'')+'</td></tr>';});
+    $('passTable').innerHTML='<tr><th>Date</th><th>Time</th><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>No.</th><th>House</th><th>Nth 第幾次</th><th>Issuer 發行人</th></tr>'+(html||'<tr><td colspan="9" class="dim">No issuance records 無發行記錄</td></tr>');
+    $('passCount').textContent=logs.length+' records 記錄（顯示首 '+Math.min(logs.length,300)+' 條）';
+    const sums=Object.keys(passData).map(sid=>({sid,count:(passData[sid]&&passData[sid].count)||0})).filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+    let shtml='';
+    sums.forEach(x=>{const st=students[x.sid]||{};
+      shtml+='<tr><td class="mono">'+esc(x.sid)+'</td><td><b>'+esc(st.name||'—')+'</b></td><td>'+esc(st.cls||'')+'</td><td>#'+x.count+'</td><td><button class="op" data-preset="'+esc(x.sid)+'">Reset 重設</button></td></tr>';});
+    $('passSumTable').innerHTML='<tr><th>Student ID</th><th>Name 姓名</th><th>Class</th><th>Count 次數</th><th></th></tr>'+(shtml||'<tr><td colspan="5" class="dim">—</td></tr>');
+  }
+  $('passFilter').oninput=renderPass;
+  $('passSumTable').addEventListener('click',e=>{
+    const b=e.target.closest('[data-preset]');if(!b)return;
+    const sid=b.getAttribute('data-preset');
+    if(confirm('Reset issuance count for '+sid+'?\n重設此學生嘅發行次數同記錄？'))db.ref('passIssues/'+sid).remove().then(()=>toast('Reset 已重設'));
+  });
+  $('btnExpPass').onclick=()=>{
+    const rows=passLogs().slice().reverse().map(L=>{const st=students[L.sid]||{};const d=L.at?new Date(L.at):null;
+      return {'Date 日期':d?fmtDate(d.getTime()):'','Time 時間':d?fmtClock(d.getTime()):'','Student ID 學生編號':L.sid,'Name 姓名':L.name||st.name||'','English Name 英文名':st.ename||'','Class 班別':L.cls||st.cls||'','No. 學號':L.no||st.no||'','House 社':L.house||st.house||'','Nth 第幾次':L.nth||'','Issuer 發行人':L.issuer||''};});
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'PassIssues');
+    XLSX.writeFile(wb,'pass-issues_'+fmtDate(Date.now())+'.xlsx');
+  };
+
+  /* ---------- 設定 ---------- */
+  $('btnTh').onclick=()=>{const v=parseInt($('thIn').value);if(v>0&&v<=120)db.ref('config/overlongMin').set(v).then(()=>toast('Saved 已儲存'));};
+  function arm(btn,fn,label){btn.onclick=()=>{
+    if(btn.classList.contains('armed')){fn();btn.classList.remove('armed');btn.textContent=label;}
+    else{btn.classList.add('armed');btn.textContent='Confirm? 確定執行？再按一次';setTimeout(()=>{btn.classList.remove('armed');btn.textContent=label;},3500);}};}
+  arm($('btnWipeRec'),()=>{db.ref('records').remove();db.ref('live').remove();db.ref('slots').remove();toast('Records cleared 已清除記錄');},'Clear All Records 清除所有記錄');
+  arm($('btnWipeStu'),()=>{db.ref('students').remove();db.ref('counters').remove();db.ref('live').remove();db.ref('slots').remove();toast('Students cleared 已清除學生');},'Clear All Students 清除所有學生');
+});
+</script>
+</body>
+</html>

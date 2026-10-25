@@ -1,0 +1,8 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "records": { ".indexOn": ["outAt", "card", "sid"] },
+    "students": { ".indexOn": ["sid"] }
+  }
+}

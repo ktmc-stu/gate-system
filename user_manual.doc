@@ -1,0 +1,138 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="utf-8">
+<title>User Manual 使用手冊 — Gate Pass System</title>
+<style>
+@page{size:A4;margin:2cm}
+body{font-family:Calibri,'Microsoft JhengHei','Noto Sans TC',sans-serif;color:#111;font-size:11pt;line-height:1.55}
+h1{font-size:20pt;margin:0 0 2pt}
+h2{font-size:14pt;margin:16pt 0 4pt;border-bottom:2pt solid #f0a500;padding-bottom:2pt;page-break-after:avoid}
+h3{font-size:11.5pt;margin:10pt 0 3pt;color:#8a6d00;page-break-after:avoid}
+.zh{color:#444}
+p,li{margin:3pt 0}
+ul,ol{margin:4pt 0 4pt 18pt}
+table{border-collapse:collapse;width:100%;font-size:9.5pt;margin:6pt 0;page-break-inside:auto}
+th,td{border:0.75pt solid #888;padding:3.5pt 5pt;vertical-align:top;text-align:left}
+th{background:#f2f2f2}
+.cover{text-align:center;margin:0 0 14pt}
+.cover .logo{width:70pt}
+.small{font-size:9pt;color:#555}
+.sigline{margin:4pt 0}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <img class="logo" src="logo.png" alt=""><br>
+  <h1>Gate Pass System — User Manual</h1>
+  <div style="font-size:13pt" class="zh">進出記錄系統 — 使用手冊</div>
+  <div class="small">Sports Day &amp; Swimming Gala · 陸運會及水運會適用 · v1.0</div>
+</div>
+
+<h2>1. System Overview 系統概述</h2>
+<p>The system records students' exits and returns during Sports Day and Swimming Gala. It is hosted on GitHub Pages with Firebase Realtime Database; all devices share the same live data.<span class="zh"> 本系統用於陸運會及水運會期間記錄學生離開與返回看台之情況。系統託管於 GitHub Pages,並以 Firebase 即時資料庫為唯一資料來源,所有裝置共享同一份即時資料。</span></p>
+<table>
+<tr><th>Page 頁面</th><th>Purpose 用途</th><th>Access 進入方式</th></tr>
+<tr><td>index.html</td><td>Entry portal 入口頁</td><td>Staff password 職員密碼</td></tr>
+<tr><td>gate.html</td><td>Gate terminal 閘口终端</td><td>Open freely; settings need staff password 開啟免密碼;設定需職員密碼</td></tr>
+<tr><td>admin.html</td><td>Administration 管理</td><td>Staff password 職員密碼</td></tr>
+<tr><td>enquiry.html</td><td>Teacher enquiry 教師查詢</td><td>Staff password 職員密碼</td></tr>
+<tr><td>manual.html</td><td>Web manual 網頁手冊</td><td>Open 無需密碼</td></tr>
+</table>
+
+<h2>2. Accounts 帳號</h2>
+<ul>
+<li>One shared staff account unlocks index, Admin, Enquiry and gate settings.<span class="zh"> 一個共用職員帳號(電郵與密碼)用於入口頁、管理頁、查詢頁及閘口設定鎖。</span></li>
+<li>A kiosk account signs gate devices in silently; no password at the gate.<span class="zh"> 閘口專用帳號使閘口裝置自動登入,開啟頁面無需密碼。</span></li>
+<li>Passwords are managed in Firebase Console → Authentication.<span class="zh"> 密碼於 Firebase 控制台之 Authentication 管理。</span></li>
+</ul>
+
+<h2>3. Before the Event 活動前準備（Admin）</h2>
+<h3>3.1 Import Students 匯入學生名單</h3>
+<p>Students tab → upload <b>.xlsx / .csv</b>. Columns: Student ID Card Number, Student ID, Class, Class Number, House. Card number must equal the QR content on the student card.<span class="zh"> 於「Students 學生」分頁上載 Excel 或 CSV 檔案,欄位為學生證卡號、學生編號、班別、學號、社;卡號須與學生證 QR 碼內容一致。</span></p>
+<h3>3.2 Competition &amp; Helper Lists 參賽者與工作人員名單</h3>
+<p>Upload replaces the whole list; any column containing Student ID or Card Number is recognised.<span class="zh"> 上載將取代整份名單;任何包含學生編號或卡號之欄位均自動識別。</span></p>
+<h3>3.3 Scenario &amp; Threshold 場景與時限</h3>
+<p>Settings → Event Scenario: Sports Day (Inside/Outside Stand) or Swimming Gala (Inside/Outside Venue). Overlong threshold default 15 minutes.<span class="zh"> 於設定選擇場景:陸運會(看台內/外)或水運會(場館內/外);超時時限預設 15 分鐘。</span></p>
+<h3>3.4 Start Event Day 開始活動</h3>
+<p>Press each morning; clears all outside states and phone-slot occupancy.<span class="zh"> 每日活動開始前執行,清除所有外出狀態與手機格占用。</span></p>
+
+<h2>4. Gate Operation 閘口操作</h2>
+<h3>4.1 Exit 外出</h3>
+<ol>
+<li>Scan the QR code (or Manual Entry).<span class="zh"> 掃描學生證 QR 碼(或手動輸入)。</span></li>
+<li>Tap purpose: Toilet / Food / Competition / Student Helper / Other.<span class="zh"> 點選目的:廁所／小食部／參賽／工作人員／其他。</span></li>
+<li>Competition &amp; Helper require list membership.<span class="zh"> 參賽及工作人員必須於名單內。</span></li>
+<li>Normal purposes: place phone in the displayed slot. Competition/Helper: no phone, no time limit.<span class="zh"> 一般目的將手機放入顯示格位;參賽及工作人員免交手機、無限時。</span></li>
+</ol>
+<h3>4.2 Return 返回</h3>
+<ol>
+<li>Scan again (Competition/Helper at any gate).<span class="zh"> 再次掃碼(參賽/工作人員可於任何閘口)。</span></li>
+<li>Collect phone from the displayed slot.<span class="zh"> 按顯示格位取回手機。</span></li>
+<li>Over threshold → yellow caution + flagged.<span class="zh"> 超時顯示黃色注意並標記。</span></li>
+</ol>
+<h3>4.3 Traffic Signals 放行信號</h3>
+<p class="sigline"><b>GREEN CIRCLE + WHITE UP-ARROW — PASS.</b> <span class="zh">綠色圓圈加白色向上箭頭——放行:手續完成,可通過。</span></p>
+<p class="sigline"><b>RED CIRCLE + WHITE CROSS — STOP.</b> Wrong gate / slots full / already out / not found / not on list. <span class="zh">紅色圓圈加白色叉——禁止:錯閘口、格位已滿、重複外出、查無此人、不在名單。</span></p>
+<p class="sigline"><b>YELLOW TRIANGLE + BLACK EXCLAMATION — CAUTION.</b> Overlong return / previously overlong / no exit record / phone at another gate. <span class="zh">黃色三角加黑色感嘆號——注意:返回超時、曾超時、無外出記錄、手機於其他閘口。</span></p>
+<h3>4.4 Purpose Rules 目的規則</h3>
+<table>
+<tr><th>Purpose 目的</th><th>List 名單</th><th>Phone slot 手機格</th><th>Time limit 時限</th><th>House 社別</th></tr>
+<tr><td>Toilet 廁所 / Food 小食部 / Other 其他</td><td>—</td><td>Assigned 分配</td><td>Applies 適用</td><td>Applies 適用</td></tr>
+<tr><td>Competition 參賽</td><td>Required 必需</td><td>None 無</td><td>None 無限時</td><td>Exempt 豁免</td></tr>
+<tr><td>Student Helper 工作人員</td><td>Required 必需</td><td>None 無</td><td>None 無限時</td><td>Exempt 豁免</td></tr>
+</table>
+<h3>4.5 Phone Slots 手機格</h3>
+<ul>
+<li>12 slots per gate; full = exits blocked.<span class="zh"> 每閘 12 格;滿格暫停外出。</span></li>
+<li>Tap an occupied slot: occupant ID, class, purpose, exit time, elapsed, trips, device, today's trips.<span class="zh"> 點選占用格可查:學生編號、班別、目的、離開時間、在外時間、次數、裝置、當日記錄。</span></li>
+<li>Manual Return (staff password) releases a slot.<span class="zh"> 「手動返回」(需職員密碼)釋放格位。</span></li>
+<li>Overlong slots flash red; header shows "⚠ n OVER".<span class="zh"> 超時格紅色閃爍,標題顯示「⚠ n OVER」。</span></li>
+</ul>
+<h3>4.6 Manual Entry 手動輸入</h3>
+<p>Keys 1–9, A–E, CLR, ⌫. Accepts card number, student ID, class+number (e.g. 3B12), or class only (lists class). Multiple matches → candidate list.<span class="zh"> 鍵盤含 1–9、A–E、CLR、退格。可輸入卡號、學生編號、班別加學號(如 3B12)或班別(列出全班);多結果時顯示候選名單。</span></p>
+<h3>4.7 Channels &amp; Houses 通道與社別</h3>
+<table>
+<tr><th>Channel 通道</th><th>Purposes 目的</th><th>Slots 手機格</th><th>Limit 時限</th></tr>
+<tr><td>Normal 普通</td><td>All 全部</td><td>Yes 有</td><td>Applies 適用</td></tr>
+<tr><td>Special 專用</td><td>Competition/Helper only 僅兩種</td><td>None 無</td><td>None 無限時</td></tr>
+</table>
+<p>Each gate serves two houses; other houses get STOP. Competition/Helper exempt at every gate.<span class="zh"> 每閘服務兩社,其他社顯示禁止;參賽及工作人員於任何閘口豁免。</span></p>
+<h3>4.8 Gate Settings 閘口設定</h3>
+<p>⚙ requires staff password: gate name, houses, mode (Auto/Out/In), channel type, sound.<span class="zh"> 按 ⚙ 需職員密碼:閘口名稱、服務社、模式、通道類型、聲音。</span></p>
+
+<h2>5. Teacher Enquiry 教師查詢</h2>
+<ul>
+<li>Search by student ID / card / class+number / class.<span class="zh"> 以學生編號、卡號、班別加學號或班別搜尋。</span></li>
+<li>Detail: status, live elapsed time, purpose, slot, trips, recent records.<span class="zh"> 詳情:狀態、即時在外時間、目的、格位、次數、最近記錄。</span></li>
+<li>"Currently Outside" and "Trip Board" for live overviews.<span class="zh"> 「正在外面」與「外出總覽」提供即時概覽。</span></li>
+</ul>
+
+<h2>6. Records &amp; Export 記錄與匯出（Admin）</h2>
+<ul>
+<li>Date range + Today / Last 7 Days / All.<span class="zh"> 日期範圍加「今天／近7日／全部」快速鈕。</span></li>
+<li>Export Excel: event, purpose, scanned value, slot, gates, times, duration, overlong.<span class="zh"> 匯出 Excel 含活動、目的、掃描值、格位、閘口、時間、時長、超時。</span></li>
+<li>Summary: per-student trips, purpose breakdown, total time, overlong count.<span class="zh"> 統計:按學生之外出次數、目的分佈、總時長、超時次數。</span></li>
+</ul>
+
+<h2>7. Troubleshooting 常見問題</h2>
+<table>
+<tr><th>Symptom 現象</th><th>Action 處理</th></tr>
+<tr><td>Camera unavailable 相機不可用</td><td>Allow camera permission (iPhone: Settings → Safari → Camera); use Safari/system browser; tap Retry.<span class="zh"> 允許相機權限(iPhone:設定→Safari→相機);使用 Safari 或系統瀏覽器;按 Retry。</span></td></tr>
+<tr><td>Login blocked 登入被封鎖</td><td>Wait 30–60 minutes, try once; verify credentials in Firebase Console.<span class="zh"> 等候 30–60 分鐘後只試一次;於 Firebase 核對帳號密碼。</span></td></tr>
+<tr><td>STOP — WRONG GATE 錯閘口</td><td>Direct to correct gate; Competition/Helper exempt.<span class="zh"> 引導至正確閘口;參賽/工作人員豁免。</span></td></tr>
+<tr><td>STOP — SLOTS FULL 格位已滿</td><td>Use the other gate of same houses, or Manual Return to free slots.<span class="zh"> 使用同社另一閘,或以手動返回釋放格位。</span></td></tr>
+<tr><td>STOP — NOT ON LIST 不在名單</td><td>Choose another purpose or verify with teacher.<span class="zh"> 改選其他目的或向教師核實。</span></td></tr>
+<tr><td>Records missing 記錄缺少</td><td>Check gate device clocks; use All range.<span class="zh"> 檢查閘口裝置時鐘;以「All 全部」查找。</span></td></tr>
+</table>
+
+<h2>8. Data &amp; Privacy 資料與私隱</h2>
+<ul>
+<li>Only card number, student ID, class, class number, house stored; no names.<span class="zh"> 只儲存卡號、學生編號、班別、學號、社;不存姓名。</span></li>
+<li>All reads/writes require authenticated staff or kiosk account.<span class="zh"> 所有讀寫須通過職員或閘口帳號驗證。</span></li>
+<li>Exported files contain identifiers; store securely, delete after use.<span class="zh"> 匯出檔案含識別資料,請妥善保管並用後刪除。</span></li>
+</ul>
+
+<p class="small" style="margin-top:14pt">Gate Pass System · User Manual v1.0 · Printed copy 打印版 · Sports Day &amp; Swimming Gala 陸運會及水運會適用</p>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Roll Call · 點名大屏</title>
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#081120;--panel:rgba(17,29,54,.88);--panel2:rgba(10,19,36,.92);--line:rgba(148,180,255,.14);--line2:rgba(148,180,255,.3);
+ --text:#f2f6ff;--dim:#a5b4d4;--faint:#6d7ea6;--amber:#ffb224;--green:#2fd37f;--red:#ff5d55;--blue:#4b8bff;
+ --shadow:0 24px 70px rgba(2,8,20,.6);--grad:linear-gradient(135deg,#ffc95e,#ff8a3d)}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
+html{color-scheme:dark}
+body{font-family:'IBM Plex Sans','Noto Sans TC',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;
+ background:radial-gradient(1300px 640px at 85% -12%,rgba(75,139,255,.2),transparent 62%),radial-gradient(1000px 620px at -10% 112%,rgba(255,178,36,.16),transparent 60%),linear-gradient(180deg,#0a1424,#070d18 60%,#081120)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,178,36,.35);border-radius:99px}
+.mono{font-family:'IBM Plex Mono',monospace}.dim{color:var(--dim)}
+.top{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 20px;
+ border-bottom:1px solid var(--line2);background:rgba(8,14,26,.8);backdrop-filter:blur(18px);box-shadow:0 10px 34px rgba(0,0,0,.35)}
+.brand{display:flex;align-items:center;gap:12px;font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:22px;letter-spacing:.06em}
+.logo{width:38px;height:38px;object-fit:contain;border-radius:12px;filter:drop-shadow(0 4px 12px rgba(255,138,61,.35))}
+.brand b{color:var(--amber)}.brand span{font-size:11px;color:var(--faint);letter-spacing:.25em;font-weight:500}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.st{border:1px solid var(--line2);border-radius:14px;padding:8px 16px;text-align:center;background:rgba(255,255,255,.03);min-width:86px}
+.st b{font-family:'Archivo';font-weight:900;font-size:26px;display:block;line-height:1.1}
+.st span{font-size:10px;color:var(--faint);letter-spacing:.12em;font-weight:600}
+.st.t b{color:var(--blue)}.st.p b{color:var(--green)}.st.l b{color:var(--amber)}.st.a b{color:var(--red)}
+.gright{display:flex;align-items:center;gap:12px}
+.clock{font-family:'IBM Plex Mono';font-weight:600;font-size:20px}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--dim);font-size:18px;cursor:pointer;transition:.2s}
+.iconbtn:hover{color:var(--amber);border-color:rgba(255,178,36,.5)}
+main{flex:1;padding:18px 20px 30px;position:relative;z-index:2;overflow:auto}
+.ready{min-height:62vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.rword{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(40px,7vw,92px);line-height:1.1;
+ background:linear-gradient(180deg,#ffffff,#ffd58a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 30px rgba(255,178,36,.25))}
+.rsub{font-size:clamp(16px,2.4vw,26px);color:var(--dim)}
+.rsess{font-size:14px;color:var(--faint);margin-top:12px;letter-spacing:.08em}
+.infocard{display:flex;gap:28px;align-items:center;border-radius:26px;border:2px solid var(--kc,var(--green));padding:30px 34px;
+ background:linear-gradient(180deg,var(--panel),var(--panel2));margin-top:10px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.infocard.ok{--kc:var(--green)}.infocard.late{--kc:var(--amber)}.infocard.warn{--kc:var(--amber)}.infocard.err{--kc:var(--red)}
+.bighouse{width:120px;height:120px;border-radius:22px;background:var(--hc,#7e8aa2);display:flex;align-items:center;justify-content:center;font:900 70px 'Archivo';color:#fff;flex:none;box-shadow:inset 0 2px 0 rgba(255,255,255,.35)}
+.iinfo{flex:1;min-width:220px}
+.bigname{font-weight:900;font-size:clamp(34px,5vw,64px);line-height:1.12;overflow-wrap:anywhere}
+.bigen{font-size:clamp(16px,2.2vw,26px);color:var(--dim);margin-top:4px;overflow-wrap:anywhere}
+.imeta{font-size:14px;color:var(--faint);margin-top:10px}
+.istatus{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(26px,4vw,48px);color:var(--kc);text-align:right}
+.istatus span{display:block;font-size:.42em;font-weight:600;color:var(--dim);margin-top:6px}
+.cont{margin-top:18px;text-align:center;font-size:clamp(14px,2vw,20px);color:var(--faint);letter-spacing:.12em}
+.abshead{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.abshead h2{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(24px,3.4vw,40px);color:var(--red)}
+.abshead h2 span{font-size:.55em;color:var(--faint);font-weight:500;margin-left:8px}
+.abshead .n{font-family:'Archivo';font-weight:900;font-size:clamp(24px,3.4vw,40px);color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.acard{position:relative;border-radius:16px;border:1px solid var(--line2);border-left:6px solid var(--hc,#7e8aa2);padding:14px 16px;
+ background:linear-gradient(180deg,var(--panel),var(--panel2));box-shadow:inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
+.acard .nm{font-weight:800;font-size:clamp(17px,1.6vw,22px);overflow-wrap:anywhere}
+.acard .en{font-size:12px;color:var(--dim);margin-top:2px;overflow-wrap:anywhere}
+.acard .meta{font-size:12px;color:var(--faint);margin-top:6px}
+.acard .hc{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font:900 16px 'Archivo';color:#fff;background:var(--hc)}
+.allpresent{border:2px solid var(--green);border-radius:22px;padding:60px 20px;text-align:center;background:rgba(47,211,127,.08)}
+.allpresent b{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:clamp(34px,6vw,72px);color:var(--green);display:block}
+.allpresent span{font-size:clamp(14px,2vw,20px);color:var(--dim)}
+#reader{position:fixed;right:16px;bottom:16px;width:200px;border-radius:16px;overflow:hidden;border:1px solid var(--line2);background:#000;z-index:6;box-shadow:0 16px 44px rgba(0,0,0,.5)}
+#reader video{width:100%!important;height:auto!important}
+#reader__dashboard,#reader__filescan_input{display:none!important}
+.overlay{position:fixed;inset:0;z-index:80;display:none;background:rgba(6,10,20,.96);backdrop-filter:blur(8px);overflow:auto;padding:24px}
+.overlay.open{display:block}
+.setbox{max-width:1000px;margin:0 auto}
+.setbox h2{font-family:'Archivo','Noto Sans TC';font-weight:900;font-size:26px;margin-bottom:6px}
+.setbox h2 span{font-size:.6em;color:var(--faint);font-weight:500;margin-left:8px}
+.setcard{border-radius:20px;border:1px solid var(--line2);padding:20px;margin:14px 0;background:linear-gradient(180deg,var(--panel),var(--panel2))}
+.setcard h3{font-family:'Archivo';font-size:15px;font-weight:800;margin-bottom:10px}
+.setcard h3 span{color:var(--faint);font-weight:500;font-size:.78em;margin-left:8px}
+.field{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.field label{font-size:13px;color:var(--dim);font-weight:600}
+.field input{background:rgba(0,0,0,.32);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:11px 14px;font-size:16px;outline:none}
+.field input:focus{border-color:var(--amber)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{border:1px solid var(--line2);background:rgba(255,255,255,.04);color:var(--dim);border-radius:99px;padding:9px 16px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Archivo'}
+.chip.on{border-color:var(--amber);color:var(--amber);background:rgba(255,178,36,.12)}
+.btn{border:0;border-radius:12px;padding:13px 22px;font-weight:800;font-size:14px;cursor:pointer;transition:.2s}
+.btn.primary{background:var(--grad);color:#2a1800;box-shadow:0 10px 26px rgba(255,150,40,.3)}
+.btn.green{background:linear-gradient(180deg,#5ce8a4,#1fb86b);color:#03230f}
+.btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--dim)}
+.btn.danger{background:none;border:1px solid rgba(255,93,85,.5);color:var(--red)}
+.xbtn{background:none;border:0;color:var(--faint);font-size:22px;cursor:pointer}
+.cands{display:grid;gap:10px;max-height:60vh;overflow:auto;margin-top:12px}
+.cand{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:rgba(255,255,255,.03);cursor:pointer;color:var(--text);font-size:17px;text-align:left;flex-wrap:wrap}
+.cand:hover{border-color:var(--amber)}
+.cand .nm{font-weight:800}
+#toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:rgba(23,37,66,.96);border:1px solid var(--amber);color:var(--text);padding:13px 24px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99}
+#toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img class="logo" src="logo.png" onerror="this.style.display='none'" alt="">R<b>O</b>LL CALL<span>點名大屏</span></div>
+  <div class="stats">
+    <div class="st t"><b id="stTotal">0</b><span>EXPECTED 應到</span></div>
+    <div class="st p"><b id="stPresent">0</b><span>PRESENT 出席</span></div>
+    <div class="st l"><b id="stLate">0</b><span>LATE 遲到</span></div>
+    <div class="st a"><b id="stAbsent">0</b><span>ABSENT 缺席</span></div>
+  </div>
+  <div class="gright">
+    <time class="clock mono" id="clock">--:--:--</time>
+    <button class="iconbtn" id="btnCam" title="鏡頭開關">📷</button>
+    <button class="iconbtn" id="btnManual" title="手動輸入">⌨</button>
+    <button class="iconbtn" id="btnSet" title="Settings 設定（需密碼）">⚙</button>
+  </div>
+</header>
+<main><div id="mainWrap"></div></main>
+<div id="reader" style="display:none"></div>
+
+<div class="overlay" id="setOv">
+  <div class="setbox">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2>Settings<span>設定（已解鎖）</span></h2><button class="xbtn" id="setClose">✕</button>
+    </div>
+    <div class="setcard">
+      <h3>Session<span>場次</span></h3>
+      <div class="field">
+        <label>Session 場次 <input type="text" id="rName" style="min-width:220px"></label>
+        <label>Date 日期 <input type="date" id="rDate"></label>
+        <label>Late after 遲到線 <input type="time" id="rCut"></label>
+      </div>
+    </div>
+    <div class="setcard">
+      <h3>Participating<span>參與範圍（留空＝全部）</span></h3>
+      <label style="font-size:13px;color:var(--dim);font-weight:600">Classes 班別</label>
+      <div class="chips" id="clsChips"></div>
+      <label style="font-size:13px;color:var(--dim);font-weight:600">Houses 社別</label>
+      <div class="chips" id="houseChips"></div>
+    </div>
+    <div class="setcard">
+      <h3>Actions<span>操作</span></h3>
+      <div class="field">
+        <button class="btn primary" id="btnSaveRoll">Save 儲存</button>
+        <button class="btn ghost" id="btnShowAbsent">Show Absent List 顯示缺席名單</button>
+        <button class="btn green" id="btnExpRoll">Export Excel 匯出</button>
+        <button class="btn danger" id="btnResetRoll">Reset 清空本次</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="candOv">
+  <div class="setbox">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2>Multiple Matches<span>多個符合 — 請選擇</span></h2><button class="xbtn" id="candClose">✕</button>
+    </div>
+    <div class="cands" id="candList"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+let students={},roll={},booted=false,qr=null,camOn=true,lastCode='',lastAt=0,infoT=null;
+let mode='ready',infoSt=null;
+let cfgRoll={name:'',date:fmtDate(Date.now()),cutoff:'08:30',classes:[],houses:[]};
+const $=id=>document.getElementById(id);
+const byClsNo=(a,b)=>String(a.cls).localeCompare(String(b.cls))||(parseInt(a.no)||0)-(parseInt(b.no)||0);
+const vAuth=firebase.initializeApp(FIREBASE_CONFIG,'rollverify').auth();
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400);}
+function who(){return (auth.currentUser&&auth.currentUser.email)||'';}
+function recs(){return roll[cfgRoll.date]||{};}
+function allClasses(){return [...new Set(Object.values(students).map(s=>String(s.cls||'').toUpperCase()).filter(Boolean))].sort();}
+function isPart(st){
+  const c=String(st.cls||'').toUpperCase(),h=String(st.house||'').toUpperCase();
+  return (cfgRoll.classes.length===0||cfgRoll.classes.includes(c))&&(cfgRoll.houses.length===0||cfgRoll.houses.includes(h));
+}
+function partStudents(){return Object.values(students).filter(isPart);}
+function cutoffMs(){const p=String(cfgRoll.cutoff||'08:30').split(':');const d=new Date(cfgRoll.date+'T00:00:00');d.setHours(+p[0]||0,+p[1]||0,0,0);return d.getTime();}
+function isLate(at){return at>=cutoffMs();}
+
+requireAuth(function(){
+  if(booted)return;booted=true;
+  bindSignOut();
+  setInterval(()=>{$('clock').textContent=fmtClock(Date.now());},500);
+  db.ref('students').on('value',s=>{students=s.val()||{};renderStats();if(mode==='absent')renderMain();});
+  db.ref('roll').on('value',s=>{roll=s.val()||{};renderStats();if(mode==='absent')renderMain();});
+  db.ref('config/roll').on('value',s=>{
+    const v=s.val()||{};
+    cfgRoll={name:v.name||'',date:v.date||fmtDate(Date.now()),cutoff:v.cutoff||'08:30',classes:v.classes||[],houses:v.houses||[]};
+    if($('setOv').classList.contains('open'))syncSetInputs();
+    renderStats();if(mode!=='info')renderMain();
+  });
+
+  function renderStats(){
+    const ps=partStudents(),r=recs();
+    const present=ps.filter(s=>r[s.sid]);
+    const late=present.filter(s=>isLate(r[s.sid].at));
+    $('stTotal').textContent=ps.length;
+    $('stPresent').textContent=present.length;
+    $('stLate').textContent=late.length;
+    $('stAbsent').textContent=ps.length-present.length;
+  }
+
+  /* ---- 主畫面：ready / info / absent ---- */
+  function renderMain(){
+    const wrap=$('mainWrap');
+    if(mode==='absent'){
+      const absent=partStudents().filter(s=>!recs()[s.sid]).sort(byClsNo);
+      wrap.innerHTML=`<div class="abshead"><h2>ABSENT<span>缺席名單</span></h2><span class="n">${absent.length}</span>
+        <button class="btn ghost" id="btnBackReady" style="margin-left:auto">← 返回掃描 Back to Scan</button></div>`+
+        (absent.length?'<div class="grid">'+absent.map(s=>{const m=houseMeta(s.house);
+          return `<div class="acard" style="--hc:${m.color}"><span class="hc">${esc(s.house||'?')}</span>
+            <div class="nm">${esc(s.name||'—')}</div>${s.ename?`<div class="en">${esc(s.ename)}</div>`:''}
+            <div class="meta mono">${esc(s.sid)} · ${esc(s.cls)} ${esc(s.no)}</div></div>`;}).join('')+'</div>'
+         :'<div class="allpresent"><b>全數到齊</b><span>ALL PRESENT</span></div>');
+      const b=$('btnBackReady');if(b)b.onclick=()=>{mode='ready';infoSt=null;renderMain();};
+      return;
+    }
+    if(mode==='info'&&infoSt){
+      const s=infoSt.st||{};const m=houseMeta(s.house);
+      wrap.innerHTML=`<div class="infocard ${infoSt.kind}">
+        <div class="bighouse" style="--hc:${m.color}">${esc(s.house||'?')}</div>
+        <div class="iinfo">
+          <div class="bigname">${esc(s.name||infoSt.raw||'—')}</div>
+          ${s.ename?`<div class="bigen">${esc(s.ename)}</div>`:''}
+          <div class="imeta mono">${esc(s.sid||infoSt.raw||'')}${s.cls?` · ${esc(s.cls)} ${esc(s.no)}`:''}</div>
+        </div>
+        <div class="istatus">${infoSt.title}${infoSt.sub?`<span>${esc(infoSt.sub)}</span>`:''}</div>
+      </div>
+      <div class="cont">可繼續刷卡 / 掃碼 Continue swiping / scanning</div>`;
+      return;
+    }
+    wrap.innerHTML=`<div class="ready">
+      <div class="rword">請刷卡 / 掃描 QR Code</div>
+      <div class="rsub">Swipe card or scan QR code to mark attendance</div>
+      <div class="rsess">${esc(cfgRoll.name||'Roll Call')} · ${esc(cfgRoll.date)} · 遲到線 ${esc(cfgRoll.cutoff)}</div>
+    </div>`;
+  }
+  function setInfo(kind,st,title,sub,raw){
+    infoSt={kind,st:st||{},title,sub:sub||'',raw:raw||''};
+    mode='info';renderMain();
+    clearTimeout(infoT);
+    infoT=setTimeout(()=>{infoSt=null;mode='ready';renderMain();},6000);
+  }
+
+  /* ---- 點名邏輯 ---- */
+  function findStudents(q){
+    q=String(q||'').trim().toUpperCase().replace(/\s+/g,' ');if(!q)return[];
+    const nz=v=>String(v??'').trim().toUpperCase().replace(/^0+/,'');
+    const Q=nz(q);
+    if(students[q])return[students[q]];
+    let out=Object.values(students).filter(s=>nz(s.sid)===Q||nz(s.card)===Q);
+    if(out.length)return out;
+    const m=q.match(/^([0-9]+[A-Z]+)[\s\-]?([0-9]+)$/);
+    if(m){out=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===m[1]&&String(parseInt(s.no,10)||s.no)===String(parseInt(m[2],10)));
+      if(out.length)return out.sort(byClsNo);}
+    out=Object.values(students).filter(s=>String(s.cls||'').toUpperCase()===q);
+    if(out.length)return out.sort(byClsNo);
+    out=Object.values(students).filter(s=>nz(s.sid).includes(Q)||nz(s.card).includes(Q)||String(s.name||'').toUpperCase().includes(q)||String(s.ename||'').toUpperCase().includes(q));
+    return out.sort(byClsNo).slice(0,12);
+  }
+  function markStudent(st){
+    const now=Date.now();
+    if(!isPart(st)){setInfo('warn',st,'NOT IN SESSION','此學生唔喺參與班別／社別範圍');sound('warn');return;}
+    const r=recs()[st.sid];
+    if(r){setInfo('late',st,'ALREADY MARKED',`${fmtHM(r.at)} · ${isLate(r.at)?'LATE 遲到':'ON TIME 準時'}`);sound('warn');return;}
+    db.ref(`roll/${cfgRoll.date}/${st.sid}`).set({sid:st.sid,at:now,by:who()}).then(()=>{
+      const late=isLate(now);
+      setInfo(late?'late':'ok',st,late?'LATE 遲到':'PRESENT 出席',`${fmtHM(now)} · ${st.cls} ${st.no}`);
+      sound(late?'warn':'in');
+    });
+  }
+  function resolveAndMark(q){
+    q=String(q||'').trim();if(!q)return;
+    const list=findStudents(q);
+    if(!list.length){setInfo('err',null,'NOT FOUND','查無此學生',q);sound('err');return;}
+    if(list.length===1){markStudent(list[0]);return;}
+    showCands(list);
+  }
+  function showCands(list){
+    $('candList').innerHTML=list.map(s=>{const m=houseMeta(s.house);
+      return `<button class="cand" data-cand="${esc(s.sid)}"><span style="background:${m.color};width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font:900 16px Archivo;color:#fff">${esc(s.house||'?')}</span><span class="nm">${esc(s.name||'—')}</span><span class="mono">${esc(s.sid)}</span><span class="dim">${esc(s.cls)} · No.${esc(s.no)}</span></button>`;}).join('');
+    $('candOv').classList.add('open');
+    $('candList').querySelectorAll('[data-cand]').forEach(b=>b.onclick=()=>{
+      $('candOv').classList.remove('open');
+      const st=students[b.dataset.cand];if(st)markStudent(st);
+    });
+  }
+  $('candClose').onclick=()=>$('candOv').classList.remove('open');
+
+  /* ---- 掃碼（相機・持續掃描）---- */
+  function startScan(){
+    if(!camOn)return;
+    if(!window.Html5Qrcode)return;
+    stopScan();
+    $('reader').style.display='block';
+    const opts={fps:10,qrbox:{width:150,height:150}};
+    const onQr=t=>handleScan(t);
+    try{
+      qr=new Html5Qrcode('reader');
+      qr.start({facingMode:'environment'},opts,onQr,()=>{})
+        .catch(()=>qr.start({facingMode:'user'},opts,onQr,()=>{}))
+        .catch(()=>{$('reader').style.display='none';});
+    }catch(e){}
+  }
+  function stopScan(){
+    $('reader').style.display='none';
+    if(!qr)return;const q=qr;qr=null;
+    if(q.isScanning){q.stop().then(()=>{try{q.clear()}catch(e){}}).catch(()=>{});}else{try{q.clear()}catch(e){}}
+  }
+  function handleScan(raw){
+    raw=String(raw||'').trim();if(!raw)return;
+    if(raw===lastCode&&Date.now()-lastAt<2500)return;
+    lastCode=raw;lastAt=Date.now();
+    resolveAndMark(raw);
+  }
+  $('btnCam').onclick=()=>{camOn=!camOn;if(camOn)startScan();else stopScan();$('btnCam').style.opacity=camOn?'1':'.5';};
+
+  /* ---- 刷卡（HID・顯示資訊期間仍生效）---- */
+  let hidBuf='',hidLast=0;
+  document.addEventListener('keydown',e=>{
+    if($('setOv').classList.contains('open')||$('candOv').classList.contains('open'))return;
+    const t=e.target;
+    if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable))return;
+    const now=Date.now();
+    if(e.key==='Enter'){
+      if(hidBuf.length>=3&&(now-hidLast)<200)resolveAndMark(hidBuf);
+      hidBuf='';hidLast=0;return;
+    }
+    if(e.key.length===1){
+      if(now-hidLast>150)hidBuf='';
+      hidBuf+=e.key;hidLast=now;
+    }else{hidBuf='';hidLast=0;}
+  });
+
+  $('btnManual').onclick=()=>{KeyPad.open({title:'Student<span>編號 / 班別+學號 / 卡號</span>',onDone:v=>resolveAndMark(v)});};
+
+  /* ---- 設定（密碼＋鋪滿＋缺席名單按鈕）---- */
+  function syncSetInputs(){
+    $('rName').value=cfgRoll.name;
+    $('rDate').value=cfgRoll.date;
+    $('rCut').value=cfgRoll.cutoff;
+    $('clsChips').innerHTML=allClasses().map(c=>`<button class="chip ${cfgRoll.classes.includes(c)?'on':''}" data-cls="${esc(c)}">${esc(c)}</button>`).join('')||'<span class="dim">無班別</span>';
+    $('clsChips').querySelectorAll('[data-cls]').forEach(b=>b.onclick=()=>{
+      const set=new Set(cfgRoll.classes);set.has(b.dataset.cls)?set.delete(b.dataset.cls):set.add(b.dataset.cls);
+      cfgRoll.classes=[...set];syncSetInputs();
+    });
+    $('houseChips').innerHTML=['K','T','M','C'].map(h=>`<button class="chip ${cfgRoll.houses.includes(h)?'on':''}" data-hs="${h}">${h}</button>`).join('');
+    $('houseChips').querySelectorAll('[data-hs]').forEach(b=>b.onclick=()=>{
+      const set=new Set(cfgRoll.houses);set.has(b.dataset.hs)?set.delete(b.dataset.hs):set.add(b.dataset.hs);
+      cfgRoll.houses=[...set];syncSetInputs();
+    });
+  }
+  $('btnSet').onclick=()=>{
+    KeyPad.open({title:'Settings Lock<span>需要密碼</span>',mask:true,onDone:pwd=>{
+      vAuth.signInWithEmailAndPassword(STAFF_EMAIL,pwd).then(()=>{
+        vAuth.signOut();syncSetInputs();$('setOv').classList.add('open');
+      }).catch(()=>toast('密碼錯誤 Incorrect password'));
+    }});
+  };
+  $('setClose').onclick=()=>$('setOv').classList.remove('open');
+  $('btnShowAbsent').onclick=()=>{$('setOv').classList.remove('open');mode='absent';infoSt=null;renderMain();};
+  $('btnSaveRoll').onclick=()=>{
+    db.ref('config/roll').update({name:$('rName').value.trim(),date:$('rDate').value||fmtDate(Date.now()),cutoff:$('rCut').value||'08:30',classes:cfgRoll.classes,houses:cfgRoll.houses})
+      .then(()=>{toast('Saved 已儲存');$('setOv').classList.remove('open');});
+  };
+  $('btnResetRoll').onclick=()=>{
+    if(confirm(`Clear ALL roll records for ${cfgRoll.date}?\n清空當日全部點名記錄？`))
+      db.ref('roll/'+cfgRoll.date).remove().then(()=>toast('Cleared 已清空'));
+  };
+  $('btnExpRoll').onclick=()=>{
+    const rows=partStudents().sort(byClsNo).map(s=>{
+      const r=recs()[s.sid];
+      const status=!r?'Absent 缺席':(isLate(r.at)?'Late 遲到':'Present 出席');
+      return {'Session 場次':cfgRoll.name||'Roll Call','Date 日期':cfgRoll.date,'Class 班別':s.cls,'Student ID 學生編號':s.sid,
+        'Name 姓名':s.name||'','English Name 英文名':s.ename||'','No. 學號':s.no,'House 社':s.house,'Status 狀態':status,
+        'Arrival 到達時間':r?fmtClock(r.at):'','Late Cutoff 遲到線':cfgRoll.cutoff};
+    });
+    const ws=XLSX.utils.json_to_sheet(rows);
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Roll');
+    XLSX.writeFile(wb,`roll_${cfgRoll.date}.xlsx`);
+    toast('Exported 已匯出');
+  };
+
+  renderStats();renderMain();startScan();
+});
+</script>
+</body>
+</html>
